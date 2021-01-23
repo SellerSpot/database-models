@@ -1,0 +1,65 @@
+{
+  "name": "@sellerspot/database-models",
+  "version": "1.0.0",
+  "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "webpack --mode development --env development",
+    "dev:server": "nodemon dist --color always",
+    "build": "webpack --mode production --env NODE_ENV=production --env production",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SellerSpot/database-models.git"
+  },
+  "keywords": [
+    "sellerspot",
+    "database-models"
+  ],
+  "author": "ThayalanGR",
+  "contributors": [{
+      "name": "Rohit Raj",
+      "email": "rij7u7d@gmail.com",
+      "url": "https://github.com/RohitRajP"
+    },
+    {
+      "name": "ThayalanGR",
+      "email": "grthayalan18@gmail.com",
+      "url": "https://github.com/ThayalanGR"
+    }
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SellerSpot/database-models/issues"
+  },
+  "homepage": "https://github.com/SellerSpot/database-models#readme",
+  "devDependencies": {
+    "@types/mongodb": "^3.6.3",
+    "@types/node": "^14.14.14",
+    "@types/webpack": "4.41.25",
+    "@types/webpack-node-externals": "^2.5.0",
+    "@typescript-eslint/eslint-plugin": "^4.10.0",
+    "@typescript-eslint/parser": "^4.10.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "eslint": "^7.16.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.0",
+    "fork-ts-checker-webpack-plugin": "^6.0.7",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.2.1",
+    "ts-loader": "^8.0.12",
+    "ts-node": "^9.1.1",
+    "tsconfig-paths-webpack-plugin": "^3.3.0",
+    "typescript": "^4.1.3",
+    "webpack": "5.11.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-node-externals": "^2.5.2",
+    "webpack-shell-plugin-next": "^2.0.8"
+  },
+  "dependencies": {
+    "mongoose": "^5.11.8"
+  }
+}
