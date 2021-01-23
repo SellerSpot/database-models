@@ -1,6 +1,5 @@
 import path from 'path';
 import webpack, { Configuration } from 'webpack';
-import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import WebpackShellPluginNext from 'webpack-shell-plugin-next';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
@@ -16,8 +15,7 @@ const webpackConfiguration = (env: {
         externalsPresets: { node: true },
         externals: [nodeExternals()],
         resolve: {
-            extensions: ['.ts', '.js'],
-            plugins: [new TsconfigPathsPlugin()],
+            extensions: ['.ts', '.d.ts'],
         },
         output: {
             path: path.join(__dirname, '/dist'),

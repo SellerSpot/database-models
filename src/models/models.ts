@@ -1,7 +1,7 @@
 // database models exports
-export * as baseDbModels from 'models/baseDb';
-export * as tenantDbModels from 'models/tenantDb';
-export * as appDbModels from 'models/appDb';
+export * as baseDbModels from './baseDb';
+export * as tenantDbModels from './tenantDb';
+export * as appDbModels from './appDb';
 
 // all models created in all databases should be listed here, if needed introduce nested object for isolation, (make sure not to introduce more than one level of nested objects)
 export const MONGOOSE_MODELS = {

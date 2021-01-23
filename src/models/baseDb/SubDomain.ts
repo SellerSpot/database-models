@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { MONGOOSE_MODELS } from 'models/models';
+import { MONGOOSE_MODELS } from '../models';
 
 const SubDomainSchema = new Schema(
     {

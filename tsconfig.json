@@ -7,20 +7,15 @@
         "lib": ["ESNext", "DOM", "DOM.Iterable"],
         "removeComments": false,
         "allowSyntheticDefaultImports": true,
-        "allowJs": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "moduleResolution": "node",
         "downlevelIteration": true,
-        "baseUrl": "src",
         "declaration": true,
-        "declarationMap": false,
-        "declarationDir": "dist",
-        "outDir": "dist"
+        "declarationMap": true,
+        "declarationDir": "./dist",
+        "outDir": "./dist",
+        "baseUrl": "./src",
     },
     "include": ["src/**/*"],
-    "paths": {
-        // will be used for module resolution
-        "models/*": ["models/*"],
-    }
 }
