@@ -19,8 +19,7 @@
     "database-models"
   ],
   "author": "ThayalanGR",
-  "contributors": [
-    {
+  "contributors": [{
       "name": "Rohit Raj",
       "email": "rij7u7d@gmail.com",
       "url": "https://github.com/RohitRajP"
@@ -49,6 +48,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.0",
     "fork-ts-checker-webpack-plugin": "^6.0.7",
+    "mongoose": "^5.11.13",
     "nodemon": "^2.0.6",
     "prettier": "^2.2.1",
     "ts-loader": "^8.0.12",
@@ -59,7 +59,8 @@
     "webpack-node-externals": "^2.5.2",
     "webpack-shell-plugin-next": "^2.0.8"
   },
-  "dependencies": {
-    "mongoose": "^5.11.8"
-  }
+  "peerDependencies": {
+    "mongoose": "^5.11.13"
+  },
+  "dependencies": {}
 }
