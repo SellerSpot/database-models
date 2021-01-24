@@ -1,6 +1,6 @@
 {
   "name": "@sellerspot/database-models",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
   "main": "dist/index.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "database-models"
   ],
   "author": "ThayalanGR",
-  "contributors": [{
+  "contributors": [
+    {
       "name": "Rohit Raj",
       "email": "rij7u7d@gmail.com",
       "url": "https://github.com/RohitRajP"
