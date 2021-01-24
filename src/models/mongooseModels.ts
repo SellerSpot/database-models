@@ -1,10 +1,5 @@
-// database models exports
-export * as baseDbModels from './baseDb';
-export * as tenantDbModels from './tenantDb';
-export * as appDbModels from './appDb';
-
 // all models created in all databases should be listed here, if needed introduce nested object for isolation, (make sure not to introduce more than one level of nested objects)
-export const MONGOOSE_MODELS = {
+const MONGOOSE_MODELS = {
     BASE_DB: {
         TENANT: 'TENANT',
         SUB_DOMAIN: 'SUB_DOMAIN',
@@ -23,3 +18,5 @@ export const MONGOOSE_MODELS = {
         // features model needs to be added as per requirement
     },
 };
+
+export default MONGOOSE_MODELS;

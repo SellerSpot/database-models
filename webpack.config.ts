@@ -22,7 +22,8 @@ const webpackConfiguration = (env: {
             filename: 'index.js',
             libraryTarget: 'umd',
             umdNamedDefine: true,
-            library: 'universal-components',
+            library: 'database-models',
+            globalObject: 'this', // refernceError: self isnot defined fix
         },
         module: {
             rules: [
@@ -44,8 +45,8 @@ const webpackConfiguration = (env: {
             }),
             !isProduction
                 ? new WebpackShellPluginNext({
-                      onBuildEnd: {
-                          scripts: ['npm run dev:server'],
+                      onDoneWatch: {
+                          scripts: ['npm run build:dev'],
                           blocking: false,
                           parallel: true,
                       },

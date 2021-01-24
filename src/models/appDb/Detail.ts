@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { MONGOOSE_MODELS, baseDbModels } from '../models';
+import { MONGOOSE_MODELS, baseDbModels } from '..';
 
 const DetailSchema = new Schema(
     {

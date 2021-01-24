@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { baseDbModels, MONGOOSE_MODELS } from '../models';
+import { baseDbModels, MONGOOSE_MODELS } from '..';
 
 // this will be the first collection created when a tenant creates a account.
 

@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document, Types } from 'mongoose';
-import { MONGOOSE_MODELS } from '../models';
+import { MONGOOSE_MODELS } from '..';
 
 const AppSchema = new Schema(
     {

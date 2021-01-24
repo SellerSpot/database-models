@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "webpack --mode development --env development",
-    "dev:server": "nodemon dist --color always",
-    "build": "webpack --mode production --env NODE_ENV=production --env production",
+    "build": "webpack --mode production --env production",
+    "build:dev": "webpack --mode development --env production",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
@@ -19,8 +19,7 @@
     "database-models"
   ],
   "author": "ThayalanGR",
-  "contributors": [
-    {
+  "contributors": [{
       "name": "Rohit Raj",
       "email": "rij7u7d@gmail.com",
       "url": "https://github.com/RohitRajP"
