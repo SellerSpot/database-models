@@ -6,7 +6,7 @@ export enum ESaleStatus {
     PENDING = 'PENDING',
 }
 
-interface ISaleItem {
+export interface ISaleItem {
     _id: string;
     product: string;
     quantity: number;
