@@ -19,9 +19,9 @@ export interface ICategorySchema {
     updatedAt?: string;
 }
 
-export type ICategorySchemaModel = Model<ICategorySchema & Document>;
+export type ICategoryModel = Model<ICategorySchema & Document>;
 
-export const CategoryModel: ICategorySchemaModel = model(
+export const CategoryModel: ICategoryModel = model(
     MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.CATEGORY,
     CategorySchema,
 );
