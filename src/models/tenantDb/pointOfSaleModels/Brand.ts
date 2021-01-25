@@ -1,22 +1,26 @@
+import { MONGOOSE_MODELS } from 'models';
 import { Schema, model, SchemaDefinition, Model, Document } from 'mongoose';
-import { EMODELS } from './models.types';
 
-const brandSchemaDefinition: SchemaDefinition = {
-    name: {
-        type: Schema.Types.String,
-        required: true,
+const BrandSchema = new Schema(
+    {
+        name: {
+            type: Schema.Types.String,
+            required: true,
+        },
     },
-};
+    { timestamps: true },
+);
 
 export interface IBrandSchema {
-    _id: string;
+    _id?: string;
     name: string;
-    createdAt: Schema.Types.Date;
-    updatedAt: Schema.Types.Date;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type IBrandModel = Model<IBrandSchema & Document>;
 
-const BrandSchema = new Schema(brandSchemaDefinition, { timestamps: true });
-
-export const BrandModel: IBrandModel = model(EMODELS.BRAND, BrandSchema);
+export const BrandModel: IBrandModel = model(
+    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.BRAND,
+    BrandSchema,
+);

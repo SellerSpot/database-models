@@ -1,18 +1,27 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { EMODELS } from './models.types';
+import { MONGOOSE_MODELS } from 'models';
 
-const CategorySchema = new Schema({
-    name: {
-        type: Schema.Types.String,
-        required: true,
-        unique: true,
+const CategorySchema = new Schema(
+    {
+        name: {
+            type: Schema.Types.String,
+            required: true,
+            unique: true,
+        },
     },
-});
+    { timestamps: true },
+);
 
 export interface ICategorySchema {
+    _id?: string;
     name: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type ICategorySchemaModel = Model<ICategorySchema & Document>;
 
-export const CategoryModel: ICategorySchemaModel = model(EMODELS.CATEGORY, CategorySchema);
+export const CategoryModel: ICategorySchemaModel = model(
+    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.CATEGORY,
+    CategorySchema,
+);

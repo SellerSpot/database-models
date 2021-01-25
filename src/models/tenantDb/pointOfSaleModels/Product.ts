@@ -1,9 +1,5 @@
+import { MONGOOSE_MODELS } from 'models';
 import { Schema, model, Model, Document } from 'mongoose';
-import { IBrandSchema } from './Brand';
-import { ICategorySchema } from './Category';
-import { EMODELS } from './models.types';
-import { IStockUnitSchema } from './StockUnit';
-import { ITaxBracketSchema } from './TaxBracket';
 
 const ProductSchema = new Schema({
     name: {
@@ -12,12 +8,12 @@ const ProductSchema = new Schema({
     },
     category: {
         type: Schema.Types.ObjectId,
-        ref: EMODELS.CATEGORY,
+        ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.CATEGORY,
         required: false,
     },
     brand: {
         type: Schema.Types.ObjectId,
-        ref: EMODELS.BRAND,
+        ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.BRAND,
         required: false,
     },
     gtinNumber: {
@@ -47,7 +43,7 @@ const ProductSchema = new Schema({
         },
         stockUnit: {
             type: Schema.Types.ObjectId,
-            ref: EMODELS.STOCKUNIT,
+            ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.STOCKUNIT,
             required: true,
         },
     },
@@ -61,7 +57,7 @@ const ProductSchema = new Schema({
         {
             type: Schema.Types.ObjectId,
             required: false,
-            ref: EMODELS.TAXBRACKET,
+            ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.TAXBRACKET,
         },
     ],
 });
@@ -71,19 +67,22 @@ const ProductSchema = new Schema({
  * @use - to provide intellisense when perfoming database operations in controllers
  */
 export interface IProductSchema {
+    _id?: string;
     name: string;
-    category: ICategorySchema;
-    brand: IBrandSchema;
+    category: string;
+    brand: string;
     gtinNumber?: string;
     mrpPrice?: number;
     landingPrice?: number;
     sellingPrice: number;
     stockInformation: {
         availableStock: number;
-        stockUnit: IStockUnitSchema;
+        stockUnit: string;
     };
     profitPercent?: number;
-    taxBracket: ITaxBracketSchema[];
+    taxBracket: string[];
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 /**
@@ -91,4 +90,7 @@ export interface IProductSchema {
  */
 export type IProductModel = Model<IProductSchema & Document>;
 
-export const ProductModel: IProductModel = model(EMODELS.PRODUCT, ProductSchema);
+export const ProductModel: IProductModel = model(
+    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.PRODUCT,
+    ProductSchema,
+);
