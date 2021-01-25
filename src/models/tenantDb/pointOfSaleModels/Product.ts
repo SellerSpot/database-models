@@ -1,4 +1,4 @@
-import { MONGOOSE_MODELS } from 'models';
+import MONGOOSE_MODELS from '../../mongooseModels';
 import { Schema, model, Model, Document } from 'mongoose';
 
 const ProductSchema = new Schema({

@@ -1,5 +1,5 @@
-import { MONGOOSE_MODELS } from 'models';
-import { Schema, model, SchemaDefinition, Model, Document } from 'mongoose';
+import MONGOOSE_MODELS from '../../mongooseModels';
+import { Schema, model, Model, Document } from 'mongoose';
 
 const BrandSchema = new Schema(
     {
