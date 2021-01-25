@@ -61,7 +61,7 @@ export const SaleSchema = new Schema(
     { timestamps: true },
 );
 
-export interface ISale {
+export interface ISaleSchema {
     _id?: string;
     status: ESaleStatus;
     products?: ISaleItem[];
@@ -73,7 +73,7 @@ export interface ISale {
     updatedAt?: string;
 }
 
-export type ISaleModel = Model<ISale & Document>;
+export type ISaleModel = Model<ISaleSchema & Document>;
 
 export const SaleModel: ISaleModel = model(
     MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE,
