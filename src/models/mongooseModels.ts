@@ -8,9 +8,19 @@ const MONGOOSE_MODELS = {
         RESERVED_DOMAIN: 'RESERVED_DOMAIN',
     },
     TENANT_DB: {
+        // billing model needs to added once confirmed
         TENANT_HANDSHAKE: 'TENANT_HANDSHAKE',
         INSTAllED_APP: 'INSTAllED_APP',
-        // billing model needs to added once confirmed
+        // point of sale models
+        POINT_OF_SALE: {
+            BASE: 'BASE',
+            PRODUCT: 'PRODUCT',
+            TAXBRACKET: 'TAXBRACKET',
+            SALE: 'SALE',
+            BRAND: 'BRAND',
+            CATEGORY: 'CATEGORY',
+            STOCKUNIT: 'STOCKUNIT',
+        },
     },
     APP_DB: {
         DETAIL: 'DETAIL',
