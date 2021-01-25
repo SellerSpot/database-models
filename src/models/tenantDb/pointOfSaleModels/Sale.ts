@@ -1,6 +1,16 @@
-import { Schema, model, SchemaDefinition } from 'mongoose';
-import { EMODELS } from '../models.types';
-import { ESaleStatus, ISaleModel } from './Sale.types';
+import { Schema, model, SchemaDefinition, Model, Document } from 'mongoose';
+import { EMODELS } from './models.types';
+
+export enum ESaleStatus {
+    COMPLETED = 'COMPLETED',
+    PENDING = 'PENDING',
+}
+
+interface ISaleItem {
+    _id: string;
+    product: string;
+    quantity: number;
+}
 
 export const saleSchemaDefinition: SchemaDefinition = {
     status: {
@@ -51,6 +61,17 @@ export const saleSchemaDefinition: SchemaDefinition = {
         required: true,
     },
 };
+export interface ISale {
+    status: ESaleStatus;
+    products?: ISaleItem[];
+    subTotal?: number;
+    discountPercent?: number;
+    totalTax?: number;
+    grandTotal?: number;
+    createdAt: string;
+}
+
+export type ISaleModel = Model<ISale & Document>;
 
 const SaleSchema = new Schema(saleSchemaDefinition);
 

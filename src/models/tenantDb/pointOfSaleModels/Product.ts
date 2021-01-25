@@ -1,6 +1,9 @@
-import { Schema, model } from 'mongoose';
-import { EMODELS } from '../models.types';
-import { IProductModel } from './Product.types';
+import { Schema, model, Model, Document } from 'mongoose';
+import { IBrandSchema } from './Brand';
+import { ICategorySchema } from './Category';
+import { EMODELS } from './models.types';
+import { IStockUnitSchema } from './StockUnit';
+import { ITaxBracketSchema } from './TaxBracket';
 
 const ProductSchema = new Schema({
     name: {
@@ -62,5 +65,30 @@ const ProductSchema = new Schema({
         },
     ],
 });
+
+/**
+ * Manually synced interface of the Product database model
+ * @use - to provide intellisense when perfoming database operations in controllers
+ */
+export interface IProductSchema {
+    name: string;
+    category: ICategorySchema;
+    brand: IBrandSchema;
+    gtinNumber?: string;
+    mrpPrice?: number;
+    landingPrice?: number;
+    sellingPrice: number;
+    stockInformation: {
+        availableStock: number;
+        stockUnit: IStockUnitSchema;
+    };
+    profitPercent?: number;
+    taxBracket: ITaxBracketSchema[];
+}
+
+/**
+ * Creating a model object to use with the IProduct interface to get intellisense in controllers
+ */
+export type IProductModel = Model<IProductSchema & Document>;
 
 export const ProductModel: IProductModel = model(EMODELS.PRODUCT, ProductSchema);
