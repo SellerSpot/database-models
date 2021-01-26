@@ -5,7 +5,6 @@ const StockUnitSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
-            required: true,
         },
     },
     { timestamps: true },

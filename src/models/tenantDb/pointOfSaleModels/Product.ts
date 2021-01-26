@@ -4,7 +4,6 @@ import { Schema, model, Model, Document } from 'mongoose';
 const ProductSchema = new Schema({
     name: {
         type: Schema.Types.String,
-        required: true,
     },
     category: {
         type: Schema.Types.ObjectId,
@@ -33,25 +32,21 @@ const ProductSchema = new Schema({
     },
     sellingPrice: {
         type: Schema.Types.Number,
-        required: true,
     },
     stockInformation: {
         availableStock: {
             type: Schema.Types.Number,
             min: 0,
-            required: true,
         },
         stockUnit: {
             type: Schema.Types.ObjectId,
             ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.STOCKUNIT,
-            required: true,
         },
     },
     profitPercent: {
         type: Schema.Types.Number,
         min: -100,
         max: 100,
-        required: true,
     },
     taxBracket: [
         {

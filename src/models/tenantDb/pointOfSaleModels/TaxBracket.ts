@@ -5,13 +5,11 @@ const TaxBracketSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
-            required: true,
         },
         taxPercent: {
             type: Schema.Types.Number,
             min: 0,
             max: 100,
-            required: true,
         },
     },
     { timestamps: true },
