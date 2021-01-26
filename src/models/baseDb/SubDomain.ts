@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document } from 'mongoose';
+import { Schema, model, Model, Document, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 import { ITenant } from './Tenant';
 
@@ -12,7 +12,7 @@ const SubDomainSchema = new Schema(
 
 export interface ISubDomain {
     domainName: string;
-    tenant: string | ITenant;
+    tenant: string | Types.ObjectId | ITenant;
     _id?: string;
     createdAt?: string;
     updatedAt?: string;
