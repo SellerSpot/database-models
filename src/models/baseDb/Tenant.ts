@@ -1,13 +1,18 @@
 import { Schema, model, Model, Document } from 'mongoose';
 import { MONGOOSE_MODELS, baseDbModels } from '..';
 
-const TenantSchema = new Schema({
-    name: String,
-    email: String,
-    password: String,
-    subDomain: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
-    apps: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.APP }], // this will just hold the basic ref of apps, all detailed thing will inside the tenantDb
-});
+const TenantSchema = new Schema(
+    {
+        name: String,
+        email: String,
+        password: String,
+        subDomain: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
+        apps: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.APP }], // this will just hold the basic ref of apps, all detailed thing will inside the tenantDb
+    },
+    {
+        timestamps: true,
+    },
+);
 
 export interface ITenant {
     name: string;
@@ -15,6 +20,9 @@ export interface ITenant {
     password: string;
     subDomain?: string | baseDbModels.SubDomainModel.ISubDomain;
     apps?: string[] | baseDbModels.AppModel.IApp[];
+    _id?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type ITenantModel = Model<ITenant & Document>;
