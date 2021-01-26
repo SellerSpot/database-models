@@ -17,6 +17,7 @@ export interface ICategorySchema {
     name: string;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type ICategoryModel = Model<ICategorySchema & Document>;

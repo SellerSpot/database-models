@@ -16,6 +16,7 @@ export interface IBrandSchema {
     name: string;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type IBrandModel = Model<IBrandSchema & Document>;

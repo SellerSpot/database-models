@@ -65,7 +65,6 @@ const ProductSchema = new Schema({
 /**
  * Manually synced interface of the Product database model
  * to provide intellisense when perfoming database operations in controllers
- * @return
  */
 export interface IProductSchema {
     _id?: string;
@@ -84,6 +83,7 @@ export interface IProductSchema {
     taxBracket: string[];
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 /**

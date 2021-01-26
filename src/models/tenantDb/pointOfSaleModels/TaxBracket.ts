@@ -23,6 +23,7 @@ export interface ITaxBracketSchema {
     taxPercent: string;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type ITaxBracketModel = Model<ITaxBracketSchema & Document>;

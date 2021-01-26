@@ -16,6 +16,7 @@ export interface IStockUnitSchema {
     name: string;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type IStockUnitModel = Model<IStockUnitSchema & Document>;

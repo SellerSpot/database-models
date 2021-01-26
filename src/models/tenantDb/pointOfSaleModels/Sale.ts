@@ -71,6 +71,7 @@ export interface ISaleSchema {
     grandTotal?: number;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type ISaleModel = Model<ISaleSchema & Document>;
