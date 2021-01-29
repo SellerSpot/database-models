@@ -22,6 +22,8 @@ jobs:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
+            - run: echo git config --global
+
             - name: Setting Up Identity
               run: git config --global user.email "grthayalan18@gmail.com" & git config --global user.name "ThayalanGR"
 
