@@ -21,11 +21,12 @@ jobs:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
+            - name: Setting Up Identity
+              run: git config --global user.email "grthayalan18@gmail.com"
+              run: git config --global user.name "ThayalanGR"
+
             - name: Build
               run: npm install
-
-            - name: echo
-              run: echo ${{ github.repository }}
 
             - name: Version
               if: github.ref == 'refs/heads/master'
@@ -36,5 +37,5 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-            - name: Tag version
+            - name: Tag Version and Push Tags
               run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git --tags
