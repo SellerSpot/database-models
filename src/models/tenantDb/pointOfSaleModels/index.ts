@@ -10,5 +10,3 @@ export * as TaxBracketModel from './TaxBracket';
 export * as ProductModel from './Product';
 
 export * as SaleModel from './Sale';
-
-export const handshake = true;

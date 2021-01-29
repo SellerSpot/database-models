@@ -7,7 +7,7 @@ export enum ESaleStatus {
 }
 
 export interface ISaleItem {
-    _id: string;
+    _id?: string;
     product: string;
     quantity: number;
 }
@@ -17,18 +17,15 @@ export const SaleSchema = new Schema(
         status: {
             type: Schema.Types.String,
             enum: [ESaleStatus.COMPLETED, ESaleStatus.PENDING],
-            required: true,
         },
         products: [
             {
                 product: {
                     type: Schema.Types.ObjectId,
                     ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.PRODUCT,
-                    required: true,
                 },
                 quantity: {
                     type: Schema.Types.Number,
-                    required: true,
                 },
             },
         ],
@@ -71,6 +68,7 @@ export interface ISaleSchema {
     grandTotal?: number;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type ISaleModel = Model<ISaleSchema & Document>;

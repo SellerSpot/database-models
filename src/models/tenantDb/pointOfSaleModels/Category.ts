@@ -5,7 +5,7 @@ const CategorySchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
-            required: true,
+
             unique: true,
         },
     },
@@ -17,6 +17,7 @@ export interface ICategorySchema {
     name: string;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type ICategoryModel = Model<ICategorySchema & Document>;

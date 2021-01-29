@@ -5,13 +5,11 @@ const TaxBracketSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
-            required: true,
         },
         taxPercent: {
             type: Schema.Types.Number,
             min: 0,
             max: 100,
-            required: true,
         },
     },
     { timestamps: true },
@@ -23,6 +21,7 @@ export interface ITaxBracketSchema {
     taxPercent: string;
     createdAt?: string;
     updatedAt?: string;
+    __v?: string;
 }
 
 export type ITaxBracketModel = Model<ITaxBracketSchema & Document>;
