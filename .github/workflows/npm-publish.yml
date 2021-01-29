@@ -24,14 +24,18 @@ jobs:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
+            - name: create git directory if not existes
+              continue-on-error: true
+              run: mkdir ~/.git
+
             - name: Setting Up Identity
+              continue-on-error: true
               run: git config user.email "grthayalan18@gmail.com" & git config user.name "ThayalanGR"
 
             - name: Build
               run: npm install
 
             - name: Version
-              if: github.ref == 'refs/heads/master'
               run: npm version patch -m "Patch Version"
 
             - name: Publish Package
