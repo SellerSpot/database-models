@@ -2,12 +2,18 @@ name: sellerspot database models npm package
 
 on:
     workflow_dispatch: # for Run workflow button
+        inputs:
+            publishType:
+                description: 'Publish Type'
+                required: true
+                default: 'patch'
     push:
+        branches:
+
 jobs:
     publish:
         name: Publish
         runs-on: ubuntu-latest
-        if: github.event_name == 'push' && ( github.ref == 'refs/heads/master' )
         steps:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v1
@@ -18,8 +24,17 @@ jobs:
             - name: Build
               run: npm install
 
-            - name: Publish
-              uses: mikeal/merge-release@master
+            - name: echo
+              run: echo ${{ github.repository }}
+
+            - name: Version
+              if: github.ref == 'refs/heads/master'
+              run: npm version patch -m "Patch Version"
+
+            - name: Publish Package
+              run: npm publish --access public
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  NPM_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+
+            - name: Tag version
+              run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git --tags
