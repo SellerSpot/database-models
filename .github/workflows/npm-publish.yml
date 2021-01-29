@@ -9,6 +9,7 @@ on:
                 default: 'patch'
     push:
         branches:
+            - master
 
 jobs:
     publish:
