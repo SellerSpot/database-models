@@ -9,7 +9,6 @@
     "build:dev": "webpack --mode development --env production",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "publish": "npm publish --access=public"
   },
   "repository": {
     "type": "git",
@@ -20,8 +19,7 @@
     "database-models"
   ],
   "author": "ThayalanGR",
-  "contributors": [
-    {
+  "contributors": [{
       "name": "Rohit Raj",
       "email": "rij7u7d@gmail.com",
       "url": "https://github.com/RohitRajP"
