@@ -4,5 +4,5 @@ export const handshake = true;
 // database name exports
 export * from './dbNames';
 
-// model name exports 
+// model name exports
 export * from './models';
