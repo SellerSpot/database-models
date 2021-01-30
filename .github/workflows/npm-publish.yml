@@ -67,6 +67,8 @@ jobs:
                   git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
                   git status
                   git branch -v
+                  git pull origin master
+                  git branch -v
                   git checkout master
                   git merge ${BRANCH_NAME}
-                  git push
+                  git push origin master
