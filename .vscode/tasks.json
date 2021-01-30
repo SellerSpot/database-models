@@ -1,0 +1,39 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "npm_link_MONGOOSE_point_of_sale_server",
+            "type": "shell",
+            "command": "[ -d '../point-of-sale-server/node_modules/mongoose' ] && [ -d './node_modules/mongoose' ] && npm link ../point-of-sale-server/node_modules/mongoose",
+            "group": "none",
+            "presentation": {
+                "group": "npm_link",
+                "focus": true,
+                "reveal": "always",
+                "panel": "new",
+                "showReuseMessage": false
+            },
+            "runOptions": {
+                "runOn": "default"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "npm_link_MONGOOSE_core_server",
+            "type": "shell",
+            "command": "[ -d '../core-server/node_modules/mongoose' ] && [ -d './node_modules/mongoose' ] && npm link ../core-server/node_modules/mongoose",
+            "group": "none",
+            "presentation": {
+                "group": "npm_link",
+                "focus": true,
+                "reveal": "always",
+                "panel": "new",
+                "showReuseMessage": false
+            },
+            "runOptions": {
+                "runOn": "default"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
