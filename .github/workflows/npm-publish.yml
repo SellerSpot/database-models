@@ -62,17 +62,16 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-            - name: Git Checkout Master
-              run: git checkout -b master
+            - run: echo ${BRANCH_NAME}
 
-            - name: Git Pull Master
-              run: git pull https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git master
+            - name: Git Push to Current Branch
+              uses: mikeal/publish-to-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  BRANCH_NAME: ${BRANCH_NAME} #optional defaults to master
 
-            - name: Git Merge Changes
-              run: git merge ${BRANCH_NAME}
-
-            - name: Git Push Changes
-              run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git master
-
-            - name: Git Push Tags
-              run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git --tags
+            - name: Git Push to Current Branch
+              uses: mikeal/publish-to-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  BRANCH_NAME: ${BRANCH_NAME} #optional defaults to master
