@@ -68,7 +68,7 @@ jobs:
                   git status
                   git branch -v
                   git checkout -b master
-                  git pull origin master -f
+                  git pull origin master --ff-only
                   git branch -v
-                  git merge ${BRANCH_NAME}
-                  git push origin master -f
+                  git merge ${BRANCH_NAME} -f --ff-only
+                  git push origin master -f --ff-only
