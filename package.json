@@ -1,6 +1,6 @@
 {
   "name": "@sellerspot/database-models",
-  "version": "10.3.0",
+  "version": "10.4.0",
   "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
   "main": "dist/index.js",
   "scripts": {
