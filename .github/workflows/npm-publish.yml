@@ -62,16 +62,14 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-            - run: echo ${BRANCH_NAME}
-
             - name: Git Push to Current Branch
               uses: mikeal/publish-to-github-action@master
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  BRANCH_NAME: ${BRANCH_NAME} #optional defaults to master
+                  BRANCH_NAME: ${{BRANCH_NAME}}
 
             - name: Git Push to Master Branch
               uses: mikeal/publish-to-github-action@master
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  BRANCH_NAME: 'master' #optional defaults to master
+                  BRANCH_NAME: 'master'
