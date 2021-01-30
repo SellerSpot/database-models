@@ -17,25 +17,25 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              if: github.event_name === 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               uses: actions/checkout@v2
               with:
                   persist-credentials: false
 
             - name: Setup Node
-              if: github.event_name === 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               uses: actions/setup-node@v1
               with:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
             - name: Create Git Directory If Not Exists
-              if: github.event_name === 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               continue-on-error: true
               run: mkdir ~/.git
 
             - name: Setting Up Git Identity
-              if: github.event_name === 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               continue-on-error: true
               run: |
                   git config --global user.email "grthayalan18@gmail.com"
@@ -57,13 +57,13 @@ jobs:
               run: npm version patch -m "version update ${{ github.event.head_commit.message }}"
 
             - name: Publish Package
-              if: github.event_name === 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               run: npm publish --access public
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
             - name: Push Changes to master and current branch
-              if: github.event_name === 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               run: |
                   git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
                   git push origin master -f
