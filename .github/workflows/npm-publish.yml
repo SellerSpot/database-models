@@ -9,9 +9,7 @@ on:
                 default: 'patch'
     push:
         branches:
-            - major
-            - minor
-            - patch
+            - master
 
 jobs:
     publish:
@@ -27,11 +25,6 @@ jobs:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
-            - uses: nelonoel/branch-name@v1.0.1
-
-            - name: Branch Name
-              run: echo ${BRANCH_NAME}
-
             - name: Create Git Directory If Not Exists
               continue-on-error: true
               run: mkdir ~/.git
@@ -46,16 +39,16 @@ jobs:
               run: npm install
 
             - name: Major Version
-              if: github.ref == 'refs/heads/major' || github.event.inputs.publishType == 'major'
-              run: npm version major -m "Major Version"
+              if: contains(github.event.head_commit.message, '@major') || github.event.inputs.publishType == 'major'
+              run: npm version major -m ${{ github.event.head_commit.message }}
 
             - name: Minor Version
-              if: github.ref == 'refs/heads/minor' || github.event.inputs.publishType == 'minor'
-              run: npm version minor -m "Minor Version"
+              if: contains(github.event.head_commit.message, '@minor') || github.event.inputs.publishType == 'minor'
+              run: npm version minor -m ${{ github.event.head_commit.message }}
 
             - name: Patch Version
-              if: github.ref == 'refs/heads/patch' || github.event.inputs.publishType == 'patch'
-              run: npm version patch -m "Patch Version"
+              if: contains(github.event.head_commit.message, '@patch') || github.event.inputs.publishType == 'patch'
+              run: npm version patch -m ${{ github.event.head_commit.message }}
 
             - name: Publish Package
               run: npm publish --access public
@@ -65,10 +58,4 @@ jobs:
             - name: Push Changes to master and current branch
               run: |
                   git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-                  git status
-                  git branch -v
-                  git checkout -b master
-                  git pull origin master --allow-unrelated-histories
-                  git branch -v
-                  git merge ${BRANCH_NAME} --allow-unrelated-histories
                   git push origin master -f
