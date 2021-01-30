@@ -65,6 +65,9 @@ jobs:
             - name: Git Checkout Master
               run: git checkout -b master
 
+            - name: Git Pull Master
+              run: git pull https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git master
+
             - name: Git Merge Changes
               run: git merge ${BRANCH_NAME}
 
