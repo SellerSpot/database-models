@@ -4,12 +4,14 @@ on:
     workflow_dispatch: # for Run workflow button
         inputs:
             publishType:
-                description: 'Publish Type'
+                description: 'Publish Type - ( major | minor | patch )'
                 required: true
                 default: 'patch'
     push:
         branches:
-            - master
+            - major
+            - minor
+            - patch
 
 jobs:
     publish:
@@ -19,16 +21,17 @@ jobs:
             - uses: actions/checkout@v2
               with:
                   persist-credentials: false
+
             - uses: actions/setup-node@v1
               with:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
-            - name: Create git directory if not existes
+            - name: Create Git Directory If Not Exists
               continue-on-error: true
               run: mkdir ~/.git
 
-            - name: Setting up identity
+            - name: Setting Up Git Identity
               continue-on-error: true
               run: |
                   git config --global user.email "grthayalan18@gmail.com"
@@ -37,7 +40,16 @@ jobs:
             - name: Build
               run: npm install
 
-            - name: Version
+            - name: Major Version
+              if: github.ref == 'refs/heads/major' || github.event.inputs.publishType == 'major'
+              run: npm version major -m "Major Version"
+
+            - name: Minor Version
+              if: github.ref == 'refs/heads/minor' || github.event.inputs.publishType == 'minor'
+              run: npm version minor -m "Minor Version"
+
+            - name: Patch Version
+              if: github.ref == 'refs/heads/patch' || github.event.inputs.publishType == 'patch'
               run: npm version patch -m "Patch Version"
 
             - name: Publish Package
@@ -45,8 +57,8 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-            - name: Push version changes
+            - name: Git Push Changes
               run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git master
 
-            - name: Push tags
+            - name: Git Push Tags
               run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git --tags
