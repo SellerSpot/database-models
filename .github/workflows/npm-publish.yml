@@ -38,8 +38,10 @@ jobs:
                   git config --global user.email "grthayalan18@gmail.com"
                   git config --global user.name "ThayalanGR"
 
-            - name: Build
-              run: npm install
+            - name: Install and Build
+              run: |
+                  npm install
+                  npm run build
 
             - name: Major Version
               if: contains(github.event.head_commit.message, '@major') || github.event.inputs.publishType == 'major'
