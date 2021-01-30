@@ -27,6 +27,11 @@ jobs:
                   node-version: 12
                   registry-url: https://registry.npmjs.org/
 
+            - uses: nelonoel/branch-name@v1.0.1
+
+            - name: Branch Name
+              run: echo ${BRANCH_NAME}
+
             - name: Create Git Directory If Not Exists
               continue-on-error: true
               run: mkdir ~/.git
@@ -56,6 +61,12 @@ jobs:
               run: npm publish --access public
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+
+            - name: Git Checkout Master
+              run: git checkout master
+
+            - name: Git Merge Changes
+              run: git merge ${{BRANCH_NAME}}
 
             - name: Git Push Changes
               run: git push https://${{ github.repository_owner }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git master
