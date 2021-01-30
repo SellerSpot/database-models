@@ -42,6 +42,7 @@ jobs:
                   git config --global user.name "ThayalanGR"
 
             - name: Build
+              if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '@major') || contains(github.event.head_commit.message, '@minor') || contains(github.event.head_commit.message, '@patch')
               run: npm install
 
             - name: Major Version
