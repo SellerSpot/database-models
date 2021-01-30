@@ -1,5 +1,9 @@
+import { Document, Model, Schema, model } from 'mongoose';
 import MONGOOSE_MODELS from '../../mongooseModels';
-import { Schema, model, Model, Document } from 'mongoose';
+import { IBrandSchema } from './Brand';
+import { ICategorySchema } from './Category';
+import { IStockUnitSchema } from './StockUnit';
+import { ITaxBracketSchema } from './TaxBracket';
 
 const ProductSchema = new Schema({
     name: {
@@ -64,18 +68,18 @@ const ProductSchema = new Schema({
 export interface IProductSchema {
     _id?: string;
     name: string;
-    category: string;
-    brand: string;
+    category: ICategorySchema;
+    brand: IBrandSchema;
     gtinNumber?: string;
     mrpPrice?: number;
     landingPrice?: number;
     sellingPrice: number;
     stockInformation: {
         availableStock: number;
-        stockUnit: string;
+        stockUnit: IStockUnitSchema;
     };
     profitPercent?: number;
-    taxBracket: string[];
+    taxBracket: ITaxBracketSchema[];
     createdAt?: string;
     updatedAt?: string;
     __v?: string;
