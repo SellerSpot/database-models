@@ -40,15 +40,15 @@ jobs:
 
             - name: Major Version
               if: contains(github.event.head_commit.message, '@major') || github.event.inputs.publishType == 'major'
-              run: npm version major -m ${{ github.event.head_commit.message }}
+              run: npm version major -m "${{ github.event.head_commit.message }}"
 
             - name: Minor Version
               if: contains(github.event.head_commit.message, '@minor') || github.event.inputs.publishType == 'minor'
-              run: npm version minor -m ${{ github.event.head_commit.message }}
+              run: npm version minor -m "${{ github.event.head_commit.message }}"
 
             - name: Patch Version
               if: contains(github.event.head_commit.message, '@patch') || github.event.inputs.publishType == 'patch'
-              run: npm version patch -m ${{ github.event.head_commit.message }}
+              run: npm version patch -m "${{ github.event.head_commit.message }}"
 
             - name: Publish Package
               run: npm publish --access public
