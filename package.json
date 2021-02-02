@@ -61,7 +61,7 @@
     "webpack-shell-plugin-next": "^2.0.8"
   },
   "peerDependencies": {
-    "mongoose": "5.11.8"
+    "mongoose": "^5.11.8"
   },
   "dependencies": {}
 }

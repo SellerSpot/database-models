@@ -1,9 +1,10 @@
 {
     "version": "2.0.0",
-    "tasks": [{
+    "tasks": [
+        {
             "label": "npm-link-mongoose-point-of-sale-server",
             "type": "shell",
-            "command": "npm link ../point-of-sale-server/node-modules/mongoose",
+            "command": "npm link ../point-of-sale-server/node_modules/mongoose",
             "group": "none",
             "presentation": {
                 "group": "npm-link",
@@ -20,7 +21,7 @@
         {
             "label": "npm-link-mongoose-core-server",
             "type": "shell",
-            "command": "npm link ../core-server/node-modules/mongoose",
+            "command": "npm link ../core-server/node_modules/mongoose",
             "group": "none",
             "presentation": {
                 "group": "npm-link",
