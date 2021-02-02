@@ -1,11 +1,10 @@
-import { Schema, model, Model, Document } from 'mongoose';
+import { Document, Model, Schema, model } from 'mongoose';
 import MONGOOSE_MODELS from '../../mongooseModels';
 
 const CategorySchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
-
             unique: true,
         },
     },
