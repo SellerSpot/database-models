@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "webpack --mode development --env development",
     "build": "webpack --mode production --env production",
-    "yalc": "yalc push",
-    "build:dev": "webpack --mode development --env production",
+    "build:dev": "webpack --mode development --env production && yalc push",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
@@ -50,6 +49,7 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.0",
     "fork-ts-checker-webpack-plugin": "^6.0.7",
+    "mongoose": "^5.11.14",
     "nodemon": "^2.0.6",
     "prettier": "^2.2.1",
     "ts-loader": "^8.0.12",
@@ -64,7 +64,5 @@
   "peerDependencies": {
     "mongoose": "^5.11.14"
   },
-  "dependencies": {
-    "mongoose": "^5.11.14"
-  }
+  "dependencies": {}
 }
