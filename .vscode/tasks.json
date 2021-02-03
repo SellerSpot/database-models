@@ -2,40 +2,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "npm-link-mongoose-point-of-sale-server",
-            "type": "shell",
-            "command": "npm link ../point-of-sale-server/node_modules/mongoose",
-            "group": "none",
-            "presentation": {
-                "group": "npm-link",
-                "focus": true,
-                "reveal": "always",
-                "panel": "new",
-                "showReuseMessage": false
-            },
-            "runOptions": {
-                "runOn": "default"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "npm-link-mongoose-core-server",
-            "type": "shell",
-            "command": "npm link ../core-server/node_modules/mongoose",
-            "group": "none",
-            "presentation": {
-                "group": "npm-link",
-                "focus": true,
-                "reveal": "always",
-                "panel": "new",
-                "showReuseMessage": false
-            },
-            "runOptions": {
-                "runOn": "default"
-            },
-            "problemMatcher": []
-        },
-        {
             "label": "open-terminal",
             "type": "shell",
             "command": "start ./terminal.bat",
