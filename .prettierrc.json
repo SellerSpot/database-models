@@ -11,6 +11,6 @@
     "jsxSingleQuote": false,
     "proseWrap": "preserve",
     "quoteProps": "as-needed",
-    "useTabs": false,
+    "useTabs": false, 
     "htmlWhitespaceSensitivity": "css"
 }

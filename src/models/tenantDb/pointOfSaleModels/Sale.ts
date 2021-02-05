@@ -1,5 +1,5 @@
+import { Document, Model, Schema, model } from 'mongoose';
 import MONGOOSE_MODELS from '../../mongooseModels';
-import { Schema, model, Model, Document } from 'mongoose';
 
 export enum ESaleStatus {
     COMPLETED = 'COMPLETED',

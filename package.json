@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "webpack --mode development --env development",
     "build": "webpack --mode production --env production",
-    "build:dev": "webpack --mode development --env production",
+    "build:dev": "webpack --mode development --env production && yalc push",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
@@ -58,10 +58,11 @@
     "webpack": "5.11.0",
     "webpack-cli": "^4.2.0",
     "webpack-node-externals": "^2.5.2",
-    "webpack-shell-plugin-next": "^2.0.8"
+    "webpack-shell-plugin-next": "^2.0.8",
+    "yalc": "^1.0.0-pre.50"
   },
   "peerDependencies": {
-    "mongoose": "5.11.8"
+    "mongoose": "^5.11.14"
   },
   "dependencies": {}
 }
