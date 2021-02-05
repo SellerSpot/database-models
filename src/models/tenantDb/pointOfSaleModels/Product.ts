@@ -1,9 +1,5 @@
 import { Document, Model, Schema, model } from 'mongoose';
 import MONGOOSE_MODELS from '../../mongooseModels';
-import { IBrandSchema } from './Brand';
-import { ICategorySchema } from './Category';
-import { IStockUnitSchema } from './StockUnit';
-import { ITaxBracketSchema } from './TaxBracket';
 
 const ProductSchema = new Schema({
     name: {
