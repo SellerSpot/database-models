@@ -1,5 +1,6 @@
-import { Document, Model, Schema, model } from 'mongoose';
+import { Document, Model, Schema, Types, model } from 'mongoose';
 import MONGOOSE_MODELS from '../../mongooseModels';
+import { IProductSchema } from './Product';
 
 export enum ESaleStatus {
     COMPLETED = 'COMPLETED',
@@ -8,7 +9,7 @@ export enum ESaleStatus {
 
 export interface ISaleItem {
     _id?: string;
-    product: string;
+    product: IProductSchema | string;
     quantity: number;
 }
 
@@ -61,7 +62,7 @@ export const SaleSchema = new Schema(
 export interface ISaleSchema {
     _id?: string;
     status: ESaleStatus;
-    products?: ISaleItem[];
+    products?: ISaleItem[] | string[];
     subTotal?: number;
     discountPercent?: number;
     totalTax?: number;
