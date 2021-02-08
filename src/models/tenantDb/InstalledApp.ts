@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { MONGOOSE_MODELS } from '..';
+import { baseDbModels, MONGOOSE_MODELS } from '..';
 
 const InstalledAppSchema = new Schema(
     {
@@ -10,7 +10,7 @@ const InstalledAppSchema = new Schema(
 );
 
 export interface IInstalledApp {
-    app: string;
+    app: string | baseDbModels.AppModel.IApp;
     _id?: string;
     createdAt?: string;
     updatedAt?: string;
