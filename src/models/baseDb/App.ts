@@ -1,4 +1,4 @@
-import { Schema, model, Model, Document, Types } from 'mongoose';
+import { Document, Model, Schema, Types, model } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
 const AppSchema = new Schema(
@@ -26,7 +26,7 @@ export interface IApp {
     iconUrl: string;
     bannerImages: string[];
     domainName: string;
-    _id?: string | Types.ObjectId;
+    _id?: string;
     slug?: string;
     dbName?: string;
     createdAt?: string;

@@ -1,5 +1,5 @@
+import { Document, Model, Schema, Types, model } from 'mongoose';
 import { ITenant } from '../baseDb/Tenant';
-import { Schema, model, Model, Document, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
 const InstalledTenantSchema = new Schema(
@@ -11,7 +11,7 @@ const InstalledTenantSchema = new Schema(
 );
 
 export interface IInstalledTenant {
-    tenant: string | Types.ObjectId | ITenant;
+    tenant: string | ITenant;
     _id?: string;
     createdAt?: string;
     updatedAt?: string;

@@ -9,7 +9,7 @@ export enum ESaleStatus {
 
 export interface ISaleItem {
     _id?: string;
-    product: IProductSchema | Types.ObjectId;
+    product: IProductSchema | string;
     quantity: number;
 }
 
@@ -62,7 +62,7 @@ export const SaleSchema = new Schema(
 export interface ISaleSchema {
     _id?: string;
     status: ESaleStatus;
-    products?: ISaleItem[] | Types.ObjectId[];
+    products?: ISaleItem[] | string[];
     subTotal?: number;
     discountPercent?: number;
     totalTax?: number;

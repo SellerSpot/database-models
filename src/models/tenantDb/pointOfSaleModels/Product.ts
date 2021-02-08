@@ -68,18 +68,18 @@ const ProductSchema = new Schema({
 export interface IProductSchema {
     _id?: string;
     name: string;
-    category: ICategorySchema | Types.ObjectId;
-    brand: IBrandSchema | Types.ObjectId;
+    category: ICategorySchema | string;
+    brand: IBrandSchema | string;
     gtinNumber?: string;
     mrpPrice?: number;
     landingPrice?: number;
     sellingPrice: number;
     stockInformation: {
         availableStock: number;
-        stockUnit: IStockUnitSchema | Types.ObjectId;
+        stockUnit: IStockUnitSchema | string;
     };
     profitPercent?: number;
-    taxBracket: ITaxBracketSchema[] | Types.ObjectId[];
+    taxBracket: ITaxBracketSchema[] | string[];
     createdAt?: string;
     updatedAt?: string;
     __v?: string;
