@@ -5,8 +5,9 @@ import { baseDbModels, MONGOOSE_MODELS } from '..';
 
 const TenantHandshake = new Schema(
     {
-        email: String,
         name: String,
+        storeName: String,
+        email: String, // email and name could be get from basedb.tenant collection , it is included here for meta
         tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
     },
     {
@@ -15,8 +16,9 @@ const TenantHandshake = new Schema(
 );
 
 export interface ITenantHandshake {
-    email: string;
     name: string;
+    storeName: string;
+    email: string;
     tenant: string | baseDbModels.TenantModel.ITenant;
     _id?: string;
     createdAt?: string;

@@ -1,11 +1,9 @@
 import { Document, Model, Schema, Types, model } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
-const AppSchema = new Schema(
+const PluginSchema = new Schema(
     {
         name: String,
-        slug: String,
-        dbName: String,
         shortDescription: String,
         longDescription: String,
         iconUrl: String,
@@ -14,25 +12,21 @@ const AppSchema = new Schema(
                 type: String,
             },
         ],
-        domainName: String,
     },
     { timestamps: true },
 );
 
-export interface IApp {
+export interface IPlugin {
     name: string;
     shortDescription: string;
     longDescription: string;
     iconUrl: string;
     bannerImages: string[];
-    domainName: string;
     _id?: string;
-    slug?: string;
-    dbName?: string;
     createdAt?: string;
     updatedAt?: string;
 }
 
-export type IAppModel = Model<IApp & Document>;
+export type IPluginModel = Model<IPlugin & Document>;
 
-export const AppModel: IAppModel = model(MONGOOSE_MODELS.BASE_DB.APP, AppSchema);
+export const PluginModel: IPluginModel = model(MONGOOSE_MODELS.BASE_DB.PLUGIN, PluginSchema);

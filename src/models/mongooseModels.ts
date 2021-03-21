@@ -2,30 +2,23 @@
 const MONGOOSE_MODELS = {
     BASE_DB: {
         TENANT: 'TENANT',
-        SUB_DOMAIN: 'SUB_DOMAIN',
-        APP: 'APP',
+        CUSTOMER: 'CUSTOMER',
+        DOMAIN: 'DOMAIN',
         PLUGIN: 'PLUGIN',
-        RESERVED_DOMAIN: 'RESERVED_DOMAIN',
     },
     TENANT_DB: {
         // billing model needs to added once confirmed
         TENANT_HANDSHAKE: 'TENANT_HANDSHAKE',
-        INSTAllED_APP: 'INSTAllED_APP',
         // point of sale models
         POINT_OF_SALE: {
-            BASE: 'BASE',
-            PRODUCT: 'PRODUCT',
-            TAXBRACKET: 'TAXBRACKET',
-            SALE: 'SALE',
-            BRAND: 'BRAND',
-            CATEGORY: 'CATEGORY',
-            STOCKUNIT: 'STOCKUNIT',
+            // point of sale collections goes here
         },
-    },
-    APP_DB: {
-        DETAIL: 'DETAIL',
-        INSTALLED_TENANT: 'INSTALLED_TENANT',
-        // features model needs to be added as per requirement
+        ECOMMERCE: {
+            // ecommerce collections goes here
+        },
+        CATALOGUE: {
+            // catalogue collections goes here
+        },
     },
 };
 
