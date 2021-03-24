@@ -7,7 +7,7 @@ const TaxGroup = new Schema(
         name: Schema.Types.String,
         brackets: {
             type: [Schema.Types.ObjectId],
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_TAXBRACKET
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET
         },
         linkedProductsCount: Schema.Types.Number,
     },
@@ -28,6 +28,6 @@ export interface ITaxGroup {
 export type ITaxGroupModel = Model<ITaxGroup & Document>;
 
 export const BaseModel: ITaxGroupModel = model(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_TAXGROUP,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXGROUP,
     TaxGroup,
 );

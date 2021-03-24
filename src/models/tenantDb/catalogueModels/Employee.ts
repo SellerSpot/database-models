@@ -24,6 +24,6 @@ export interface IEmployee {
 export type IEmployeeModel = Model<IEmployee & Document>;
 
 export const BaseModel: IEmployeeModel = model(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_EMPLOYEE,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.EMPLOYEE,
     Employee,
 );

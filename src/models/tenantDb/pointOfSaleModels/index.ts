@@ -1,1 +1,1 @@
-export const removeMe = 'if exported something from this file';
+export * as Inventory from './Inventory'

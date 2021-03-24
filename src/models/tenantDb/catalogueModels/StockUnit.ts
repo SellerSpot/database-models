@@ -22,6 +22,6 @@ export interface IStockUnit {
 export type IStockUnitModel = Model<IStockUnit & Document>;
 
 export const BaseModel: IStockUnitModel = model(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_STOCKUNIT,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
     StockUnit,
 );
