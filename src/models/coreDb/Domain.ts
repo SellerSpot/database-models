@@ -4,7 +4,7 @@ import { coreDbModels, MONGOOSE_MODELS } from '..';
 const DomainSchema = new Schema(
     {
         name: String,
-        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
+        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.TENANT },
         isSubDomain: Boolean,
         isActive: Boolean,
     },
@@ -23,4 +23,4 @@ export interface IDomain {
 
 export type IDomainModel = Model<IDomain & Document>;
 
-export const DomainModel: IDomainModel = model(MONGOOSE_MODELS.BASE_DB.DOMAIN, DomainSchema);
+export const DomainModel: IDomainModel = model(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);

@@ -17,4 +17,4 @@ export interface ICustomer {
 
 export type ICustomerModel = Model<ICustomer & Document>;
 
-export const CustomerModel: ICustomerModel = model(MONGOOSE_MODELS.BASE_DB.DOMAIN, CustomerSchema);
+export const CustomerModel: ICustomerModel = model(MONGOOSE_MODELS.CORE_DB.DOMAIN, CustomerSchema);

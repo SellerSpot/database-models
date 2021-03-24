@@ -1,6 +1,6 @@
 // all models created in all databases should be listed here, if needed introduce nested object for isolation, (make sure not to introduce more than one level of nested objects)
 const MONGOOSE_MODELS = {
-    BASE_DB: {
+    CORE_DB: {
         TENANT: 'TENANT',
         CUSTOMER: 'CUSTOMER',
         DOMAIN: 'DOMAIN',

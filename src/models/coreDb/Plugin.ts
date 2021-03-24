@@ -1,4 +1,4 @@
-import { Document, Model, Schema, Types, model } from 'mongoose';
+import { Document, Model, Schema, model } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
 const PluginSchema = new Schema(
@@ -29,4 +29,4 @@ export interface IPlugin {
 
 export type IPluginModel = Model<IPlugin & Document>;
 
-export const PluginModel: IPluginModel = model(MONGOOSE_MODELS.BASE_DB.PLUGIN, PluginSchema);
+export const PluginModel: IPluginModel = model(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);

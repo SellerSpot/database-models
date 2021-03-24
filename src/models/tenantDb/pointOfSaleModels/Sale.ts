@@ -66,7 +66,7 @@ const Sale = new Schema(
         saleTotal: Schema.Types.Number,
         customer: {
             type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.BASE_DB.CUSTOMER,
+            ref: MONGOOSE_MODELS.CORE_DB.CUSTOMER,
         },
         employee: {
             type: Schema.Types.ObjectId,

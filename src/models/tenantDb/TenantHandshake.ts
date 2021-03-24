@@ -8,7 +8,7 @@ const TenantHandshake = new Schema(
         name: String,
         storeName: String,
         email: String, // email and name could be get from basedb.tenant collection , it is included here for meta
-        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
+        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.TENANT },
     },
     {
         timestamps: true,
