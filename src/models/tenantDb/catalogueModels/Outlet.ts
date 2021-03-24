@@ -22,6 +22,6 @@ export interface IOutlet {
 export type IOutletModel = Model<IOutlet & Document>;
 
 export const BaseModel: IOutletModel = model(
-    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.POINT_OF_SALE_OUTLET,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_OUTLET,
     Outlet,
 );

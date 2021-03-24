@@ -26,6 +26,6 @@ export interface ITaxBracket {
 export type ITaxBracketModel = Model<ITaxBracket & Document>;
 
 export const BaseModel: ITaxBracketModel = model(
-    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.POINT_OF_SALE_TAXBRACKET,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_TAXBRACKET,
     TaxBracket,
 );

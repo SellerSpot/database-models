@@ -22,6 +22,6 @@ export interface ICategory {
 export type ICategoryModel = Model<ICategory & Document>;
 
 export const BaseModel: ICategoryModel = model(
-    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.POINT_OF_SALE_CATEGORY,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_CATEGORY,
     Category,
 );

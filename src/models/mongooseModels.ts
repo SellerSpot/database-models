@@ -11,21 +11,22 @@ const MONGOOSE_MODELS = {
         TENANT_HANDSHAKE: 'TENANT_HANDSHAKE',
         // point of sale models
         POINT_OF_SALE: {
-            // point of sale collections goes here
-            POINT_OF_SALE_PRODUCT: 'PRODUCT',
-            POINT_OF_SALE_STOCKUNIT: 'STOCKUNIT',
-            POINT_OF_SALE_CATEGORY: 'CATEGORY',
-            POINT_OF_SALE_BRAND: 'BRAND',
-            POINT_OF_SALE_TAXBRACKET: 'TAXBRACKET',
-            POINT_OF_SALE_TAXGROUP: 'TAXGROUP',
-            POINT_OF_SALE_OUTLET: 'OUTLET',
-            POINT_OF_SALE_EMPLOYEE: 'EMPLOYEE',
+            
         },
         ECOMMERCE: {
             // ecommerce collections goes here
         },
         CATALOGUE: {
             // catalogue collections goes here
+            // point of sale collections goes here
+            CATALOGUE_PRODUCT: 'PRODUCT',
+            CATALOGUE_STOCKUNIT: 'STOCKUNIT',
+            CATALOGUE_CATEGORY: 'CATEGORY',
+            CATALOGUE_BRAND: 'BRAND',
+            CATALOGUE_TAXBRACKET: 'TAXBRACKET',
+            CATALOGUE_TAXGROUP: 'TAXGROUP',
+            CATALOGUE_OUTLET: 'OUTLET',
+            CATALOGUE_EMPLOYEE: 'EMPLOYEE',
         },
     },
 };

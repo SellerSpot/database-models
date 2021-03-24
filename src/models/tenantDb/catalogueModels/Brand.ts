@@ -22,6 +22,6 @@ export interface IBrand {
 export type IBrandModel = Model<IBrand & Document>;
 
 export const BaseModel: IBrandModel = model(
-    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.POINT_OF_SALE_BRAND,
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATALOGUE_BRAND,
     Brand,
 );
