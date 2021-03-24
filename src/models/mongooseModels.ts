@@ -17,6 +17,7 @@ const MONGOOSE_MODELS = {
             POINT_OF_SALE_CATEGORY: 'CATEGORY',
             POINT_OF_SALE_BRAND: 'BRAND',
             POINT_OF_SALE_TAXBRACKET: 'TAXBRACKET',
+            POINT_OF_SALE_TAXGROUP: 'TAXGROUP',
         },
         ECOMMERCE: {
             // ecommerce collections goes here
