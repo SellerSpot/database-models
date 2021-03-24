@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { baseDbModels, MONGOOSE_MODELS } from '..';
+import { coreDbModels, MONGOOSE_MODELS } from '..';
 
 const DomainSchema = new Schema(
     {
@@ -13,7 +13,7 @@ const DomainSchema = new Schema(
 
 export interface IDomain {
     name: string;
-    tenant: string | baseDbModels.TenantModel.ITenant;
+    tenant: string | coreDbModels.TenantModel.ITenant;
     isSubDomain: boolean;
     isActive: boolean;
     _id?: string;

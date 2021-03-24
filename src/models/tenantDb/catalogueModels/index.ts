@@ -1,1 +1,2 @@
-export const removeMe = 'if exported something from this file';
+export * as ProductModel from './Product';
+export * as StockUnitModel from './StockUnit';
