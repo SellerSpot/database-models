@@ -15,6 +15,7 @@ const MONGOOSE_MODELS = {
             POINT_OF_SALE_PRODUCT: 'PRODUCT',
             POINT_OF_SALE_STOCKUNIT: 'STOCKUNIT',
             POINT_OF_SALE_CATEGORY: 'CATEGORY',
+            POINT_OF_SALE_BRAND: 'BRAND',
         },
         ECOMMERCE: {
             // ecommerce collections goes here
