@@ -3,10 +3,10 @@ import { coreDbModels, MONGOOSE_MODELS } from '..';
 
 const DomainSchema = new Schema(
     {
-        name: String,
+        name: Schema.Types.String,
         tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.TENANT },
-        isSubDomain: Boolean,
-        isActive: Boolean,
+        isSubDomain: Schema.Types.Boolean,
+        isActive: Schema.Types.Boolean,
     },
     { timestamps: true },
 );

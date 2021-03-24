@@ -3,10 +3,10 @@ import { MONGOOSE_MODELS, coreDbModels } from '..';
 
 const TenantSchema = new Schema(
     {
-        name: String,
-        email: String,
-        password: String,
-        storeName: String,
+        name: Schema.Types.String,
+        email: Schema.Types.String,
+        password: Schema.Types.String,
+        storeName: Schema.Types.String,
         domains: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.DOMAIN }],
         plugins: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.PLUGIN }],
     },

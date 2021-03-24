@@ -3,7 +3,7 @@ import { MONGOOSE_MODELS } from '..';
 
 const CustomerSchema = new Schema(
     {
-        name: String,
+        name: Schema.Types.String,
     },
     { timestamps: true },
 );

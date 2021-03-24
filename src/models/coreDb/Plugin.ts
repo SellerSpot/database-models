@@ -3,13 +3,13 @@ import { MONGOOSE_MODELS } from '..';
 
 const PluginSchema = new Schema(
     {
-        name: String,
-        shortDescription: String,
-        longDescription: String,
-        iconUrl: String,
+        name: Schema.Types.String,
+        shortDescription: Schema.Types.String,
+        longDescription: Schema.Types.String,
+        iconUrl: Schema.Types.String,
         bannerImages: [
             {
-                type: String,
+                type: Schema.Types.String,
             },
         ],
     },
