@@ -14,7 +14,6 @@ const MONGOOSE_MODELS = {
             // point of sale collections goes here
             INVENTORY: 'POINT_OF_SALE_INVENTORY',
             SALE: 'POINT_OF_SALE_SALE',
-            CART: 'POINT_OF_SALE_CART',
         },
         ECOMMERCE: {
             // ecommerce collections goes here
