@@ -1,15 +1,15 @@
-import { Document, Model, Schema, Types, model } from 'mongoose';
+import { Document, Model, Schema, model } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
 const PluginSchema = new Schema(
     {
-        name: String,
-        shortDescription: String,
-        longDescription: String,
-        iconUrl: String,
+        name: Schema.Types.String,
+        shortDescription: Schema.Types.String,
+        longDescription: Schema.Types.String,
+        iconUrl: Schema.Types.String,
         bannerImages: [
             {
-                type: String,
+                type: Schema.Types.String,
             },
         ],
     },
@@ -29,4 +29,4 @@ export interface IPlugin {
 
 export type IPluginModel = Model<IPlugin & Document>;
 
-export const PluginModel: IPluginModel = model(MONGOOSE_MODELS.BASE_DB.PLUGIN, PluginSchema);
+export const PluginModel: IPluginModel = model(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);

@@ -1,5 +1,5 @@
 import { Schema, model, Model, Document } from 'mongoose';
-import { baseDbModels, MONGOOSE_MODELS } from '..';
+import { coreDbModels, MONGOOSE_MODELS } from '..';
 
 // this will be the first collection created when a tenant creates a account.
 
@@ -8,7 +8,7 @@ const TenantHandshake = new Schema(
         name: String,
         storeName: String,
         email: String, // email and name could be get from basedb.tenant collection , it is included here for meta
-        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
+        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.TENANT },
     },
     {
         timestamps: true,
@@ -19,7 +19,7 @@ export interface ITenantHandshake {
     name: string;
     storeName: string;
     email: string;
-    tenant: string | baseDbModels.TenantModel.ITenant;
+    tenant: string | coreDbModels.TenantModel.ITenant;
     _id?: string;
     createdAt?: string;
     updatedAt?: string;
