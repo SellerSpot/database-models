@@ -1,4 +1,4 @@
-name: Sellerspot Database Models Npm Package
+name: Sellerspot database-models Npm Package
 
 on:
     workflow_dispatch: # for Run workflow button

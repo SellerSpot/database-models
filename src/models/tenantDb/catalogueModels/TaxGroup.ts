@@ -7,7 +7,7 @@ const TaxGroup = new Schema(
         name: Schema.Types.String,
         brackets: {
             type: [Schema.Types.ObjectId],
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
         },
         linkedProductsCount: Schema.Types.Number,
     },

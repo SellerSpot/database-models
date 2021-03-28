@@ -8,7 +8,7 @@ const Product = new Schema(
         barcode: String,
         stockUnit: {
             type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
         },
     },
     {
@@ -27,7 +27,4 @@ export interface IProduct {
 
 export type IProductModel = Model<IProduct & Document>;
 
-export const BaseModel: IProductModel = model(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    Product,
-);
+export const BaseModel: IProductModel = model(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT, Product);
