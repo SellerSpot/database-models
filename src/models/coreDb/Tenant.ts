@@ -7,7 +7,6 @@ const TenantSchema = new Schema(
         email: Schema.Types.String,
         password: Schema.Types.String,
         storeName: Schema.Types.String,
-        domains: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.DOMAIN }],
         plugins: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.PLUGIN }],
     },
     {
@@ -20,7 +19,6 @@ export interface ITenant {
     email: string;
     password: string;
     storeName: string;
-    domains?: string[] | coreDbModels.DomainModel.IDomain[];
     plugins?: string[] | coreDbModels.PluginModel.IPlugin[];
     _id?: string;
     createdAt?: string;

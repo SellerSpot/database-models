@@ -46,6 +46,7 @@ const webpackConfiguration = (env: {
             !isProduction
                 ? new WebpackShellPluginNext({
                       onDoneWatch: {
+                        //   scripts: ['npm run build:dev', 'npm run dev:server'],
                           scripts: ['npm run build:dev'],
                           blocking: false,
                           parallel: true,
