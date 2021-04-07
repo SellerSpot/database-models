@@ -1,65 +1,35 @@
+import { authTypes, ERROR_CODE } from '@sellerspot/universal-types';
 import { ITenant } from '../../models/coreDb/Tenant';
-import joi from 'joi';
-import { errorHandler } from '../../utilities/erroHandler';
-import { dbs, tenantWrapper } from '../../config/initializer';
-import { introduceDelay } from '@sellerspot/universal-functions';
-import { coreDbModels, MONGOOSE_MODELS } from '../../models';
+import { IDomain } from '../../models/coreDb/Domain';
+import { logger, error } from '@sellerspot/universal-functions';
+import { dbs } from '../../config/initializer';
+import { MONGOOSE_MODELS } from '../../';
+
 /**
  * creates a tenant if necessary props are passed
  *
  * @returns document of the created tenant
  */
 export const createTenant = async (
-    props: Pick<ITenant, 'name' | 'email' | 'password' | 'storeName'>,
-): Promise<ITenant | Error> => {
-    try {
-        // validation block
-        const validatedProps: typeof props = await joi
-            .object(<
-                {
-                    [key in keyof typeof props]: joi.AnySchema;
-                }
-            >{
-                email: joi.string().email().required(),
-                name: joi.string().min(3).max(15).required(),
-                password: joi.string().min(4).required(),
-                storeName: joi.string().min(3).required(),
-            })
-            .validateAsync(props, { abortEarly: false });
-
-        // database operation block
-        const TenantModel: coreDbModels.TenantModel.ITenantModel = dbs.core.model(
-            MONGOOSE_MODELS.CORE_DB.TENANT,
-        );
-
-        const tenant = await TenantModel.create({
-            name: validatedProps.name,
-            storeName: validatedProps.storeName,
-            email: validatedProps.email,
-            password: validatedProps.password,
-        });
-
-        // success promise resolving block
-        return Promise.resolve(tenant);
-    } catch (error) {
-        // error catching promise rejection block
-        return Promise.reject(errorHandler(error));
+    tenantDetails: authTypes.authRequestTypes.ISignupTenantRequest,
+): Promise<Partial<ITenant>> => {
+    const { name, email, password, domainName, storeName } = tenantDetails;
+    const Tenant = dbs.core.model<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const existingTenant = await Tenant.findOne({ email });
+    if (existingTenant) {
+        logger.info(`Tenant invalid - tenant with same email already exist`);
+        throw new error.BadRequestError(ERROR_CODE.TENANT_INVALID, 'Auth error');
     }
+    const Domain = dbs.core.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
+    const existingDomain = await Domain.findOne({ name: domainName });
+    if (existingDomain) {
+        logger.info(`Tenant invalid - domain already exist`);
+        throw new error.BadRequestError(ERROR_CODE.TENANT_INVALID, 'Domain already exist');
+    }
+    const tenant = await Tenant.create({ name, email, password, storeName });
+    await tenant.save();
+    const domain = await Domain.create({ name: domainName, tenant: tenant?.id });
+    await domain.save();
+    logger.info(`Tenant registered successfully ${email} - ${tenant.id}`);
+    return tenant.toJSON() as ITenant;
 };
-
-// tenant wrapper sample
-export const performATenantDbRelatedOperation = tenantWrapper(
-    async (props: { name: string }): Promise<string> => {
-        await introduceDelay(6000);
-        // will have current requested tenant's db
-        if (dbs.tenant) {
-            console.log('intializeConfig active and tenantDb valid');
-        } else {
-            console.log('intializeConfig inActive and tenantDb Invalid');
-        }
-        return props.name;
-    },
-);
-
-// uncomment to check how tenantWrapped function works
-// performATenantDbRelatedOperation('tenantIdskgs', { name: 'boom' });
