@@ -7,6 +7,8 @@ export interface IDomain extends Document {
     isCustom: boolean;
     isActive: boolean;
     isReserved: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 const DomainSchema = new Schema(

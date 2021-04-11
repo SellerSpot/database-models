@@ -1,6 +1,6 @@
 import { Schema, model, Document } from 'mongoose';
-import { coreDbModels, MONGOOSE_MODELS } from '..';
-
+import { ITenant } from '../coreDb/Tenant';
+import { MONGOOSE_MODELS } from '..';
 // this will be the first collection created when a tenant creates a account.
 
 const TenantHandshake = new Schema(
@@ -26,7 +26,7 @@ export interface ITenantHandshake extends Document {
     name: string;
     storeName: string;
     email: string;
-    tenant: string | coreDbModels.TenantModel.ITenant;
+    tenant: string | ITenant;
 }
 
 export const BaseModel = model<ITenantHandshake>(

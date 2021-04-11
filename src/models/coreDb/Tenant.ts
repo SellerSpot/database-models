@@ -1,7 +1,7 @@
 import { Schema, model, Model, Document } from 'mongoose';
 import { IPlugin } from './Plugin';
 import { MONGOOSE_MODELS } from '..';
-import { service } from '@sellerspot/universal-functions';
+import { auth } from '@sellerspot/universal-functions';
 
 /**
  * An interface that describes the properties
@@ -13,6 +13,8 @@ export interface ITenant extends Document {
     password: string;
     storeName: string;
     plugins?: string[] | IPlugin[];
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 const TenantSchema = new Schema(
@@ -58,7 +60,7 @@ const TenantSchema = new Schema(
 
 TenantSchema.pre('save', async function (done) {
     if (this.isModified('password')) {
-        const hashed = await service.auth.PasswordManager.toHash(this.get('password'));
+        const hashed = await auth.PasswordManager.toHash(this.get('password'));
         this.set('password', hashed);
     }
     done();
