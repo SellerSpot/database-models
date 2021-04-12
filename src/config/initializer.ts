@@ -2,6 +2,7 @@
 import { DB_NAMES } from '../dbNames';
 import { Connection } from 'mongoose';
 import { ArgumentsType } from '../typings/common.types';
+import { logger } from '@sellerspot/universal-functions';
 
 const inferDbTypes = <T extends { [key: string]: Connection }>(arg: T): T => arg;
 
@@ -20,7 +21,7 @@ export const dbs = inferDbTypes({
  *
  */
 export const intializeDatabaseModels = (connectionObject: Connection): void => {
-    dbs.core = connectionObject?.useDb(DB_NAMES.CORE_DB);
+    dbs.core = connectionObject?.useDb(DB_NAMES.CORE_DB, { useCache: true });
 };
 
 /**
@@ -29,7 +30,7 @@ export const intializeDatabaseModels = (connectionObject: Connection): void => {
  * @param tenantId - tenantId of the tenant to set the current tenantdb in dbs object scope
  */
 export const setTenantDb = (tenantId: string): void => {
-    dbs.tenant = dbs?.core?.useDb(tenantId);
+    dbs.tenant = dbs?.core?.useDb(tenantId, { useCache: true });
 };
 
 /**
@@ -41,7 +42,7 @@ export const tenantWrapper = <T extends (...args: any[]) => any>(func: T) => (
     tenantId: string,
     ...args: ArgumentsType<T>
 ): ReturnType<T> => {
-    console.log('setting tenantDb for the tenant', tenantId);
+    logger.info('Setting tenantDb for the tenant', tenantId);
     setTenantDb(tenantId);
     return func(...args);
 };

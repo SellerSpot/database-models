@@ -1,26 +1,48 @@
-import { Schema, model, Model, Document } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import { coreDbModels, MONGOOSE_MODELS } from '..';
 
-const DomainSchema = new Schema(
-    {
-        name: Schema.Types.String,
-        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.TENANT },
-        isSubDomain: Schema.Types.Boolean,
-        isActive: Schema.Types.Boolean,
-    },
-    { timestamps: true },
-);
-
-export interface IDomain {
+export interface IDomain extends Document {
     name: string;
     tenant: string | coreDbModels.TenantModel.ITenant;
-    isSubDomain: boolean;
+    isCustom: boolean;
     isActive: boolean;
-    _id?: string;
+    isReserved: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
 
-export type IDomainModel = Model<IDomain & Document>;
+const DomainSchema = new Schema(
+    {
+        name: {
+            type: Schema.Types.String,
+            required: true,
+        },
+        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.TENANT },
+        isCustom: {
+            type: Schema.Types.Boolean,
+            default: false,
+        },
+        isActive: {
+            type: Schema.Types.Boolean,
+            default: true,
+        },
+        isReserved: {
+            type: Schema.Types.Boolean,
+            default: true,
+        },
+    },
+    {
+        timestamps: true,
+        toJSON: {
+            //Arg 1 -> actual doc Arg2 -> doc to be returned
+            transform(_, ret) {
+                (ret.id = ret._id), delete ret._id;
+            },
+            versionKey: false,
+        },
+    },
+);
 
-export const DomainModel: IDomainModel = model(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);
+const DomainModel = model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);
+
+export { DomainModel };

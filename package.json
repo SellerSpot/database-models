@@ -1,31 +1,30 @@
 {
-    "name": "@sellerspot/database-models",
-    "version": "10.7.0",
-    "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
-    "main": "dist/index.js",
-    "scripts": {
-        "dev": "webpack --mode development --env development",
-        "dev:server": "node dist",
-        "build": "webpack --mode production --env production",
-        "build:dev": "webpack --mode development --env production && yalc push",
-        "lint": "eslint src",
-        "lint:fix": "eslint src --fix",
-        "yalc:link": "yalc link @sellerspot/universal-functions",
-        "yalc:remove": "yalc remove --all",
-        "prettier": "prettier --write src",
-        "lint-staged": "lint-staged",
-        "postinstall": "npm run husky:install",
-        "husky:install": "husky install",
-        "husky:pre-commit": "npm run lint-staged"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/SellerSpot/database-models.git"
-    },
-    "keywords": [
-        "sellerspot",
-        "database-models"
-    ],
+  "name": "@sellerspot/database-models",
+  "version": "10.7.0",
+  "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "webpack --mode development --env development",
+    "dev:server": "node dist",
+    "build": "webpack --mode production --env production",
+    "build:dev": "webpack --mode development --env production && yalc push",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "prettier": "prettier --write src",
+    "yalc:link": "yalc link @sellerspot/universal-functions && yalc link @sellerspot/universal-types",
+    "yalc:add": "yalc add @sellerspot/universal-functions && yalc add @sellerspot/universal-types",
+    "yalc:remove": "yalc remove --all",
+    "husky:install": "husky install",
+    "husky:pre-commit": "npm run lint-staged"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SellerSpot/database-models.git"
+  },
+  "keywords": [
+    "sellerspot",
+    "database-models"
+  ],
     "author": "ThayalanGR",
     "contributors": [
         {
@@ -39,11 +38,6 @@
             "url": "https://github.com/ThayalanGR"
         }
     ],
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/SellerSpot/database-models/issues"
-    },
-    "homepage": "https://github.com/SellerSpot/database-models#readme",
     "lint-staged": {
         "*.{ts,tsx,less}": [
             "prettier --write",
