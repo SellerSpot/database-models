@@ -13,6 +13,7 @@
         "prettier": "prettier --write src",
         "yalc:link": "yalc link @sellerspot/universal-functions && yalc link @sellerspot/universal-types",
         "yalc:remove": "yalc remove --all",
+        "lint-staged": "lint-staged",
         "husky:install": "husky install",
         "husky:pre-commit": "npm run lint-staged",
         "prepare": "npm run husky:install"

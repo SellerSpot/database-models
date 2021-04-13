@@ -43,6 +43,10 @@ jobs:
                   npm install
                   npm run build
 
+            - name: Clear Git working directory
+              continue-on-error: true
+              run: git add . && git commit -m "Version update clear working directory" --no-verify
+
             - name: Major Version
               if: contains(github.event.head_commit.message, '@major') || github.event.inputs.publishType == 'major'
               run: npm version major -m "version update ${{ github.event.head_commit.message }}"
