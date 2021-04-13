@@ -3,14 +3,12 @@ import { logger, error } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { dbs } from '../../config/initializer';
 import { MONGOOSE_MODELS } from '../../';
+import { LeanDocument } from 'mongoose';
 
-/**
- * creates a domain if necessary props
- * @param {string} domainName
- * @param {string} tenantId
- * @returns {Promise<LeanDocument<IDomain>>} lean document of the created domain
- */
-export const createDomain = async (domainName: string, tenantId: string): Promise<IDomain> => {
+export const createDomain = async (
+    domainName: string,
+    tenantId: string,
+): Promise<LeanDocument<IDomain>> => {
     const Domain = dbs.core.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     if (!checkDomainAvailability(domainName)) {
         logger.error(`Tenant invalid - domain already exist ${domainName}`);
