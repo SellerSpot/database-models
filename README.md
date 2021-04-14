@@ -4,7 +4,5 @@ This Repo contains all database models (will be consumed by all services) keepin
 
 ## ChangeLog
 
-<!-- add changeLog atop -->
-
 -   28/03/2021 - yalc auto publish webpack setup done
 -   21/03/2021 - prototype 1 to 2 migration
