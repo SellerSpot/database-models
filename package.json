@@ -16,7 +16,8 @@
         "lint-staged": "lint-staged",
         "husky:install": "husky install",
         "husky:pre-commit": "npm run lint-staged",
-        "prepare": "npm run husky:install"
+        "prepare": "npm run husky:install",
+        "update:packages": "npm install -D @sellerspot/universal-functions @sellerspot/universal-types"
     },
     "repository": {
         "type": "git",
@@ -47,7 +48,7 @@
         "*.{ts,tsx}": "eslint --fix --max-warnings 0"
     },
     "devDependencies": {
-        "@sellerspot/universal-functions": "^1.3.0",
+        "@sellerspot/universal-functions": "^1.3.1",
         "@sellerspot/universal-types": "^1.8.2",
         "@types/express": "^4.17.11",
         "@types/mongodb": "^3.6.3",
