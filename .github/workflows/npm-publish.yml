@@ -1,4 +1,4 @@
-name: Sellerspot database-models Npm Package
+name: Sellerspot universal-functions npm package publish
 
 on:
     workflow_dispatch: # for Run workflow button
@@ -64,8 +64,18 @@ jobs:
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
 
-            - name: Push Changes to master and current branch
+            - name: Push changes to master
               run: |
                   git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
                   git push origin master -f
                   git push --tags
+
+            - name: Trigger version bump on dependant repos
+              run: |
+                  for i in $(cat dependant-repos.txt); do
+                      echo "URL: $i"
+                      curl --request POST \
+                      --url "https://api.github.com/repos/sellerspot/$i/dispatches" \
+                      --header 'authorization: Bearer ${{ secrets.GH_API_FULL_ACCESS_TOKEN }}' \
+                      --data '{"event_type": "dispatch-version-bump"}'
+                  done
