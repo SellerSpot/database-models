@@ -1,32 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DB_NAMES } from '../dbNames';
 import { Connection } from 'mongoose';
+export class DbConnectionManager {
+    private static _core: Connection;
+    private static _tenant: Connection;
 
-const inferDbTypes = <T extends { [key: string]: Connection }>(arg: T): T => arg;
+    public static intialize(conn: Connection): void {
+        DbConnectionManager._core = conn?.useDb(DB_NAMES.CORE_DB, { useCache: true });
+    }
 
-/**
- * contains all dbs reflections
- */
-export const dbs = inferDbTypes({
-    core: <Connection>null,
-    tenant: <Connection>null,
-});
+    public static setTenantDb = (tenantId: string): void => {
+        DbConnectionManager._tenant = DbConnectionManager._core?.useDb(tenantId, {
+            useCache: true,
+        });
+    };
 
-/**
- * Intializes the database models package, hence future db service operations will use the dbs object to access corresponding databases
- *
- * @param {Connection} connectionObject - mongoose connection object
- *
- */
-export const intializeDatabaseModels = (connectionObject: Connection): void => {
-    dbs.core = connectionObject?.useDb(DB_NAMES.CORE_DB, { useCache: true });
-};
+    public static getCoreDb(): Connection {
+        return DbConnectionManager._core;
+    }
 
-/**
- * sets the tenantdb for the passed in tenantId (later validation should be made here)
- *
- * @param tenantId - tenantId of the tenant to set the current tenantdb in dbs object scope
- */
-export const setTenantDb = (tenantId: string): void => {
-    dbs.tenant = dbs?.core?.useDb(tenantId, { useCache: true });
-};
+    public static getTenantDb(): Connection {
+        return DbConnectionManager._tenant;
+    }
+}

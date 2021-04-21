@@ -80,8 +80,5 @@
     },
     "peerDependencies": {
         "mongoose": "^5.11.14"
-    },
-    "dependencies": {
-        "joi": "^17.4.0"
     }
 }
