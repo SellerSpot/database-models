@@ -1,13 +1,12 @@
 import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { LeanDocument } from 'mongoose';
-import { DbConnectionManager } from '../../config/initializer';
-import { MONGOOSE_MODELS } from '../../model';
-import { ITenant } from '../../model/coreDb/Tenant';
+import { DbConnectionManager } from '../../configs/initializer';
+import { MONGOOSE_MODELS } from '../../models';
+import { ITenant } from '../../models/coreDb/Tenant';
 
 type TTenantAttrs = Pick<ITenant, 'email' | 'name' | 'password' | 'storeName'>;
 
-export const createTenant = async (tenantDetails: TTenantAttrs): Promise<LeanDocument<ITenant>> => {
+export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant> => {
     const conn = DbConnectionManager.getCoreDb();
     const { name, email, password, storeName } = tenantDetails;
     const Tenant = conn.model<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
@@ -21,7 +20,7 @@ export const createTenant = async (tenantDetails: TTenantAttrs): Promise<LeanDoc
     }
     const tenant = await Tenant.create({ name, email, password, storeName });
     logger.info(`Tenant registered successfully ${email} - ${tenant.id}`);
-    return tenant.toJSON();
+    return tenant;
 };
 
 export const getTenantById = async (tenantId: string): Promise<ITenant> => {

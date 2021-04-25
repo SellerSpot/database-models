@@ -1,13 +1,10 @@
 // database-models service intitializer
-export * from './config/initializer';
-
-export * as dbMiddleware from './middleware';
-
+export * from './configs/initializer';
 // database name exports
 export * from './dbNames';
-
+export * as dbMiddleware from './middlewares';
+export * from './models';
 // model exports
-export * as models from './model';
-
+export * as models from './models';
 // model name exports
-export * from './service';
+export * from './services';

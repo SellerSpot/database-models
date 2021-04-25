@@ -1,6 +1,6 @@
 import { Document, model, Model, Schema } from 'mongoose';
+import { catalogueModels } from '..';
 import { coreDbModels, MONGOOSE_MODELS } from '../..';
-import { catalogueModels } from '../../tenantDb';
 
 enum DiscountTypesEnum {
     VALUE = 'VALUE',

@@ -17,7 +17,7 @@
         "lint-staged": "lint-staged",
         "husky:install": "husky install",
         "husky:pre-commit": "npm run lint-staged",
-        "postinstall": "npm run husky:install",
+        "prepare": "npm run husky:install",
         "update:packages": "npm install -D @sellerspot/universal-functions @sellerspot/universal-types"
     },
     "repository": {

@@ -1,14 +1,10 @@
 import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { LeanDocument } from 'mongoose';
-import { DbConnectionManager } from '../../config/initializer';
-import { MONGOOSE_MODELS } from '../../model';
-import { IDomain } from '../../model/coreDb/Domain';
+import { DbConnectionManager } from '../../configs/initializer';
+import { MONGOOSE_MODELS } from '../../models';
+import { IDomain } from '../../models/coreDb/Domain';
 
-export const createDomain = async (
-    domainName: string,
-    tenantId: string,
-): Promise<LeanDocument<IDomain>> => {
+export const createDomain = async (domainName: string, tenantId: string): Promise<IDomain> => {
     const conn = DbConnectionManager.getCoreDb();
     const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     if (!checkDomainAvailability(domainName)) {
@@ -17,7 +13,7 @@ export const createDomain = async (
     }
     const domain = await Domain.create({ name: domainName, tenant: tenantId });
     logger.info(`Tenant ${tenantId} has been mapped to ${domainName}.`);
-    return domain.toJSON();
+    return domain;
 };
 
 export const checkDomainAvailability = async (domainName: string): Promise<boolean> => {
@@ -30,16 +26,16 @@ export const checkDomainAvailability = async (domainName: string): Promise<boole
     return true;
 };
 
-export const getDomainByTenantId = async (tenantId: string): Promise<LeanDocument<IDomain>> => {
+export const getDomainByTenantId = async (tenantId: string): Promise<IDomain> => {
     const conn = DbConnectionManager.getCoreDb();
     const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     const domain = await Domain.findOne({ tenant: tenantId });
-    return domain.toJSON();
+    return domain;
 };
 
-export const getDomainByName = async (domainName: string): Promise<LeanDocument<IDomain>> => {
+export const getDomainByName = async (domainName: string): Promise<IDomain> => {
     const conn = DbConnectionManager.getCoreDb();
     const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     const domain = await Domain.findOne({ name: domainName });
-    return domain.toJSON();
+    return domain;
 };

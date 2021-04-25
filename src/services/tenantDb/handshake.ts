@@ -1,12 +1,11 @@
 import { logger } from '@sellerspot/universal-functions';
-import { LeanDocument } from 'mongoose';
-import { DbConnectionManager } from '../../config/initializer';
-import { MONGOOSE_MODELS } from '../../model';
-import { ITenant } from '../../model/coreDb/Tenant';
-import { ITenantHandshake } from '../../model/tenantDb/TenantHandshake';
+import { DbConnectionManager } from '../../configs/initializer';
+import { MONGOOSE_MODELS } from '../../models';
+import { ITenant } from '../../models/coreDb/Tenant';
+import { ITenantHandshake } from '../../models/tenantDb/TenantHandshake';
 
 export const createHandshake = async (
-    props: Pick<LeanDocument<Required<ITenant>>, 'id' | 'name' | 'email' | 'storeName'>,
+    props: Pick<Required<ITenant>, 'id' | 'name' | 'email' | 'storeName'>,
 ): Promise<void> => {
     try {
         DbConnectionManager.setTenantDb(props.id);

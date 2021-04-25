@@ -1,9 +1,10 @@
-import { Document, LeanDocument, model, Schema } from 'mongoose';
-import { coreDbModels, MONGOOSE_MODELS } from '..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '..';
+import { ITenant } from './Tenant';
 
 export interface IDomain extends Document {
     name: string;
-    tenant: string | LeanDocument<coreDbModels.TenantModel.ITenant>;
+    tenant: string | ITenant;
     isCustom: boolean;
     isActive: boolean;
     isReserved: boolean;
