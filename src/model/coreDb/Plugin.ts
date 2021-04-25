@@ -1,4 +1,4 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
 export interface IPlugin extends Document {

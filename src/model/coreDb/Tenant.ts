@@ -1,7 +1,7 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { IPlugin } from './Plugin';
-import { MONGOOSE_MODELS } from '..';
 import { auth } from '@sellerspot/universal-functions';
+import { Document, model, Model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '..';
+import { IPlugin } from './Plugin';
 
 /**
  * An interface that describes the properties
@@ -50,7 +50,7 @@ const TenantSchema = new Schema(
         toJSON: {
             //Arg 1 -> actual doc Arg2 -> doc to be returned
             transform(_, ret) {
-                (ret.id = ret._id), delete ret._id;
+                (ret.id = ret._id?.toString()), delete ret._id;
                 delete ret.password;
             },
             versionKey: false,

@@ -1,6 +1,6 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { catalogueModels } from '..';
+import { Document, model, Model, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../..';
+import { ITaxBracket } from './TaxBracket';
 
 const TaxGroup = new Schema(
     {
@@ -19,7 +19,7 @@ const TaxGroup = new Schema(
 export interface ITaxGroup {
     _id?: string;
     name: string;
-    brackets: string[] | catalogueModels.TaxBracketModel.ITaxBracket[];
+    brackets: string[] | ITaxBracket[];
     linkedProductsCount: number;
     createdAt?: string;
     updatedAt?: string;

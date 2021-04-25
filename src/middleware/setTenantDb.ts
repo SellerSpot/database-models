@@ -1,7 +1,7 @@
-import { DbConnectionManager } from '../config/initializer';
+import { logger, ServerError } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { logger, error } from '@sellerspot/universal-functions';
 import { RequestHandler } from 'express';
+import { DbConnectionManager } from '../config/initializer';
 
 /**
  * Sets tenant db based on tenant id
@@ -13,5 +13,5 @@ export const setTenantDb: RequestHandler = (req, _, next): void => {
         logger.info(`Db ${req.currentTenant.id} is set`);
         return next();
     }
-    throw new error.ServerError(ERROR_CODE.DB_FAILURE, 'Cannot set tenant db');
+    throw new ServerError(ERROR_CODE.DB_FAILURE, 'Cannot set tenant db');
 };

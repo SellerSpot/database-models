@@ -1,21 +1,22 @@
 {
     "compilerOptions": {
-        "sourceMap": false,
+        "sourceMap": true,
         "noImplicitAny": true,
         "module": "CommonJS",
-        "target": "ES5",
+        "target": "ES6",
         "lib": ["ESNext", "DOM", "DOM.Iterable"],
         "removeComments": false,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
+        "skipLibCheck":true,
         "moduleResolution": "node",
         "downlevelIteration": true,
         "declaration": true,
         "declarationMap": true,
         "declarationDir": "./dist",
         "outDir": "./dist",
-        "baseUrl": "./src",
+        "baseUrl": "./src"
     },
     "include": ["src/**/*"],
 }

@@ -1,6 +1,6 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { catalogueModels } from '..';
+import { Document, model, Model, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../..';
+import { IStockUnit } from './StockUnit';
 
 const Product = new Schema(
     {
@@ -20,7 +20,7 @@ export interface IProduct {
     _id?: string;
     name: string;
     barcode: string;
-    stockUnit: string | catalogueModels.StockUnitModel.IStockUnit;
+    stockUnit: string | IStockUnit;
     createdAt?: string;
     updatedAt?: string;
 }

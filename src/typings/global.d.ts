@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ITenantJWTToken } from '@sellerspot/universal-types';
 
 declare global {
@@ -10,4 +11,5 @@ declare global {
 }
 
 // convert it into a module by adding an empty export statement.
-export {};
+export { };
+

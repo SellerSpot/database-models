@@ -1,5 +1,5 @@
-import { DB_NAMES } from '../dbNames';
 import { Connection } from 'mongoose';
+import { DB_NAMES } from '../dbNames';
 export class DbConnectionManager {
     private static _core: Connection;
     private static _tenant: Connection;

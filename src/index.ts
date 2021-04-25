@@ -1,16 +1,13 @@
-// mongoose connection reference handShake
-export const handshake = true;
-
 // database-models service intitializer
 export * from './config/initializer';
 
-export * from './middleware/setTenantDb';
+export * as dbMiddleware from './middleware';
 
 // database name exports
 export * from './dbNames';
 
 // model exports
-export * from './models';
+export * as models from './model';
 
 // model name exports
-export * from './services';
+export * from './service';

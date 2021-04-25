@@ -1,1 +1,3 @@
 auth-server
+pos-server
+catalogue-server

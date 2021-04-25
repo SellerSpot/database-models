@@ -1,4 +1,4 @@
-import { Schema, model, Document, LeanDocument } from 'mongoose';
+import { Document, LeanDocument, model, Schema } from 'mongoose';
 import { coreDbModels, MONGOOSE_MODELS } from '..';
 
 export interface IDomain extends Document {

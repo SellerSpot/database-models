@@ -1,9 +1,10 @@
-import { Schema, model, Document } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '..';
 
 export interface ICustomer extends Document {
     name: string;
 }
+
 const CustomerSchema = new Schema(
     {
         name: {
