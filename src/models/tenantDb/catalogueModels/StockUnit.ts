@@ -1,7 +1,7 @@
-import { Document, model, Model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
-const StockUnit = new Schema(
+const StockUnitSchema = new Schema(
     {
         name: Schema.Types.String,
         linkedProductsCount: Schema.Types.Number,
@@ -11,7 +11,7 @@ const StockUnit = new Schema(
     },
 );
 
-export interface IStockUnit {
+export interface IStockUnit extends Document {
     _id?: string;
     name: string;
     linkedProductsCount: number;
@@ -19,9 +19,7 @@ export interface IStockUnit {
     updatedAt?: string;
 }
 
-export type IStockUnitModel = Model<IStockUnit & Document>;
-
-export const BaseModel: IStockUnitModel = model(
+export const StockUnit = model<IStockUnit>(
     MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
-    StockUnit,
+    StockUnitSchema,
 );

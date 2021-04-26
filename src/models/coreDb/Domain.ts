@@ -1,5 +1,5 @@
 import { Document, model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '..';
+import { MONGOOSE_MODELS } from '../mongooseModels';
 import { ITenant } from './Tenant';
 
 export interface IDomain extends Document {
@@ -44,6 +44,4 @@ const DomainSchema = new Schema(
     },
 );
 
-const DomainModel = model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);
-
-export { DomainModel };
+export const DomainModel = model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);

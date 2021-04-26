@@ -6,9 +6,9 @@
     "scripts": {
         "build": "webpack --mode production --env production",
         "dev": "webpack --mode development --env development",
-        "build:dev": "webpack --mode development --env production && yalc push",
+        "build:dev": "webpack --mode development --env production && yalc push --no-scripts",
         "dev:server": "node dist",
-        "debug": "rm -rf dist/ && tsc-watch --onSuccess 'yalc push'",
+        "debug": "rm -rf dist/ && tsc-watch --onSuccess 'yalc push --no-scripts'",
         "lint": "eslint src",
         "lint:fix": "eslint src --fix",
         "prettier": "prettier --write src",

@@ -1,7 +1,7 @@
-import { Document, model, Model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
-const Brand = new Schema(
+const BrandSchema = new Schema(
     {
         name: Schema.Types.String,
         linkedProductsCount: Schema.Types.Number,
@@ -11,14 +11,9 @@ const Brand = new Schema(
     },
 );
 
-export interface IBrand {
-    _id?: string;
+export interface IBrand extends Document {
     name: string;
     linkedProductsCount: number;
-    createdAt?: string;
-    updatedAt?: string;
 }
 
-export type IBrandModel = Model<IBrand & Document>;
-
-export const BaseModel: IBrandModel = model(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND, Brand);
+export const BrandModel = model<IBrand>(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND, BrandSchema);

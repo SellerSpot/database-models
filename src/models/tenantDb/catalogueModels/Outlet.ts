@@ -1,7 +1,7 @@
-import { Document, model, Model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
-const Outlet = new Schema(
+const OutletSchema = new Schema(
     {
         name: Schema.Types.String,
         address: Schema.Types.String,
@@ -11,14 +11,9 @@ const Outlet = new Schema(
     },
 );
 
-export interface IOutlet {
-    _id?: string;
+export interface IOutlet extends Document {
     name: string;
     address: string;
-    createdAt?: string;
-    updatedAt?: string;
 }
 
-export type IOutletModel = Model<IOutlet & Document>;
-
-export const BaseModel: IOutletModel = model(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET, Outlet);
+export const OutletModel = model<IOutlet>(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET, OutletSchema);

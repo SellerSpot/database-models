@@ -1,7 +1,7 @@
-import { Document, model, Model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
-const Employee = new Schema(
+const EmployeeSchema = new Schema(
     {
         name: Schema.Types.String,
         employeeId: Schema.Types.String,
@@ -12,18 +12,13 @@ const Employee = new Schema(
     },
 );
 
-export interface IEmployee {
-    _id?: string;
+export interface IEmployee extends Document {
     name: string;
     employeeId: string;
     password: string;
-    createdAt?: string;
-    updatedAt?: string;
 }
 
-export type IEmployeeModel = Model<IEmployee & Document>;
-
-export const BaseModel: IEmployeeModel = model(
+export const EmployeeModel = model<IEmployee>(
     MONGOOSE_MODELS.TENANT_DB.CATALOGUE.EMPLOYEE,
-    Employee,
+    EmployeeSchema,
 );

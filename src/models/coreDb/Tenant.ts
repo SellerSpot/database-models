@@ -1,6 +1,6 @@
 import { auth } from '@sellerspot/universal-functions';
-import { Document, model, Model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../mongooseModels';
 import { IPlugin } from './Plugin';
 
 /**
@@ -50,7 +50,7 @@ const TenantSchema = new Schema(
         toJSON: {
             //Arg 1 -> actual doc Arg2 -> doc to be returned
             transform(_, ret) {
-                (ret.id = ret._id?.toString()), delete ret._id;
+                (ret.id = ret._id), delete ret._id;
                 delete ret.password;
             },
             versionKey: false,
@@ -66,6 +66,4 @@ TenantSchema.pre('save', async function (done) {
     done();
 });
 
-const TenantModel = model<ITenant, Model<ITenant>>(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);
-
-export { TenantModel };
+export const TenantModel = model<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);

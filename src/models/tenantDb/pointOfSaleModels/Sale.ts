@@ -1,6 +1,7 @@
-import { Document, model, Model, Schema } from 'mongoose';
-import { catalogueModels } from '..';
-import { coreDbModels, MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
+import { ICustomer } from '../../coreDb';
+import { IEmployee, IOutlet } from '../catalogueModels';
 
 enum DiscountTypesEnum {
     VALUE = 'VALUE',
@@ -8,7 +9,7 @@ enum DiscountTypesEnum {
 }
 
 enum SaletatusEnum {
-    PARKER = 'PARKED',
+    PARKED = 'PARKED',
     COMPLETED = 'COMPLETED',
     VOIDED = 'VOIDED',
 }
@@ -18,7 +19,7 @@ enum PaymentMethodsEnum {
     CARD = 'CARD',
 }
 
-const Sale = new Schema(
+const SaleSchema = new Schema(
     {
         cart: [
             {
@@ -82,7 +83,7 @@ const Sale = new Schema(
     },
 );
 
-export interface ISale {
+export interface ISale extends Document {
     _id?: string;
     cart: {
         productId: string;
@@ -108,13 +109,11 @@ export interface ISale {
         balance: number;
     };
     saleTotal: number;
-    customer: string | coreDbModels.CustomerModel.ICustomer;
-    employee: string | catalogueModels.ExployeeModel.IEmployee;
-    outlet: string | catalogueModels.OutletModel.IOutlet;
+    customer: string | ICustomer;
+    employee: string | IEmployee;
+    outlet: string | IOutlet;
     createdAt?: string;
     updatedAt?: string;
 }
 
-export type ISaleModel = Model<ISale & Document>;
-
-export const BaseModel: ISaleModel = model(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, Sale);
+export const SaleModel = model<ISale>(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);

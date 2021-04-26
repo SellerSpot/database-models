@@ -1,5 +1,5 @@
 import { Document, model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '..';
+import { MONGOOSE_MODELS } from '../mongooseModels';
 
 export interface ICustomer extends Document {
     name: string;
@@ -24,6 +24,4 @@ const CustomerSchema = new Schema(
     },
 );
 
-const CustomerModel = model<ICustomer>(MONGOOSE_MODELS.CORE_DB.CUSTOMER, CustomerSchema);
-
-export { CustomerModel };
+export const CustomerModel = model<ICustomer>(MONGOOSE_MODELS.CORE_DB.CUSTOMER, CustomerSchema);
