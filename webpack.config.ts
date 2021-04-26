@@ -57,6 +57,14 @@ const webpackConfiguration = (env: {
         ],
         devtool: false,
         watch: !isProduction,
+        node: {
+            console: false,
+            global: false,
+            process: false,
+            Buffer: false,
+            __filename: false,
+            __dirname: false,
+        },
     };
 };
 
