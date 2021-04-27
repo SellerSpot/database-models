@@ -1,8 +1,8 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { catalogueModels } from '..';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
+import { IStockUnit } from './StockUnit';
 
-const Product = new Schema(
+const ProductSchema = new Schema(
     {
         name: String,
         barcode: String,
@@ -16,15 +16,16 @@ const Product = new Schema(
     },
 );
 
-export interface IProduct {
+export interface IProduct extends Document {
     _id?: string;
     name: string;
     barcode: string;
-    stockUnit: string | catalogueModels.StockUnitModel.IStockUnit;
+    stockUnit: string | IStockUnit;
     createdAt?: string;
     updatedAt?: string;
 }
 
-export type IProductModel = Model<IProduct & Document>;
-
-export const BaseModel: IProductModel = model(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT, Product);
+export const ProductModel = model<IProduct>(
+    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+    ProductSchema,
+);

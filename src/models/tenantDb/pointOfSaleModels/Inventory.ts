@@ -1,8 +1,8 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { catalogueModels } from '..';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
+import { IBrand, ICategory, IOutlet, IProduct } from '../catalogueModels';
 
-const Inventory = new Schema(
+const InventorySchema = new Schema(
     {
         product: {
             type: Schema.Types.ObjectId,
@@ -32,25 +32,20 @@ const Inventory = new Schema(
     },
 );
 
-export interface IInventory {
-    _id?: string;
-    product: string | catalogueModels.ProductModel.IProduct;
-    brand: string | catalogueModels.BrandModel.IBrand;
-    category: string | catalogueModels.CategoryModel.ICategory;
+export interface IInventory extends Document {
+    product: string | IProduct;
+    brand: string | IBrand;
+    category: string | ICategory;
     tags: [string];
     landingCost: number;
     sellingPrice: number;
     markup: number;
     active: boolean;
-    outlet: string | catalogueModels.OutletModel.IOutlet;
+    outlet: string | IOutlet;
     stockLevel: number;
-    createdAt?: string;
-    updatedAt?: string;
 }
 
-export type IInventoryModel = Model<IInventory & Document>;
-
-export const BaseModel: IInventoryModel = model(
+export const InventoryModel = model<IInventory>(
     MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY,
-    Inventory,
+    InventorySchema,
 );

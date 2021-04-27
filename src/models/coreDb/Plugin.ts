@@ -1,5 +1,5 @@
-import { Document, Schema, model } from 'mongoose';
-import { MONGOOSE_MODELS } from '..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../mongooseModels';
 
 export interface IPlugin extends Document {
     name: string;
@@ -38,6 +38,4 @@ const PluginSchema = new Schema(
     },
 );
 
-const PluginModel = model<IPlugin>(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);
-
-export { PluginModel };
+export const PluginModel = model<IPlugin>(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);

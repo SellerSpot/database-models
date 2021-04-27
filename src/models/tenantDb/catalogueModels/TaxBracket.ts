@@ -1,7 +1,7 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
-const TaxBracket = new Schema(
+const TaxBracketSchema = new Schema(
     {
         name: Schema.Types.String,
         rate: Schema.Types.Number,
@@ -13,19 +13,14 @@ const TaxBracket = new Schema(
     },
 );
 
-export interface ITaxBracket {
-    _id?: string;
+export interface ITaxBracket extends Document {
     name: string;
     rate: number;
     isStateTax: boolean;
     linkedProductsCount: number;
-    createdAt?: string;
-    updatedAt?: string;
 }
 
-export type ITaxBracketModel = Model<ITaxBracket & Document>;
-
-export const BaseModel: ITaxBracketModel = model(
+export const TaxBracketModel = model<ITaxBracket>(
     MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
-    TaxBracket,
+    TaxBracketSchema,
 );

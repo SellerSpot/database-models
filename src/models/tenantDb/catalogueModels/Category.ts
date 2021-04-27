@@ -1,7 +1,7 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { MONGOOSE_MODELS } from '../..';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
-const Category = new Schema(
+const CategorySchema = new Schema(
     {
         name: Schema.Types.String,
         linkedProductsCount: Schema.Types.Number,
@@ -11,17 +11,12 @@ const Category = new Schema(
     },
 );
 
-export interface ICategory {
-    _id?: string;
+export interface ICategory extends Document {
     name: string;
     linkedProductsCount: number;
-    createdAt?: string;
-    updatedAt?: string;
 }
 
-export type ICategoryModel = Model<ICategory & Document>;
-
-export const BaseModel: ICategoryModel = model(
+export const CategoryModel = model<ICategory>(
     MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    Category,
+    CategorySchema,
 );

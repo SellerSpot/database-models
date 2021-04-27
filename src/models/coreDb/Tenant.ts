@@ -1,7 +1,7 @@
-import { Schema, model, Model, Document } from 'mongoose';
-import { IPlugin } from './Plugin';
-import { MONGOOSE_MODELS } from '..';
 import { auth } from '@sellerspot/universal-functions';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../mongooseModels';
+import { IPlugin } from './Plugin';
 
 /**
  * An interface that describes the properties
@@ -66,6 +66,4 @@ TenantSchema.pre('save', async function (done) {
     done();
 });
 
-const TenantModel = model<ITenant, Model<ITenant>>(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);
-
-export { TenantModel };
+export const TenantModel = model<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);

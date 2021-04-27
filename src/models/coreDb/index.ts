@@ -1,4 +1,4 @@
-export * as TenantModel from './Tenant';
-export * as DomainModel from './Domain';
-export * as PluginModel from './Plugin';
-export * as CustomerModel from './Customer';
+export * from './Customer';
+export * from './Domain';
+export * from './Plugin';
+export * from './Tenant';

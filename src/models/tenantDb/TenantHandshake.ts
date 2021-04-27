@@ -1,9 +1,8 @@
-import { Schema, model, Document } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
+import { MONGOOSE_MODELS } from '../mongooseModels';
 import { ITenant } from '../coreDb/Tenant';
-import { MONGOOSE_MODELS } from '..';
-// this will be the first collection created when a tenant creates a account.
 
-const TenantHandshake = new Schema(
+const TenantHandshakeSchema = new Schema(
     {
         name: { type: Schema.Types.String, required: true },
         storeName: { type: Schema.Types.String, required: true },
@@ -29,7 +28,7 @@ export interface ITenantHandshake extends Document {
     tenant: string | ITenant;
 }
 
-export const BaseModel = model<ITenantHandshake>(
+export const TenantHandshakeModel = model<ITenantHandshake>(
     MONGOOSE_MODELS.TENANT_DB.TENANT_HANDSHAKE,
-    TenantHandshake,
+    TenantHandshakeSchema,
 );
