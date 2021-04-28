@@ -51,7 +51,10 @@
             "prettier --write",
             "git add"
         ],
-        "!(*webpack.config).{ts,tsx}": "eslint --fix --max-warnings 0"
+        "!(*webpack.config).{ts,tsx}": [
+            "eslint --fix --max-warnings 0",
+            "git add"
+        ]
     },
     "devDependencies": {
         "@sellerspot/universal-functions": "^1.5.8",
