@@ -55,8 +55,8 @@
         ]
     },
     "devDependencies": {
-        "@sellerspot/universal-functions": "^1.5.8",
-        "@sellerspot/universal-types": "^1.8.6",
+        "@sellerspot/universal-functions": "^1.5.9",
+        "@sellerspot/universal-types": "^1.8.7",
         "@sellerspot/webpack-run-scripts-custom-plugin": "^1.17.3",
         "@types/express": "^4.17.11",
         "@types/node": "^14.14.14",
