@@ -19,7 +19,7 @@ export const createDomain = async ({
     const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     if (!checkDomainAvailability(domainName)) {
         logger.error(`Tenant invalid - domain already exist ${domainName}`);
-        throw new BadRequestError(ERROR_CODE.TENANT_INVALID, 'Domain already exist');
+        throw new BadRequestError(ERROR_CODE.DOMAIN_ALREADY_EXIST, 'Domain already exist');
     }
     const domain = await Domain.create({
         name: domainName,

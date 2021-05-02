@@ -14,7 +14,7 @@ export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant
     if (existingTenant) {
         logger.error(`Tenant with the email ${email} already exist`);
         throw new BadRequestError(
-            ERROR_CODE.TENANT_NOT_CREATED,
+            ERROR_CODE.TENANT_ALREADY_EXIST,
             `Tenant with email ${email} already exist.`,
         );
     }
