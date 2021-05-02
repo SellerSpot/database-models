@@ -29,7 +29,7 @@ const DomainSchema = new Schema(
         },
         isReserved: {
             type: Schema.Types.Boolean,
-            default: true,
+            default: false,
         },
     },
     {
