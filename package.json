@@ -1,6 +1,6 @@
 {
     "name": "@sellerspot/database-models",
-    "version": "10.8.3",
+    "version": "10.8.4",
     "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
     "main": "dist/index.js",
     "scripts": {
@@ -17,7 +17,7 @@
         "husky:install": "husky install",
         "husky:pre-commit": "npm run lint-staged",
         "prepare": "npm run husky:install",
-        "update:packages": "npm install -D @sellerspot/universal-functions @sellerspot/universal-types"
+        "update:packages": "npm install -D @sellerspot/universal-functions @sellerspot/universal-types @sellerspot/webpack-run-scripts-custom-plugin"
     },
     "repository": {
         "type": "git",
@@ -47,14 +47,16 @@
     ],
     "lint-staged": {
         "*.{ts,tsx,less}": [
-            "prettier --write",
-            "git add"
+            "prettier --write"
         ],
-        "*.{ts,tsx}": "eslint --fix --max-warnings 0"
+        "!(*webpack.config).{ts,tsx}": [
+            "eslint --fix --max-warnings 0"
+        ]
     },
     "devDependencies": {
-        "@sellerspot/universal-functions": "^1.5.7",
-        "@sellerspot/universal-types": "^1.8.5",
+        "@sellerspot/universal-functions": "^1.5.9",
+        "@sellerspot/universal-types": "^1.8.7",
+        "@sellerspot/webpack-run-scripts-custom-plugin": "^1.17.3",
         "@types/express": "^4.17.11",
         "@types/node": "^14.14.14",
         "@types/webpack": "^4.41.25",
@@ -79,7 +81,6 @@
         "webpack": "^4.46.0",
         "webpack-cli": "^4.2.0",
         "webpack-node-externals": "^2.5.2",
-        "webpack-shell-plugin-next": "^1.2.0",
         "yalc": "^1.0.0-pre.50"
     },
     "peerDependencies": {

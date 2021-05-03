@@ -12,9 +12,9 @@ export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant
     const Tenant = conn.model<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
     const existingTenant = await Tenant.findOne({ email });
     if (existingTenant) {
-        logger.error(`Tenant with that email ${email} exist`);
+        logger.error(`Tenant with the email ${email} already exist`);
         throw new BadRequestError(
-            ERROR_CODE.TENANT_NOT_CREATED,
+            ERROR_CODE.TENANT_ALREADY_EXIST,
             `Tenant with email ${email} already exist.`,
         );
     }
