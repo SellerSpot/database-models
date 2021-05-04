@@ -7,7 +7,6 @@ import {
     getAllCategory,
 } from '../src/services/tenantDb/catalogue';
 import { DbConnectionManager } from '../src';
-import { logger } from '@sellerspot/universal-functions';
 import { ICategoryDoc } from '../src/models/tenantDb/catalogueModels';
 
 describe('Category Model Test', () => {
@@ -63,12 +62,20 @@ describe('Category Model Test', () => {
         expect(rootCategory.children).toContainEqual(mongoose.Types.ObjectId(child1.id));
         expect(rootCategory.children).toContainEqual(mongoose.Types.ObjectId(child2.id));
 
-        logger.info(child1.children);
-        expect(child1.children).toContainEqual(mongoose.Types.ObjectId(child11.id));
-        expect(child1.children).toContainEqual(mongoose.Types.ObjectId(child12.id));
+        //done this way as children is populated
+        expect((<ICategoryDoc[]>child1.children).map((child) => child._id)).toContainEqual(
+            mongoose.Types.ObjectId(child11.id),
+        );
+        expect((<ICategoryDoc[]>child1.children).map((child) => child._id)).toContainEqual(
+            mongoose.Types.ObjectId(child12.id),
+        );
 
-        expect(child2.children).toContainEqual(mongoose.Types.ObjectId(child21.id));
-        expect(child2.children).toContainEqual(mongoose.Types.ObjectId(child21.id));
+        expect((<ICategoryDoc[]>child2.children).map((child) => child._id)).toContainEqual(
+            mongoose.Types.ObjectId(child21.id),
+        );
+        expect((<ICategoryDoc[]>child2.children).map((child) => child._id)).toContainEqual(
+            mongoose.Types.ObjectId(child21.id),
+        );
 
         //ancestors checks
         expect(rootCategory.ancestors.length).toBe(0);

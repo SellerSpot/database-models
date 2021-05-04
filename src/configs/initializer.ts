@@ -23,7 +23,7 @@ export class DbConnectionManager {
     }
 
     /**
-     * @typeparam T generic should extends Document
+     * @typeparam T generic should extends Document and should be passed
      * @param modelName
      * @returns {Model<T>}
      */
@@ -32,7 +32,7 @@ export class DbConnectionManager {
     }
 
     /**
-     * @typeparam T generic should extends Document
+     * @typeparam T generic should extends Document and should be passed
      * @param modelName
      * @returns {Model<T>}
      */

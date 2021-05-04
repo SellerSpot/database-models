@@ -3,13 +3,14 @@ import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { BadRequestError, logger, ServerError } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
+import { PackageConstant } from '../../../configs/PackageConstant';
 
 const CategorySchema = new Schema(
     {
         title: {
             type: Schema.Types.String,
-            min: 5,
-            max: 255,
+            min: PackageConstant.DEFAULT_MIN_TEXT_SIZE,
+            max: PackageConstant.DEFAULT_MAX_TEXT_SIZE,
             required: true,
         },
         parent: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY },

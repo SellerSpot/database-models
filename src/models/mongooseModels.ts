@@ -8,7 +8,7 @@ export const MONGOOSE_MODELS = {
     },
     TENANT_DB: {
         // billing model needs to added once confirmed
-        TENANT_HANDSHAKE: 'TENANT_HANDSHAKE',
+        USER: 'USER',
         // point of sale models
         POINT_OF_SALE: {
             // point of sale collections goes here
@@ -28,7 +28,6 @@ export const MONGOOSE_MODELS = {
             TAXBRACKET: 'CATALOGUE_TAXBRACKET',
             TAXGROUP: 'CATALOGUE_TAXGROUP',
             OUTLET: 'CATALOGUE_OUTLET',
-            EMPLOYEE: 'CATALOGUE_EMPLOYEE',
         },
     },
 };

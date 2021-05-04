@@ -1,7 +1,8 @@
 import { Document, model, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { ICustomer } from '../../coreDb';
-import { IEmployee, IOutlet } from '../catalogueModels';
+import { IOutlet } from '../catalogueModels';
+import { IUser } from '../User';
 
 enum DiscountTypesEnum {
     VALUE = 'VALUE',
@@ -71,7 +72,7 @@ const SaleSchema = new Schema(
         },
         employee: {
             type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.EMPLOYEE,
+            ref: MONGOOSE_MODELS.TENANT_DB.USER,
         },
         outlet: {
             type: Schema.Types.ObjectId,
@@ -110,7 +111,7 @@ export interface ISale extends Document {
     };
     saleTotal: number;
     customer: string | ICustomer;
-    employee: string | IEmployee;
+    employee: string | IUser;
     outlet: string | IOutlet;
     createdAt?: string;
     updatedAt?: string;
