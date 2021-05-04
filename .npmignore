@@ -1,4 +1,7 @@
 webpack.config.ts
+jest.config.ts
+test
+.yalc
 tsconfig.json
 .prettierrc.json
 .eslintignore

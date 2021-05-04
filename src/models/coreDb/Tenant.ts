@@ -22,7 +22,7 @@ const TenantSchema = new Schema(
         name: {
             type: Schema.Types.String,
             min: 5,
-            max: 150,
+            max: 255,
             required: true,
         },
         email: {
@@ -40,7 +40,7 @@ const TenantSchema = new Schema(
         storeName: {
             type: Schema.Types.String,
             min: 5,
-            max: 150,
+            max: 255,
             required: true,
         },
         plugins: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.PLUGIN }],
