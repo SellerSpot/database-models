@@ -1,5 +1,5 @@
 // direct model exports
-export * as TentatHandshakeModel from './TenantHandshake';
+export * from './User';
 
 // namespaced model exports
 export * as pointOfSaleModels from './pointOfSaleModels';

@@ -34,7 +34,7 @@ export const createDomain = async ({
 export const checkDomainAvailability = async (domainName: string): Promise<boolean> => {
     const conn = DbConnectionManager.getCoreDb();
     const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
-    const existingDomain = await Domain.findOne({ name: domainName });
+    const existingDomain = await Domain.findOne({ name: domainName, isReserved: false });
     if (existingDomain) {
         return false;
     }
