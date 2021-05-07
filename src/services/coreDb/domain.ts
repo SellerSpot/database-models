@@ -48,9 +48,14 @@ export const getDomainByTenantId = async (tenantId: string): Promise<IDomain> =>
     return domain;
 };
 
-export const getDomainByName = async (domainName: string): Promise<IDomain> => {
+export const getDomainByName = async (
+    domainName: string,
+    populateTenant?: boolean,
+): Promise<IDomain> => {
     const conn = DbConnectionManager.getCoreDb();
     const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
-    const domain = await Domain.findOne({ name: domainName });
+    const domain = await Domain.findOne({ name: domainName }).populate(
+        populateTenant ? 'tenant' : '',
+    );
     return domain;
 };
