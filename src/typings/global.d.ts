@@ -1,15 +1,13 @@
-/* eslint-disable prettier/prettier */
-import { ITenantJWTToken } from '@sellerspot/universal-types';
+import { IUserJwtTokenPayload } from '@sellerspot/universal-types';
 
 declare global {
     namespace NodeJS {}
     namespace Express {
         interface Request {
-            currentTenant?: ITenantJWTToken;
+            currentTenant?: IUserJwtTokenPayload;
         }
     }
 }
 
 // convert it into a module by adding an empty export statement.
-export { };
-
+export {};

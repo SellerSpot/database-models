@@ -14,7 +14,7 @@ export const createDefaultUser = async (
 ): Promise<IUserDoc> => {
     const { name, password } = userDetails;
     const { primaryEmail, id } = tenantDoc;
-    isEmpty(DbConnectionManager.getTenantDb()) && DbConnectionManager.setTenantDb(id);
+    if (isEmpty(DbConnectionManager.getTenantDb())) DbConnectionManager.setTenantDb(id);
     const User = DbConnectionManager.getTenantModel<IUserDoc>(MONGOOSE_MODELS.TENANT_DB.USER);
     const rootUser = await User.create({ email: primaryEmail, name, password });
     return rootUser;
