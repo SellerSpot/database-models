@@ -29,7 +29,9 @@
     ],
     "author": "Sellerspot",
     "devDependencies": {
-        "@sellerspot/webpack-run-scripts-custom-plugin": "^1.17.3",
+        "@sellerspot/universal-functions": "^1.5.9",
+        "@sellerspot/universal-types": "^1.8.7",
+        "@sellerspot/webpack-run-scripts-custom-plugin": "^1.18.1",
         "@types/express": "^4.17.11",
         "@types/jest": "^26.0.23",
         "@types/lodash": "^4.14.168",
@@ -65,8 +67,6 @@
         "mongoose": "^5.12.5"
     },
     "dependencies": {
-        "@sellerspot/universal-functions": "^1.5.9",
-        "@sellerspot/universal-types": "^1.8.7",
         "lodash": "^4.17.21"
     }
 }
