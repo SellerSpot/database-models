@@ -27,32 +27,7 @@
         "sellerspot",
         "database-models"
     ],
-    "author": "ThayalanGR",
-    "contributors": [
-        {
-            "name": "Rohit Raj",
-            "email": "rij7u7d@gmail.com",
-            "url": "https://github.com/RohitRajP"
-        },
-        {
-            "name": "ThayalanGR",
-            "email": "grthayalan18@gmail.com",
-            "url": "https://github.com/ThayalanGR"
-        },
-        {
-            "name": "Immanuel Irwin",
-            "email": "noelimmanuel1998@gmail.com",
-            "url": "https://github.com/noelimmi"
-        }
-    ],
-    "lint-staged": {
-        "*.{ts,tsx,less}": [
-            "prettier --write"
-        ],
-        "!(*webpack.config).{ts,tsx}": [
-            "eslint --fix --max-warnings 0"
-        ]
-    },
+    "author": "Sellerspot",
     "devDependencies": {
         "@sellerspot/webpack-run-scripts-custom-plugin": "^1.17.3",
         "@types/express": "^4.17.11",
