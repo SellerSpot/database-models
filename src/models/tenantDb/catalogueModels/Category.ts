@@ -105,10 +105,10 @@ CategorySchema.methods.checkTitleAvailability = async function (this: ICategoryD
                     (child: ICategoryDoc) => this.title.toUpperCase() === child.title.toUpperCase(),
                 );
                 if (!isEmpty(filterSameTitleArr)) {
-                    throw new BadRequestError(
-                        ERROR_CODE.CATEGORY_TITLE_INVALID,
-                        'Same level sibling should not have same title',
-                    );
+                    // throw new BadRequestError(
+                    //     ERROR_CODE.CATEGORY_TITLE_INVALID,
+                    //     'Same level sibling should not have same title',
+                    // );
                 }
             }
         }
