@@ -16,9 +16,6 @@ const UserSchema = new Schema(
             lowercase: true,
             trim: true,
         },
-        employeeId: {
-            type: Schema.Types.String,
-        },
         password: {
             type: Schema.Types.String,
             required: true,
@@ -40,7 +37,6 @@ const UserSchema = new Schema(
 export interface IUser {
     name: string;
     email?: string;
-    employeeId?: string;
     password: string;
 }
 
