@@ -1,7 +1,7 @@
-import { Document, Model, model, Schema } from 'mongoose';
+import { Document, Model, model, Schema, Query } from 'mongoose';
 import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { BadRequestError, logger, ServerError } from '@sellerspot/universal-functions';
+import { BadRequestError, CustomError, logger, ServerError } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { PackageConstant } from '../../../configs/PackageConstant';
 
@@ -41,6 +41,8 @@ const CategorySchema = new Schema(
     },
 );
 export interface ICategory {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    id?: any;
     title: string;
     parent?: string | ICategory | null;
     ancestors?: string[] | ICategory[];
@@ -49,6 +51,7 @@ export interface ICategory {
 
 export interface ICategoryDoc extends ICategory, Document {
     buildAncestorsAndAddAsChild(): Promise<void>;
+    checkTitleAvailability(): Promise<void>;
 }
 
 CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICategoryDoc) {
@@ -78,13 +81,77 @@ CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICate
         }
     } catch (error) {
         logger.error(`Error occurred in buildAncestorsAndAddAsChild ${error}`);
-        throw new ServerError(ERROR_CODE.OPERATION_FAILURE);
+        if (!(error instanceof CustomError)) throw new ServerError(ERROR_CODE.OPERATION_FAILURE);
+        throw error;
+    }
+};
+
+CategorySchema.methods.checkTitleAvailability = async function (this: ICategoryDoc) {
+    try {
+        if (this.isModified('title') && !isEmpty(this.parent)) {
+            logger.info(`checkTitleAvailability is triggered`);
+            const parentId = this.parent;
+            //creates another instance of same documents model
+            const Category = <Model<ICategoryDoc>>this.constructor;
+            const parent = await Category.findById(parentId).populate('children', 'title');
+            if (isEmpty(parent)) {
+                throw new BadRequestError(
+                    ERROR_CODE.CATEGORY_NOT_FOUND,
+                    `cannot find parent category`,
+                );
+            }
+            if (!isEmpty(parent.children)) {
+                const filterSameTitleArr = (<ICategoryDoc[]>parent.children).filter(
+                    (child: ICategoryDoc) => this.title.toUpperCase() === child.title.toUpperCase(),
+                );
+                if (!isEmpty(filterSameTitleArr)) {
+                    throw new BadRequestError(
+                        ERROR_CODE.CATEGORY_TITLE_INVALID,
+                        'Same level sibling should not have same title',
+                    );
+                }
+            }
+        }
+    } catch (error) {
+        logger.error(`Error occurred in checkTitleAvailability ${error}`);
+        if (!(error instanceof CustomError)) throw new ServerError(ERROR_CODE.OPERATION_FAILURE);
+        throw error;
     }
 };
 
 CategorySchema.pre<ICategoryDoc>('save', async function () {
     logger.info(`entered pre save hook`);
+    await this.checkTitleAvailability();
     await this.buildAncestorsAndAddAsChild();
+});
+
+CategorySchema.post<ICategoryDoc>('remove', async function () {
+    logger.info(`Post remove middleware is triggered`);
+    const deletedCategoryId = this._id;
+
+    //creates another instance of same documents model
+    const Category = <Model<ICategoryDoc>>this.constructor;
+
+    //remove reference from immediate parent
+    if (this.parent) {
+        const updateRes = await Category.updateOne(
+            { _id: { $in: [this.parent] } },
+            { $pull: { children: deletedCategoryId } },
+        );
+        logger.info(
+            `No of matched category ${updateRes.n} | No of matched updated ${updateRes.nModified}`,
+        );
+    }
+
+    //removes all children document
+    if (!isEmpty(this.children)) {
+        const deleteRes = await Category.deleteMany({ ancestors: { $in: [deletedCategoryId] } });
+        if (deleteRes) {
+            logger.info(
+                `No of matched category ${deleteRes.n} | deleted ${deleteRes.deletedCount} | childrenLength ${this.children.length}`,
+            );
+        }
+    }
 });
 
 export const CategoryModel = model<ICategoryDoc>(
