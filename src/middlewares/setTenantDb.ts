@@ -1,7 +1,7 @@
 import { logger, ServerError } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { RequestHandler } from 'express';
-import { DbConnectionManager } from '../configs/initializer';
+import { DbConnectionManager } from '../configs/DbConnectionManager';
 
 /**
  * Sets tenant db based on tenant id
