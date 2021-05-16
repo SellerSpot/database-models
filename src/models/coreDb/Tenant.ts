@@ -1,5 +1,5 @@
 import { Document, model, Schema } from 'mongoose';
-import { PackageConstant } from '../../configs/PackageConstant';
+import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
 import { IPlugin } from './Plugin';
 
@@ -15,8 +15,8 @@ const TenantSchema = new Schema(
     {
         storeName: {
             type: Schema.Types.String,
-            min: PackageConstant.DEFAULT_MIN_TEXT_SIZE,
-            max: PackageConstant.DEFAULT_MAX_TEXT_SIZE,
+            min: CONFIG.DEFAULT_MIN_TEXT_SIZE,
+            max: CONFIG.DEFAULT_MAX_TEXT_SIZE,
             required: true,
             trim: true,
         },

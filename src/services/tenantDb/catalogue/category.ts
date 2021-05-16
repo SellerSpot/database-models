@@ -1,4 +1,4 @@
-import { DbConnectionManager } from '../../../configs/initializer';
+import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../../models';
 import { ICategory, ICategoryDoc } from '../../../models/tenantDb/catalogueModels';

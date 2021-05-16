@@ -3,14 +3,14 @@ import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { BadRequestError, CustomError, logger, ServerError } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { PackageConstant } from '../../../configs/PackageConstant';
+import { CONFIG } from '../../../configs/config';
 
 const CategorySchema = new Schema(
     {
         title: {
             type: Schema.Types.String,
-            min: PackageConstant.DEFAULT_MIN_TEXT_SIZE,
-            max: PackageConstant.DEFAULT_MAX_TEXT_SIZE,
+            min: CONFIG.DEFAULT_MIN_TEXT_SIZE,
+            max: CONFIG.DEFAULT_MAX_TEXT_SIZE,
             required: true,
         },
         parent: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY },
@@ -105,10 +105,10 @@ CategorySchema.methods.checkTitleAvailability = async function (this: ICategoryD
                     (child: ICategoryDoc) => this.title.toUpperCase() === child.title.toUpperCase(),
                 );
                 if (!isEmpty(filterSameTitleArr)) {
-                    throw new BadRequestError(
-                        ERROR_CODE.CATEGORY_TITLE_INVALID,
-                        'Same level sibling should not have same title',
-                    );
+                    // throw new BadRequestError(
+                    //     ERROR_CODE.CATEGORY_TITLE_INVALID,
+                    //     'Same level sibling should not have same title',
+                    // );
                 }
             }
         }

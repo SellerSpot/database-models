@@ -1,8 +1,7 @@
 import { IUser, IUserDoc } from '../../models/tenantDb';
 import { ITenantDoc } from '../../models/coreDb/Tenant';
-import { DbConnectionManager } from '../../configs/initializer';
+import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
-import { isEmpty } from 'lodash';
 
 /**
  * No validation check will be done, should be called by in create
@@ -14,7 +13,7 @@ export const createDefaultUser = async (
 ): Promise<IUserDoc> => {
     const { name, password } = userDetails;
     const { primaryEmail, id } = tenantDoc;
-    if (isEmpty(DbConnectionManager.getTenantDb())) DbConnectionManager.setTenantDb(id);
+    DbConnectionManager.setTenantDb(id);
     const User = DbConnectionManager.getTenantModel<IUserDoc>(MONGOOSE_MODELS.TENANT_DB.USER);
     const rootUser = await User.create({ email: primaryEmail, name, password });
     return rootUser;
