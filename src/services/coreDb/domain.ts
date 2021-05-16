@@ -1,6 +1,6 @@
 import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { DbConnectionManager } from '../../configs/initializer';
+import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
 import { IDomain } from '../../models/coreDb/Domain';
 
