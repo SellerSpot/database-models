@@ -32,6 +32,7 @@
         "@sellerspot/universal-functions": "^1.5.9",
         "@sellerspot/universal-types": "^1.8.8",
         "@sellerspot/webpack-run-scripts-custom-plugin": "^1.18.3",
+        "@types/continuation-local-storage": "^3.2.3",
         "@types/express": "^4.17.11",
         "@types/jest": "^26.0.23",
         "@types/lodash": "^4.14.168",

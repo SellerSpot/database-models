@@ -1,5 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '../mongooseModels';
+import { Document, Schema } from 'mongoose';
 
 export interface IPlugin extends Document {
     name: string;
@@ -9,7 +8,7 @@ export interface IPlugin extends Document {
     bannerImages: string[];
 }
 
-const PluginSchema = new Schema(
+export const PluginSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
@@ -37,5 +36,3 @@ const PluginSchema = new Schema(
         },
     },
 );
-
-export const PluginModel = model<IPlugin>(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);

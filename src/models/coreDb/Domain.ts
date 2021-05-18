@@ -1,4 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../mongooseModels';
 import { ITenant } from './Tenant';
 
@@ -12,7 +12,7 @@ export interface IDomain extends Document {
     updatedAt?: string;
 }
 
-const DomainSchema = new Schema(
+export const DomainSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
@@ -43,5 +43,3 @@ const DomainSchema = new Schema(
         },
     },
 );
-
-export const DomainModel = model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);

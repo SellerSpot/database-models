@@ -1,4 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
 import { IPlugin } from './Plugin';
@@ -11,7 +11,7 @@ export interface ITenant {
 
 export interface ITenantDoc extends ITenant, Document {}
 
-const TenantSchema = new Schema(
+export const TenantSchema = new Schema(
     {
         storeName: {
             type: Schema.Types.String,
@@ -39,5 +39,3 @@ const TenantSchema = new Schema(
         },
     },
 );
-
-export const TenantModel = model<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);

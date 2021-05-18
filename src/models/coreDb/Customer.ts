@@ -1,11 +1,10 @@
-import { Document, model, Schema } from 'mongoose';
-import { MONGOOSE_MODELS } from '../mongooseModels';
+import { Document, Schema } from 'mongoose';
 
 export interface ICustomer extends Document {
     name: string;
 }
 
-const CustomerSchema = new Schema(
+export const CustomerSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
@@ -23,5 +22,3 @@ const CustomerSchema = new Schema(
         },
     },
 );
-
-export const CustomerModel = model<ICustomer>(MONGOOSE_MODELS.CORE_DB.CUSTOMER, CustomerSchema);

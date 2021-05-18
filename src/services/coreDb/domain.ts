@@ -32,8 +32,7 @@ export const createDomain = async ({
 };
 
 export const checkDomainAvailability = async (domainName: string): Promise<boolean> => {
-    const conn = DbConnectionManager.getCoreDb();
-    const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
+    const Domain = DbConnectionManager.getCoreModel<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     const existingDomain = await Domain.findOne({ name: domainName, isReserved: false });
     if (existingDomain) {
         return false;
@@ -42,8 +41,7 @@ export const checkDomainAvailability = async (domainName: string): Promise<boole
 };
 
 export const getDomainByTenantId = async (tenantId: string): Promise<IDomain> => {
-    const conn = DbConnectionManager.getCoreDb();
-    const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
+    const Domain = DbConnectionManager.getCoreModel<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     const domain = await Domain.findOne({ tenant: tenantId });
     return domain;
 };
@@ -52,8 +50,7 @@ export const getDomainByName = async (
     domainName: string,
     populateTenant?: boolean,
 ): Promise<IDomain> => {
-    const conn = DbConnectionManager.getCoreDb();
-    const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
+    const Domain = DbConnectionManager.getCoreModel<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     const domain = await Domain.findOne({ name: domainName }).populate(
         populateTenant ? 'tenant' : '',
     );

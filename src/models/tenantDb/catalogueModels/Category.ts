@@ -5,7 +5,21 @@ import { BadRequestError, CustomError, logger, ServerError } from '@sellerspot/u
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { CONFIG } from '../../../configs/config';
 
-const CategorySchema = new Schema(
+export interface ICategory {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    id?: any;
+    title: string;
+    parent?: string | ICategory | null;
+    ancestors?: string[] | ICategory[];
+    children?: string[] | ICategory[];
+}
+
+export interface ICategoryDoc extends ICategory, Document {
+    buildAncestorsAndAddAsChild(): Promise<void>;
+    checkTitleAvailability(): Promise<void>;
+}
+
+export const CategorySchema = new Schema(
     {
         title: {
             type: Schema.Types.String,
@@ -40,19 +54,6 @@ const CategorySchema = new Schema(
         },
     },
 );
-export interface ICategory {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    id?: any;
-    title: string;
-    parent?: string | ICategory | null;
-    ancestors?: string[] | ICategory[];
-    children?: string[] | ICategory[];
-}
-
-export interface ICategoryDoc extends ICategory, Document {
-    buildAncestorsAndAddAsChild(): Promise<void>;
-    checkTitleAvailability(): Promise<void>;
-}
 
 CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICategoryDoc) {
     try {
@@ -105,10 +106,10 @@ CategorySchema.methods.checkTitleAvailability = async function (this: ICategoryD
                     (child: ICategoryDoc) => this.title.toUpperCase() === child.title.toUpperCase(),
                 );
                 if (!isEmpty(filterSameTitleArr)) {
-                    // throw new BadRequestError(
-                    //     ERROR_CODE.CATEGORY_TITLE_INVALID,
-                    //     'Same level sibling should not have same title',
-                    // );
+                    throw new BadRequestError(
+                        ERROR_CODE.CATEGORY_TITLE_INVALID,
+                        'Same level sibling should not have same title',
+                    );
                 }
             }
         }
@@ -153,8 +154,3 @@ CategorySchema.post<ICategoryDoc>('remove', async function () {
         }
     }
 });
-
-export const CategoryModel = model<ICategoryDoc>(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    CategorySchema,
-);
