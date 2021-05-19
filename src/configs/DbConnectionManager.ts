@@ -24,7 +24,7 @@ export class DbConnectionManager {
      * @returns {Model<T>}
      */
     public static getTenantModel<T extends Document>(modelName: string): Model<T> {
-        const schema = MODEL_NAME_VS_SCHEMA[modelName];
+        const schema = MODEL_NAME_VS_SCHEMA.get(modelName);
         return DbConnectionManager.getTenantDb().model<T>(modelName, schema);
     }
 
@@ -34,7 +34,7 @@ export class DbConnectionManager {
      * @returns {Model<T>}
      */
     public static getCoreModel<T extends Document>(modelName: string): Model<T> {
-        const schema = MODEL_NAME_VS_SCHEMA[modelName];
+        const schema = MODEL_NAME_VS_SCHEMA.get(modelName);
         return DbConnectionManager.getCoreDb().model<T>(modelName, schema);
     }
 }

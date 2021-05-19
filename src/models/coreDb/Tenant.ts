@@ -1,6 +1,7 @@
 import { Document, Schema } from 'mongoose';
 import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
+import { MODEL_NAME_VS_SCHEMA } from '../schemaMap';
 import { IPlugin } from './Plugin';
 
 export interface ITenant {
@@ -39,3 +40,5 @@ export const TenantSchema = new Schema(
         },
     },
 );
+
+MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);
