@@ -1,8 +1,9 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { ICustomer } from '../../coreDb';
 import { IOutlet } from '../catalogueModels';
 import { IUser } from '../User';
+import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
 
 enum DiscountTypesEnum {
     VALUE = 'VALUE',
@@ -20,7 +21,7 @@ enum PaymentMethodsEnum {
     CARD = 'CARD',
 }
 
-const SaleSchema = new Schema(
+export const SaleSchema = new Schema(
     {
         cart: [
             {
@@ -117,4 +118,4 @@ export interface ISale extends Document {
     updatedAt?: string;
 }
 
-export const SaleModel = model<ISale>(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);
+MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);

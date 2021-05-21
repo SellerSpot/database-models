@@ -1,11 +1,12 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../mongooseModels';
+import { MODEL_NAME_VS_SCHEMA } from '../schemaMap';
 
 export interface ICustomer extends Document {
     name: string;
 }
 
-const CustomerSchema = new Schema(
+export const CustomerSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
@@ -24,4 +25,4 @@ const CustomerSchema = new Schema(
     },
 );
 
-export const CustomerModel = model<ICustomer>(MONGOOSE_MODELS.CORE_DB.CUSTOMER, CustomerSchema);
+MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.CORE_DB.CUSTOMER, CustomerSchema);
