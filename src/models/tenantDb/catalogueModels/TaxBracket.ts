@@ -1,7 +1,8 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
+import { SchemaService } from '../../SchemaService';
 
-const TaxBracketSchema = new Schema(
+export const TaxBracketSchema = new Schema(
     {
         name: Schema.Types.String,
         rate: Schema.Types.Number,
@@ -20,7 +21,4 @@ export interface ITaxBracket extends Document {
     linkedProductsCount: number;
 }
 
-export const TaxBracketModel = model<ITaxBracket>(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
-    TaxBracketSchema,
-);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET, TaxBracketSchema);

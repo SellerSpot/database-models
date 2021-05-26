@@ -1,9 +1,10 @@
 import { auth, logger } from '@sellerspot/universal-functions';
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
+import { SchemaService } from '../SchemaService';
 
-const UserSchema = new Schema(
+export const UserSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
@@ -14,6 +15,7 @@ const UserSchema = new Schema(
         email: {
             type: Schema.Types.String,
             lowercase: true,
+            index: true,
             trim: true,
         },
         password: {
@@ -34,12 +36,6 @@ const UserSchema = new Schema(
     },
 );
 
-export interface IUser {
-    name: string;
-    email?: string;
-    password: string;
-}
-
 UserSchema.pre('save', async function (done) {
     if (this.isModified('password')) {
         logger.info(`password is modified hence rehashing`);
@@ -49,7 +45,13 @@ UserSchema.pre('save', async function (done) {
     done();
 });
 
+export interface IUser {
+    name: string;
+    email?: string;
+    password: string;
+}
+
 //methods in model can be added here
 export interface IUserDoc extends IUser, Document {}
 
-export const UserModel = model<IUserDoc>(MONGOOSE_MODELS.TENANT_DB.USER, UserSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.USER, UserSchema);

@@ -1,8 +1,9 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { IStockUnit } from './StockUnit';
+import { SchemaService } from '../../SchemaService';
 
-const ProductSchema = new Schema(
+export const ProductSchema = new Schema(
     {
         name: String,
         barcode: String,
@@ -25,7 +26,4 @@ export interface IProduct extends Document {
     updatedAt?: string;
 }
 
-export const ProductModel = model<IProduct>(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    ProductSchema,
-);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT, ProductSchema);

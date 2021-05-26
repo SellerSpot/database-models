@@ -1,8 +1,9 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
+import { SchemaService } from '../../SchemaService';
 import { ITaxBracket } from './TaxBracket';
 
-const TaxGroupSchema = new Schema(
+export const TaxGroupSchema = new Schema(
     {
         name: Schema.Types.String,
         brackets: {
@@ -25,7 +26,4 @@ export interface ITaxGroup extends Document {
     updatedAt?: string;
 }
 
-export const TaxGroupModel = model<ITaxGroup>(
-    MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXGROUP,
-    TaxGroupSchema,
-);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXGROUP, TaxGroupSchema);

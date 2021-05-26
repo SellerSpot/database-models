@@ -1,8 +1,9 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
+import { SchemaService } from '../../SchemaService';
 import { IBrand, ICategory, IOutlet, IProduct } from '../catalogueModels';
 
-const InventorySchema = new Schema(
+export const InventorySchema = new Schema(
     {
         product: {
             type: Schema.Types.ObjectId,
@@ -45,7 +46,4 @@ export interface IInventory extends Document {
     stockLevel: number;
 }
 
-export const InventoryModel = model<IInventory>(
-    MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY,
-    InventorySchema,
-);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY, InventorySchema);

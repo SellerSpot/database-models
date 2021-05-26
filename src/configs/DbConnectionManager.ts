@@ -1,25 +1,21 @@
 import { Connection, Document, Model } from 'mongoose';
-import { DB_NAMES } from '../dbNames';
+import { CLSService } from '@sellerspot/universal-functions';
+import { SchemaService } from '../models/SchemaService';
+
 export class DbConnectionManager {
     private static _core: Connection;
-    private static _tenant: Connection;
 
     public static intialize(conn: Connection): void {
-        DbConnectionManager._core = conn?.useDb(DB_NAMES.CORE_DB, { useCache: true });
+        DbConnectionManager._core = conn;
     }
-
-    public static setTenantDb = (tenantId: string): void => {
-        DbConnectionManager._tenant = DbConnectionManager._core?.useDb(tenantId, {
-            useCache: true,
-        });
-    };
-
     public static getCoreDb(): Connection {
         return DbConnectionManager._core;
     }
 
     public static getTenantDb(): Connection {
-        return DbConnectionManager._tenant;
+        return DbConnectionManager._core?.useDb(CLSService.getData('tenantId'), {
+            useCache: true,
+        });
     }
 
     /**
@@ -28,7 +24,8 @@ export class DbConnectionManager {
      * @returns {Model<T>}
      */
     public static getTenantModel<T extends Document>(modelName: string): Model<T> {
-        return DbConnectionManager.getTenantDb().model<T>(modelName);
+        const schema = SchemaService.get(modelName);
+        return DbConnectionManager.getTenantDb().model<T>(modelName, schema);
     }
 
     /**
@@ -37,6 +34,7 @@ export class DbConnectionManager {
      * @returns {Model<T>}
      */
     public static getCoreModel<T extends Document>(modelName: string): Model<T> {
-        return DbConnectionManager.getCoreDb().model<T>(modelName);
+        const schema = SchemaService.get(modelName);
+        return DbConnectionManager.getCoreDb().model<T>(modelName, schema);
     }
 }
