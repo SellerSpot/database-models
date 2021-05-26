@@ -2,7 +2,7 @@ import { auth, logger } from '@sellerspot/universal-functions';
 import { Document, Schema } from 'mongoose';
 import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
-import { MODEL_NAME_VS_SCHEMA } from '../schemaMap';
+import { SchemaService } from '../SchemaService';
 
 export const UserSchema = new Schema(
     {
@@ -54,4 +54,4 @@ export interface IUser {
 //methods in model can be added here
 export interface IUserDoc extends IUser, Document {}
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.USER, UserSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.USER, UserSchema);

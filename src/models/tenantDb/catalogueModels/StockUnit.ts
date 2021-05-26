@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
+import { SchemaService } from '../../SchemaService';
 
 export const StockUnitSchema = new Schema(
     {
@@ -20,4 +20,4 @@ export interface IStockUnit extends Document {
     updatedAt?: string;
 }
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT, StockUnitSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT, StockUnitSchema);

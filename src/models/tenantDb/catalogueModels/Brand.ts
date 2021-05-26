@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
+import { SchemaService } from '../../SchemaService';
 
 export const BrandSchema = new Schema(
     {
@@ -17,4 +17,4 @@ export interface IBrand extends Document {
     linkedProductsCount: number;
 }
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND, BrandSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND, BrandSchema);

@@ -1,7 +1,7 @@
 import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { IStockUnit } from './StockUnit';
-import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
+import { SchemaService } from '../../SchemaService';
 
 export const ProductSchema = new Schema(
     {
@@ -26,4 +26,4 @@ export interface IProduct extends Document {
     updatedAt?: string;
 }
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT, ProductSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT, ProductSchema);

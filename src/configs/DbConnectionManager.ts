@@ -1,6 +1,6 @@
 import { Connection, Document, Model } from 'mongoose';
-import { AuthUtil } from '@sellerspot/universal-functions';
-import { MODEL_NAME_VS_SCHEMA } from '../models/schemaMap';
+import { CLSService } from '@sellerspot/universal-functions';
+import { SchemaService } from '../models/SchemaService';
 
 export class DbConnectionManager {
     private static _core: Connection;
@@ -13,7 +13,7 @@ export class DbConnectionManager {
     }
 
     public static getTenantDb(): Connection {
-        return DbConnectionManager._core?.useDb(AuthUtil.getCurrentTenantId(), {
+        return DbConnectionManager._core?.useDb(CLSService.getData('tenantId'), {
             useCache: true,
         });
     }
@@ -24,7 +24,7 @@ export class DbConnectionManager {
      * @returns {Model<T>}
      */
     public static getTenantModel<T extends Document>(modelName: string): Model<T> {
-        const schema = MODEL_NAME_VS_SCHEMA.get(modelName);
+        const schema = SchemaService.get(modelName);
         return DbConnectionManager.getTenantDb().model<T>(modelName, schema);
     }
 
@@ -34,7 +34,7 @@ export class DbConnectionManager {
      * @returns {Model<T>}
      */
     public static getCoreModel<T extends Document>(modelName: string): Model<T> {
-        const schema = MODEL_NAME_VS_SCHEMA.get(modelName);
+        const schema = SchemaService.get(modelName);
         return DbConnectionManager.getCoreDb().model<T>(modelName, schema);
     }
 }

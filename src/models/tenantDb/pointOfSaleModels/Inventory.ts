@@ -1,6 +1,6 @@
 import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
+import { SchemaService } from '../../SchemaService';
 import { IBrand, ICategory, IOutlet, IProduct } from '../catalogueModels';
 
 export const InventorySchema = new Schema(
@@ -46,4 +46,4 @@ export interface IInventory extends Document {
     stockLevel: number;
 }
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY, InventorySchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY, InventorySchema);

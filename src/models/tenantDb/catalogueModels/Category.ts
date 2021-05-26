@@ -4,7 +4,7 @@ import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { BadRequestError, CustomError, logger, ServerError } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { CONFIG } from '../../../configs/config';
-import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
+import { SchemaService } from '../../SchemaService';
 
 export interface ICategory {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -156,4 +156,4 @@ CategorySchema.post<ICategoryDoc>('remove', async function () {
     }
 });
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY, CategorySchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY, CategorySchema);

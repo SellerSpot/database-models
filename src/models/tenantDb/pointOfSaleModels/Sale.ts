@@ -3,7 +3,7 @@ import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { ICustomer } from '../../coreDb';
 import { IOutlet } from '../catalogueModels';
 import { IUser } from '../User';
-import { MODEL_NAME_VS_SCHEMA } from '../../schemaMap';
+import { SchemaService } from '../../SchemaService';
 
 enum DiscountTypesEnum {
     VALUE = 'VALUE',
@@ -118,4 +118,4 @@ export interface ISale extends Document {
     updatedAt?: string;
 }
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);

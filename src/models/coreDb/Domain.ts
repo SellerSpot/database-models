@@ -1,7 +1,7 @@
 import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../mongooseModels';
 import { ITenant } from './Tenant';
-import { MODEL_NAME_VS_SCHEMA } from '../schemaMap';
+import { SchemaService } from '../SchemaService';
 
 export interface IDomain extends Document {
     name: string;
@@ -45,4 +45,4 @@ export const DomainSchema = new Schema(
     },
 );
 
-MODEL_NAME_VS_SCHEMA.set(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);
+SchemaService.set(MONGOOSE_MODELS.CORE_DB.DOMAIN, DomainSchema);
