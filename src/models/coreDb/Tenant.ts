@@ -5,12 +5,15 @@ import { SchemaService } from '../SchemaService';
 import { IPlugin } from './Plugin';
 
 export interface ITenant {
+    id: string;
     storeName: string;
     primaryEmail: string;
     plugins?: string[] | IPlugin[];
 }
 
-export interface ITenantDoc extends ITenant, Document {}
+export interface ITenantDoc extends ITenant, Document {
+    id: string;
+}
 
 export const TenantSchema = new Schema(
     {

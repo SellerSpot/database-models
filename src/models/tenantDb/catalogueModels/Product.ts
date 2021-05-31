@@ -1,12 +1,12 @@
-import { Document, Schema } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { IStockUnit } from './StockUnit';
 import { SchemaService } from '../../SchemaService';
 
 export const ProductSchema = new Schema(
     {
-        name: String,
-        barcode: String,
+        name: { type: Schema.Types.String },
+        barcode: { type: Schema.Types.String },
         stockUnit: {
             type: Schema.Types.ObjectId,
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
@@ -18,10 +18,10 @@ export const ProductSchema = new Schema(
 );
 
 export interface IProduct extends Document {
-    _id?: string;
+    id: string;
     name: string;
     barcode: string;
-    stockUnit: string | IStockUnit;
+    stockUnit: Types.ObjectId | IStockUnit;
     createdAt?: string;
     updatedAt?: string;
 }
