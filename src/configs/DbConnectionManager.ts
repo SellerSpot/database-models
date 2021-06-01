@@ -1,5 +1,5 @@
 import { Connection, Document, Model } from 'mongoose';
-import { CLSService } from '@sellerspot/universal-functions';
+import { AuthUtil } from '@sellerspot/universal-functions';
 import { SchemaService } from '../models/SchemaService';
 
 export class DbConnectionManager {
@@ -8,12 +8,13 @@ export class DbConnectionManager {
     public static intialize(conn: Connection): void {
         DbConnectionManager._core = conn;
     }
-    public static getCoreDb(): Connection {
+
+    private static getCoreDb(): Connection {
         return DbConnectionManager._core;
     }
 
-    public static getTenantDb(): Connection {
-        return DbConnectionManager._core?.useDb(CLSService.getData('tenantId'), {
+    private static getTenantDb(): Connection {
+        return DbConnectionManager._core?.useDb(AuthUtil.getCurrentTenantId(), {
             useCache: true,
         });
     }
