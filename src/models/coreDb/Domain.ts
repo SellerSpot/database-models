@@ -4,6 +4,7 @@ import { ITenant } from './Tenant';
 import { SchemaService } from '../SchemaService';
 
 export interface IDomain extends Document {
+    id: string;
     name: string;
     tenant: string | ITenant;
     isCustom: boolean;

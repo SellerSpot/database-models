@@ -4,6 +4,8 @@ import { SchemaService } from '../SchemaService';
 
 export interface ICustomer extends Document {
     name: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export const CustomerSchema = new Schema(

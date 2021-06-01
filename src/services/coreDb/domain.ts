@@ -15,8 +15,7 @@ export const createDomain = async ({
     isReserved?: boolean;
     isCustom?: boolean;
 }): Promise<IDomain> => {
-    const conn = DbConnectionManager.getCoreDb();
-    const Domain = conn.model<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
+    const Domain = DbConnectionManager.getCoreModel<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
     if (!checkDomainAvailability(domainName)) {
         logger.error(`Tenant invalid - domain already exist ${domainName}`);
         throw new BadRequestError(ERROR_CODE.DOMAIN_ALREADY_EXIST, 'Domain already exist');

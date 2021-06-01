@@ -5,7 +5,6 @@ import { SchemaService } from '../../SchemaService';
 export const BrandSchema = new Schema(
     {
         name: Schema.Types.String,
-        linkedProductsCount: Schema.Types.Number,
     },
     {
         timestamps: true,
@@ -14,7 +13,8 @@ export const BrandSchema = new Schema(
 
 export interface IBrand extends Document {
     name: string;
-    linkedProductsCount: number;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND, BrandSchema);
