@@ -4,7 +4,7 @@
     "description": "This Package contains all database models (will be consumed by all services) - keeping models in seperate repo will keep all the services in sync.",
     "main": "dist/index.js",
     "scripts": {
-        "dev": "tsc-watch --onSuccess 'yalc push --no-scripts'",
+        "dev": "tsc-watch --onSuccess \"yalc push --no-scripts\"",
         "test": "jest --runInBand",
         "build": "webpack --mode production --env production",
         "build:dev": "webpack --mode development --env production && yalc push --no-scripts",
