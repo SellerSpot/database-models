@@ -1,4 +1,4 @@
-import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
@@ -25,5 +25,15 @@ export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant
 export const getTenantById = async (tenantId: string): Promise<ITenantDoc> => {
     const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
     const tenant = await Tenant.findById(tenantId);
+    return tenant;
+};
+
+/**
+ * Deletes the current tenant
+ */
+export const deleteTenant = async (): Promise<ITenantDoc> => {
+    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const currentTenantId = AuthUtil.getCurrentTenantId();
+    const tenant = await Tenant.findByIdAndDelete(currentTenantId);
     return tenant;
 };
