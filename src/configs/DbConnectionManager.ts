@@ -16,6 +16,11 @@ export class DbConnectionManager {
     private static getTenantDb(): Connection {
         return DbConnectionManager._core?.useDb(AuthUtil.getCurrentTenantId(), {
             useCache: true,
+            /**
+             * By defualt there will be EventEmitter be attaced to parent connection, which shoot up memory usage
+             * check out for more {@link https://github.com/Automattic/mongoose/issues/9961}
+             */
+            noListener: true,
         });
     }
 

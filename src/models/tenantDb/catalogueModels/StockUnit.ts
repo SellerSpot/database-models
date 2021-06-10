@@ -5,7 +5,6 @@ import { SchemaService } from '../../SchemaService';
 export const StockUnitSchema = new Schema(
     {
         name: Schema.Types.String,
-        linkedProductsCount: Schema.Types.Number,
     },
     {
         timestamps: true,
@@ -15,7 +14,6 @@ export const StockUnitSchema = new Schema(
 export interface IStockUnit extends Document {
     _id?: string;
     name: string;
-    linkedProductsCount: number;
     createdAt?: string;
     updatedAt?: string;
 }

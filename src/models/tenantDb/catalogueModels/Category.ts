@@ -18,6 +18,8 @@ export interface ICategory {
 export interface ICategoryDoc extends ICategory, Document {
     buildAncestorsAndAddAsChild(): Promise<void>;
     checkTitleAvailability(): Promise<void>;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export const CategorySchema = new Schema(
