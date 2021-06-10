@@ -1,22 +1,22 @@
-import { Document, Schema } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { ICustomer } from '../../coreDb';
-import { IOutlet } from '../catalogueModels';
+import { IOutlet, IProduct, IStockUnit, ITaxBracket } from '../catalogueModels';
 import { IUser } from '../User';
 import { SchemaService } from '../../SchemaService';
 
-enum DiscountTypesEnum {
+export enum DiscountTypesEnum {
     VALUE = 'VALUE',
     PERCENT = 'PERCENT',
 }
 
-enum SaletatusEnum {
+export enum SaletatusEnum {
     PARKED = 'PARKED',
     COMPLETED = 'COMPLETED',
     VOIDED = 'VOIDED',
 }
 
-enum PaymentMethodsEnum {
+export enum PaymentMethodsEnum {
     CASH = 'CASH',
     CARD = 'CARD',
 }
@@ -25,59 +25,91 @@ export const SaleSchema = new Schema(
     {
         cart: [
             {
-                productId: {
-                    type: Schema.Types.ObjectId,
-                    ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+                product: {
+                    name: {
+                        type: Schema.Types.String,
+                    },
+                    reference: {
+                        type: Schema.Types.ObjectId,
+                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+                    },
                 },
-                productName: Schema.Types.String,
-                quantity: Schema.Types.Number,
-                unitPrice: Schema.Types.Number,
-                discount: Schema.Types.Number,
-                discountType: {
+                stockUnit: {
+                    name: {
+                        type: Schema.Types.String,
+                    },
+                    reference: {
+                        type: Schema.Types.ObjectId,
+                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+                    },
+                },
+                quantity: { type: Schema.Types.Number },
+                unitPrice: { type: Schema.Types.Number },
+                productDiscount: { type: Schema.Types.Number },
+                productDiscountType: {
                     type: Schema.Types.String,
                     enum: DiscountTypesEnum,
                 },
-                taxDetails: [
-                    {
-                        taxBracketId: {
-                            type: Schema.Types.ObjectId,
-                            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+                taxBracket: {
+                    name: { type: Schema.Types.String },
+                    rate: { type: Schema.Types.Number },
+                    group: [
+                        {
+                            name: { type: Schema.Types.String },
+                            rate: { type: Schema.Types.Number },
                         },
-                        bracketName: Schema.Types.String,
-                        bracketRate: Schema.Types.Number,
+                    ],
+                    reference: {
+                        type: Schema.Types.ObjectId,
+                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
                     },
-                ],
+                },
             },
         ],
         status: {
             type: Schema.Types.String,
             enum: SaletatusEnum,
         },
-        saleDiscount: Schema.Types.Number,
+        saleDiscount: { type: Schema.Types.Number },
         saleDiscountType: {
             type: Schema.Types.String,
             enum: DiscountTypesEnum,
         },
-        paymentDetails: {
+        payment: {
             method: {
                 type: Schema.Types.String,
                 enum: PaymentMethodsEnum,
             },
-            amountPaid: Schema.Types.Number,
-            balance: Schema.Types.Number,
+            total: { type: Schema.Types.Number },
+            amountPaid: { type: Schema.Types.Number },
+            balance: { type: Schema.Types.Number },
         },
-        saleTotal: Schema.Types.Number,
         customer: {
-            type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.CORE_DB.CUSTOMER,
+            name: {
+                type: Schema.Types.String,
+            },
+            ref: {
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.CORE_DB.CUSTOMER,
+            },
         },
-        employee: {
-            type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.USER,
+        user: {
+            name: {
+                type: Schema.Types.String,
+            },
+            ref: {
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.TENANT_DB.USER,
+            },
         },
         outlet: {
-            type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
+            name: {
+                type: Schema.Types.String,
+            },
+            ref: {
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
+            },
         },
     },
     {
@@ -85,35 +117,49 @@ export const SaleSchema = new Schema(
     },
 );
 
-export interface ISale extends Document {
-    _id?: string;
-    cart: {
-        productId: string;
-        productName: string;
-        quantity: number;
-        unitPrice: number;
-        discount: number;
-        discountType: DiscountTypesEnum;
-        taxDetails: [
+export interface ICartDetails {
+    product: {
+        name: string;
+        reference: Types.ObjectId | IProduct;
+    };
+    stockUnit: {
+        name: string;
+        reference: Types.ObjectId | IStockUnit;
+    };
+    quantity: number;
+    unitPrice: number;
+    productDiscount: number;
+    productDiscountType: DiscountTypesEnum;
+    taxDetails: {
+        name: string;
+        rate: number;
+        group: [
             {
-                taxBracketId: string;
-                bracketName: string;
-                bracketRate: number;
+                name: string;
+                rate: number;
             },
         ];
-    }[];
+        reference: Types.ObjectId | ITaxBracket;
+    };
+}
+
+export interface ISale {
+    cart: ICartDetails[];
     status: SaletatusEnum;
     saleDiscount: number;
     saleDiscountType: DiscountTypesEnum;
-    paymentDetails: {
+    payment: {
         method: PaymentMethodsEnum;
+        total: { type: Schema.Types.Number };
         amountPaid: number;
         balance: number;
     };
-    saleTotal: number;
-    customer: string | ICustomer;
-    employee: string | IUser;
+    customer: Types.ObjectId | ICustomer;
+    user: Types.ObjectId | IUser;
     outlet: string | IOutlet;
+}
+export interface ISaleDoc extends Document, ISale {
+    id?: string;
     createdAt?: string;
     updatedAt?: string;
 }

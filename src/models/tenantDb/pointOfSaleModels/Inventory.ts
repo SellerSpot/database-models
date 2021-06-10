@@ -1,7 +1,7 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { SchemaService } from '../../SchemaService';
-import { IBrand, ICategory, IOutlet, IProduct } from '../catalogueModels';
+import { IOutlet, IProduct, IStockUnit, ITaxBracket } from '../catalogueModels';
 
 export const InventorySchema = new Schema(
     {
@@ -10,21 +10,21 @@ export const InventorySchema = new Schema(
             required: true,
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
         },
-        brand: {
-            type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-        },
-        category: {
-            type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-        },
-        tags: [{ type: Schema.Types.String }],
-        markupPercent: { type: Schema.Types.Number },
-        landingCost: { type: Schema.Types.Number },
-        sellingPrice: { type: Schema.Types.Number },
-        stock: { type: Schema.Types.Number, default: 0 },
-        isTrackInventory: { type: Schema.Types.Boolean, default: false },
         isActive: { type: Schema.Types.Boolean, default: true },
+        tags: { type: [Schema.Types.String] },
+        stock: { type: Schema.Types.Number, default: 0 },
+        stockUnit: {
+            type: Schema.Types.ObjectId,
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+        },
+        isTrack: { type: Schema.Types.Boolean, default: false },
+        markup: { type: Schema.Types.Number },
+        landingCost: { type: Schema.Types.Number },
+        sellingPrice: { type: Schema.Types.Number, required: true },
+        taxBracket: {
+            type: Schema.Types.ObjectId,
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+        },
         outlet: {
             type: Schema.Types.ObjectId,
             required: true,
@@ -37,22 +37,29 @@ export const InventorySchema = new Schema(
 );
 
 // unique composite index with outlet and product id
-InventorySchema.index({ outlet: 1, product: 1 }, { unique: true, dropDups: true });
+InventorySchema.index({ outlet: 1, product: 1 }, { unique: true });
 
 // text index with tag (full text search)
 InventorySchema.index({ tags: 'text' });
 
-export interface IInventory extends Document {
-    id: string;
+export interface IInventory {
     product: Types.ObjectId | IProduct;
+    isActive: boolean;
     tags: [string];
-    markupPercent: number;
+    stock: number;
+    stockUnit: Types.ObjectId | IStockUnit;
+    isTrack: true;
+    markup: number;
     landingCost: number;
     sellingPrice: number;
-    stock: number;
-    isTrackInventory: true;
-    isActive: boolean;
+    taxBracket: Types.ObjectId | ITaxBracket;
     outlet: Types.ObjectId | IOutlet;
+}
+
+export interface IInventoryDoc extends Document, IInventory {
+    id: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY, InventorySchema);
