@@ -1,4 +1,4 @@
-import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
@@ -54,4 +54,15 @@ export const getDomainByName = async (
         populateTenant ? 'tenant' : '',
     );
     return domain;
+};
+
+/**
+ *
+ * @returns deletes all domains related to the current tenant and returns total number of deleted domains.
+ */
+export const deleteDomainsByTenantId = async (): Promise<number> => {
+    const Domain = DbConnectionManager.getCoreModel<IDomain>(MONGOOSE_MODELS.CORE_DB.DOMAIN);
+    const currentTenantId = AuthUtil.getCurrentTenantId();
+    const deleteDomains = await Domain.deleteMany({ tenant: currentTenantId });
+    return deleteDomains.deletedCount;
 };

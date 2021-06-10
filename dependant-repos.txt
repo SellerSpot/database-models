@@ -1,3 +1,4 @@
 auth-server
+core-server
 pos-server
 catalogue-server

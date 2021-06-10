@@ -35,6 +35,13 @@ export class DbConnectionManager {
     }
 
     /**
+     * @returns {boolean}
+     */
+    public static async deleteTenantDb(): Promise<void> {
+        return await DbConnectionManager.getTenantDb().dropDatabase();
+    }
+
+    /**
      * @typeparam T generic should extends Document and should be passed
      * @param modelName
      * @returns {Model<T>}
