@@ -1,4 +1,4 @@
-import { auth, logger } from '@sellerspot/universal-functions';
+import { logger, PasswordManager } from '@sellerspot/universal-functions';
 import { Document, Schema } from 'mongoose';
 import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
@@ -39,7 +39,7 @@ export const UserSchema = new Schema(
 UserSchema.pre('save', async function (done) {
     if (this.isModified('password')) {
         logger.info(`password is modified hence rehashing`);
-        const hashed = await auth.PasswordManager.toHash(this.get('password'));
+        const hashed = await PasswordManager.toHash(this.get('password'));
         this.set('password', hashed);
     }
     done();

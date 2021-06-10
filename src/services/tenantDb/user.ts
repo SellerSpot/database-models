@@ -20,10 +20,11 @@ export const createDefaultUser = async (
 
 export const getUserByEmail = async (email: string): Promise<IUserDoc> => {
     const User = DbConnectionManager.getTenantModel<IUserDoc>(MONGOOSE_MODELS.TENANT_DB.USER);
-    return await User.findOne({ email }).exec();
+    return await User.findOne({ email });
 };
 
 export const getUserById = async (userId: string): Promise<IUserDoc> => {
     const User = DbConnectionManager.getTenantModel<IUserDoc>(MONGOOSE_MODELS.TENANT_DB.USER);
-    return await User.findById(userId).exec();
+    const user = await User.findById(userId);
+    return user;
 };

@@ -13,8 +13,8 @@ export class DbConnectionManager {
         return DbConnectionManager._core;
     }
 
-    private static getTenantDb(): Connection {
-        return DbConnectionManager._core?.useDb(AuthUtil.getCurrentTenantId(), {
+    private static getTenantDb(tenantId?: string): Connection {
+        return DbConnectionManager._core?.useDb(tenantId ?? AuthUtil.getCurrentTenantId(), {
             useCache: true,
         });
     }
@@ -30,10 +30,11 @@ export class DbConnectionManager {
     }
 
     /**
+     * crucial operation, perform with caution
      * @returns {boolean}
      */
-    public static async deleteTenantDb(): Promise<void> {
-        return await DbConnectionManager.getTenantDb().dropDatabase();
+    public static async deleteTenantDb(tenantId: string): Promise<void> {
+        return await DbConnectionManager.getTenantDb(tenantId).dropDatabase();
     }
 
     /**
