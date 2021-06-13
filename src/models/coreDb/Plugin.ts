@@ -6,8 +6,12 @@ export interface IPlugin extends Document {
     name: string;
     shortDescription: string;
     longDescription: string;
-    iconUrl: string;
+    iconName: string;
+    image: string;
     bannerImages: string[];
+    id?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export const PluginSchema = new Schema(
@@ -20,7 +24,8 @@ export const PluginSchema = new Schema(
             type: Schema.Types.String,
         },
         longDescription: { type: Schema.Types.String },
-        iconUrl: { type: Schema.Types.String },
+        iconName: { type: Schema.Types.String },
+        image: { type: Schema.Types.String },
         bannerImages: [
             {
                 type: Schema.Types.String,

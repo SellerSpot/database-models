@@ -4,16 +4,31 @@ import { MONGOOSE_MODELS } from '../mongooseModels';
 import { SchemaService } from '../SchemaService';
 import { IPlugin } from './Plugin';
 
+export interface IInstalledPlugin extends Document {
+    plugin: string | IPlugin;
+    createdAt?: string;
+    updatedAt?: string;
+}
 export interface ITenant {
     id: string;
     storeName: string;
     primaryEmail: string;
-    plugins?: string[] | IPlugin[];
+    plugins?: IInstalledPlugin[];
 }
 
 export interface ITenantDoc extends ITenant, Document {
     id: string;
 }
+
+const pluginSchema = new Schema(
+    {
+        plugin: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.PLUGIN },
+    },
+    {
+        timestamps: true,
+        _id: false,
+    },
+);
 
 export const TenantSchema = new Schema(
     {
@@ -30,17 +45,10 @@ export const TenantSchema = new Schema(
             lowercase: true,
             trim: true,
         },
-        plugins: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.PLUGIN }],
+        plugins: [pluginSchema],
     },
     {
         timestamps: true,
-        toJSON: {
-            //Arg 1 -> actual doc Arg2 -> doc to be returned
-            transform(_, ret) {
-                (ret.id = ret._id), delete ret._id;
-            },
-            versionKey: false,
-        },
     },
 );
 
