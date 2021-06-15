@@ -6,8 +6,9 @@ import { ICategoryDoc } from './Category';
 
 export const ProductSchema = new Schema(
     {
-        name: { type: Schema.Types.String },
+        name: { type: Schema.Types.String, required: true },
         barcode: { type: Schema.Types.String },
+        description: { type: Schema.Types.String },
         brand: {
             type: Schema.Types.ObjectId,
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
@@ -26,6 +27,7 @@ export interface IProduct extends Document {
     id: string;
     name: string;
     barcode: string;
+    description: string;
     brand: Types.ObjectId | IBrand;
     category: Types.ObjectId | ICategoryDoc;
     createdAt?: string;

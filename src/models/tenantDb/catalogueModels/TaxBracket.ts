@@ -35,9 +35,14 @@ TaxBracketSchema.virtual('isGroup').get(function (this: ITaxBracket) {
 });
 
 export interface ITaxBracket extends Document {
+    id: string;
     name: string;
     rate: number;
     group: Types.ObjectId[] | ITaxBracket[];
+    /**
+     * isGroup - virtual to differentiate between tax bracket / tax group
+     */
+    isGroup: boolean;
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET, TaxBracketSchema);
