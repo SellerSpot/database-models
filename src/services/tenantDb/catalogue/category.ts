@@ -96,11 +96,11 @@ export const editCategoryPosition = async (
         {
             $pull: { children: categoryId },
         },
-    ).exec();
+    );
 
     //Gets the category changes the parent and updates
     //Done this way insead on direct update -> to trigger save middleware
-    const category = await Category.findById(categoryId).exec();
+    const category = await Category.findById(categoryId);
     category.parent = newParentId;
     await category.save();
     return category;
