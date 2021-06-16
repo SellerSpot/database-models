@@ -3,7 +3,7 @@
         "sourceMap": true,
         "noImplicitAny": true,
         "module": "CommonJS",
-        "target": "ES5",
+        "target": "es2018",
         "lib": ["ESNext"],
         "removeComments": false,
         "allowSyntheticDefaultImports": true,
