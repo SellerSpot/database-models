@@ -13,7 +13,7 @@ export interface ITenant {
     id: string;
     storeName: string;
     primaryEmail: string;
-    plugins?: IInstalledPlugin[];
+    plugins: IInstalledPlugin[];
 }
 
 export interface ITenantDoc extends ITenant, Document {

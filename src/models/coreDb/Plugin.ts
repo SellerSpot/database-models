@@ -4,6 +4,7 @@ import { SchemaService } from '../SchemaService';
 
 export interface IPlugin extends Document {
     name: string;
+    uniqueName: string;
     shortDescription: string;
     longDescription: string;
     iconName: string;
@@ -17,6 +18,10 @@ export interface IPlugin extends Document {
 export const PluginSchema = new Schema(
     {
         name: {
+            type: Schema.Types.String,
+            required: true,
+        },
+        uniqueName: {
             type: Schema.Types.String,
             required: true,
         },
