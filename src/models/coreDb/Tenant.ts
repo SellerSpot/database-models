@@ -16,13 +16,14 @@ export interface ITenant {
     plugins: IInstalledPlugin[];
 }
 
+// remove ITenantDoc
 export interface ITenantDoc extends ITenant, Document {
     id: string;
 }
 
 const pluginSchema = new Schema(
     {
-        plugin: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.CORE_DB.PLUGIN },
+        plugin: { type: Schema.Types.String },
     },
     {
         timestamps: true,
@@ -51,5 +52,14 @@ export const TenantSchema = new Schema(
         timestamps: true,
     },
 );
+
+/**
+ * using unique Id as foreign key to populate instead _id
+ */
+TenantSchema.virtual('populatePlugins', {
+    ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
+    localField: 'plugins.plugin',
+    foreignField: 'plugins',
+});
 
 SchemaService.set(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);
