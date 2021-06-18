@@ -19,6 +19,7 @@ export interface ITenant {
 // remove ITenantDoc
 export interface ITenantDoc extends ITenant, Document {
     id: string;
+    populatePlugins: IPlugin[];
 }
 
 const pluginSchema = new Schema(
@@ -59,7 +60,8 @@ export const TenantSchema = new Schema(
 TenantSchema.virtual('populatePlugins', {
     ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
     localField: 'plugins.plugin',
-    foreignField: 'plugins',
+    foreignField: 'pluginId',
+    justOne: false,
 });
 
 SchemaService.set(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);

@@ -87,9 +87,17 @@ export const addPlugin = async (
             $push: { plugins: { $each: structuredPluginsToInstall } },
         },
         { new: true },
-    ).populate(<PopulateOptions>{ path: 'populatePlugins' });
+    ).populate('populatePlugins');
 
-    return tenant.plugins;
+    //it works ;)
+    const pluginsList: IInstalledPlugin[] = [];
+    const poulatedPlugins = tenant.populatePlugins;
+    tenant.plugins.forEach((pluginDoc, i) => {
+        pluginDoc = <IInstalledPlugin>pluginDoc.toJSON();
+        pluginDoc.plugin = <IPlugin>poulatedPlugins[i].toJSON();
+        pluginsList.push(pluginDoc);
+    });
+    return pluginsList;
 };
 
 /**
@@ -146,7 +154,15 @@ export const removePlugin = async (
             $pullAll: { plugins: structuredPluginsToUnInstall },
         },
         { new: true },
-    ).populate(<PopulateOptions>{ path: 'populatePlugins' });
+    ).populate('populatePlugins');
 
-    return tenant.plugins;
+    //it works ;)
+    const pluginsList: IInstalledPlugin[] = [];
+    const poulatedPlugins = tenant.populatePlugins;
+    tenant.plugins.forEach((pluginDoc, i) => {
+        pluginDoc = <IInstalledPlugin>pluginDoc.toJSON();
+        pluginDoc.plugin = <IPlugin>poulatedPlugins[i].toJSON();
+        pluginsList.push(pluginDoc);
+    });
+    return pluginsList;
 };
