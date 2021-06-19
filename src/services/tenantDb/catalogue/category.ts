@@ -1,14 +1,14 @@
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../../models';
-import { ICategory } from '../../../models/tenantDb/catalogueModels';
+import { ICategory, ICategoryDoc } from '../../../models/tenantDb/catalogueModels';
 import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
 
 export const createCategory = async (
     props: Pick<ICategory, 'title' | 'parent'>,
-): Promise<ICategory> => {
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+): Promise<ICategoryDoc> => {
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     const { title } = props;
@@ -29,9 +29,9 @@ export const createCategory = async (
 export const editCategoryContent = async (
     categoryId: string,
     props: Pick<ICategory, 'title'>,
-): Promise<ICategory> => {
+): Promise<ICategoryDoc> => {
     const { title } = props;
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     const updatedCategory = await Category.findOneAndUpdate(
@@ -49,9 +49,9 @@ export interface ICategorySibling {
 export const editCategorySiblingOrder = async (
     parentId: string,
     props: ICategorySibling,
-): Promise<ICategory> => {
+): Promise<ICategoryDoc> => {
     const { siblingOrder } = props;
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     const updatedCategory = await Category.findByIdAndUpdate(parentId);
@@ -82,9 +82,9 @@ export interface ICategoryPosition {
 export const editCategoryPosition = async (
     categoryId: string,
     props: ICategoryPosition,
-): Promise<ICategory> => {
+): Promise<ICategoryDoc> => {
     const { newParentId, oldParentId } = props;
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
 
@@ -106,26 +106,26 @@ export const editCategoryPosition = async (
     return category;
 };
 
-export const getRootCategory = async (): Promise<ICategory> => {
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+export const getRootCategory = async (): Promise<ICategoryDoc> => {
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     return await Category.findOne({ title: 'root' });
 };
 
-export const getCategoryById = async (categoryId: string): Promise<ICategory> => {
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+export const getCategoryById = async (categoryId: string): Promise<ICategoryDoc> => {
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     return await Category.findById(categoryId).populate('children').exec();
 };
 
-export const getAllCategory = async (): Promise<ICategory[]> => {
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+export const getAllCategory = async (): Promise<ICategoryDoc[]> => {
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     const rootCategory = await getRootCategory();
-    let allCategory: ICategory[] = [];
+    let allCategory: ICategoryDoc[] = [];
     if (rootCategory) {
         const rootId = rootCategory.id;
         allCategory = await Category.find({ ancestors: rootId });
@@ -134,8 +134,8 @@ export const getAllCategory = async (): Promise<ICategory[]> => {
     return allCategory;
 };
 
-export const deleteCategory = async (categoryId: string): Promise<ICategory> => {
-    const Category = DbConnectionManager.getTenantModel<ICategory>(
+export const deleteCategory = async (categoryId: string): Promise<ICategoryDoc> => {
+    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     //remove should be called on returned document and not on Model itself

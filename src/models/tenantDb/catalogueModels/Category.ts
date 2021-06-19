@@ -6,22 +6,19 @@ import { ERROR_CODE } from '@sellerspot/universal-types';
 import { CONFIG } from '../../../configs/config';
 import { SchemaService } from '../../SchemaService';
 
-export interface ICategory extends Document {
-    id?: string;
+export interface ICategory {
     title: string;
     parent?: string | ICategory | null;
     ancestors?: string[] | ICategory[];
     children?: string[] | ICategory[];
+}
+
+export interface ICategoryDoc extends ICategory, Document {
+    id: string;
+    buildAncestorsAndAddAsChild(): Promise<void>;
+    checkTitleAvailability(): Promise<void>;
     createdAt?: string;
     updatedAt?: string;
-    /**
-     * @protected
-     */
-    buildAncestorsAndAddAsChild(): Promise<void>;
-    /**
-     * @protected
-     */
-    checkTitleAvailability(): Promise<void>;
 }
 
 export const CategorySchema = new Schema(
@@ -60,13 +57,13 @@ export const CategorySchema = new Schema(
     },
 );
 
-CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICategory) {
+CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICategoryDoc) {
     try {
         if (this.isModified('parent') && !isEmpty(this.parent)) {
             logger.info(`buildAncestorsAndAddAsChild is triggered`);
             const parentId = this.parent;
             //creates another instance of same documents model
-            const Category = <Model<ICategory>>this.constructor;
+            const Category = <Model<ICategoryDoc>>this.constructor;
             const parent = await Category.findById(parentId);
             if (isEmpty(parent)) {
                 throw new BadRequestError(
@@ -92,13 +89,13 @@ CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICate
     }
 };
 
-CategorySchema.methods.checkTitleAvailability = async function (this: ICategory) {
+CategorySchema.methods.checkTitleAvailability = async function (this: ICategoryDoc) {
     try {
         if (this.isModified('title') && !isEmpty(this.parent)) {
             logger.info(`checkTitleAvailability is triggered`);
             const parentId = this.parent;
             //creates another instance of same documents model
-            const Category = <Model<ICategory>>this.constructor;
+            const Category = <Model<ICategoryDoc>>this.constructor;
             const parent = await Category.findById(parentId).populate('children', 'title');
             if (isEmpty(parent)) {
                 throw new BadRequestError(
@@ -125,18 +122,18 @@ CategorySchema.methods.checkTitleAvailability = async function (this: ICategory)
     }
 };
 
-CategorySchema.pre<ICategory>('save', async function () {
+CategorySchema.pre<ICategoryDoc>('save', async function () {
     logger.info(`entered pre save hook`);
     await this.checkTitleAvailability();
     await this.buildAncestorsAndAddAsChild();
 });
 
-CategorySchema.post<ICategory>('remove', async function () {
+CategorySchema.post<ICategoryDoc>('remove', async function () {
     logger.info(`Post remove middleware is triggered`);
     const deletedCategoryId = this._id;
 
     //creates another instance of same documents model
-    const Category = <Model<ICategory>>this.constructor;
+    const Category = <Model<ICategoryDoc>>this.constructor;
 
     //remove reference from immediate parent
     if (this.parent) {
