@@ -9,17 +9,15 @@ export interface IInstalledPlugin extends Document {
     createdAt?: string;
     updatedAt?: string;
 }
-export interface ITenant {
+export interface ITenant extends Document {
     id: string;
     storeName: string;
     primaryEmail: string;
     plugins: IInstalledPlugin[];
-}
-
-// remove ITenantDoc
-export interface ITenantDoc extends ITenant, Document {
-    id: string;
-    populatePlugins: IPlugin[];
+    /**
+     * virtuals
+     */
+    populatePlugins?: IPlugin[];
 }
 
 const pluginSchema = new Schema(

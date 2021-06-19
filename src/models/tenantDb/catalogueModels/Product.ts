@@ -2,7 +2,7 @@ import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { SchemaService } from '../../SchemaService';
 import { IBrand } from './Brand';
-import { ICategoryDoc } from './Category';
+import { ICategory } from './Category';
 
 export const ProductSchema = new Schema(
     {
@@ -29,7 +29,7 @@ export interface IProduct extends Document {
     barcode: string;
     description: string;
     brand: Types.ObjectId | IBrand;
-    category: Types.ObjectId | ICategoryDoc;
+    category: Types.ObjectId | ICategory;
     createdAt?: string;
     updatedAt?: string;
 }

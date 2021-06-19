@@ -15,6 +15,10 @@ export interface IPlugin extends Document {
     bannerImages: string[];
     createdAt?: string;
     updatedAt?: string;
+    /**
+     * virtuals
+     */
+    populateDependantPlugins?: IPlugin[];
 }
 
 export const PluginSchema = new Schema(
@@ -75,8 +79,9 @@ export const PluginSchema = new Schema(
  */
 PluginSchema.virtual('populateDependantPlugins', {
     ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
-    localField: 'uniqueId',
-    foreignField: 'dependantPlugins',
+    localField: 'dependantPlugins',
+    foreignField: 'pluginId',
+    justOne: false,
 });
 
 SchemaService.set(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);

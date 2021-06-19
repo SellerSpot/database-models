@@ -1,16 +1,16 @@
 import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { PopulateOptions } from 'mongoose';
+import { LeanDocument, PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
 import { IPlugin } from '../../models/coreDb';
-import { ITenantDoc, ITenant, IInstalledPlugin } from '../../models/coreDb/Tenant';
+import { ITenant, IInstalledPlugin } from '../../models/coreDb/Tenant';
 
 type TTenantAttrs = Pick<ITenant, 'storeName' | 'primaryEmail'>;
 
-export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenantDoc> => {
+export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant> => {
     const { primaryEmail, storeName } = tenantDetails;
-    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
     const existingTenant = await Tenant.findOne({ primaryEmail });
     if (existingTenant) {
         logger.error(`Tenant with the email ${primaryEmail} already exist`);
@@ -27,19 +27,29 @@ export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant
 export const getTenantById = async (
     tenantId: string,
     populatePlugins: boolean,
-): Promise<ITenantDoc> => {
-    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+): Promise<ITenant> => {
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
     const tenant = await (populatePlugins
-        ? Tenant.findById(tenantId).populate(<PopulateOptions>{ path: 'plugins.plugin' })
+        ? Tenant.findById(tenantId).populate('populatePlugins')
         : Tenant.findById(tenantId));
-    return tenant;
+    let flatPlugins = tenant.toJSON().plugins;
+    if (populatePlugins) {
+        flatPlugins = getPopulatedInstalledPlugins(tenant);
+    }
+    const leanTenant: LeanDocument<ITenant> = {
+        id: tenant._id.toString(),
+        plugins: flatPlugins,
+        primaryEmail: tenant.primaryEmail.toString(),
+        storeName: tenant.storeName.toString(),
+    };
+    return <ITenant>leanTenant;
 };
 
 /**
  * Deletes the current tenant
  */
-export const deleteTenant = async (): Promise<ITenantDoc> => {
-    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+export const deleteTenant = async (): Promise<ITenant> => {
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
     const currentTenantId = AuthUtil.getCurrentTenantId();
     const tenant = await Tenant.findByIdAndDelete(currentTenantId);
     return tenant;
@@ -73,7 +83,7 @@ export const addPlugin = async (
     // push any dependant plugins for the current plugin
     pluginsToInstall.push(...(((plugin.dependantPlugins ?? []) as unknown) as string[]));
 
-    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
 
     // structing the array of plugin object to push all at one shot
     const structuredPluginsToInstall: { plugin: string }[] = pluginsToInstall.map(
@@ -88,15 +98,7 @@ export const addPlugin = async (
         },
         { new: true },
     ).populate('populatePlugins');
-
-    //it works ;)
-    const pluginsList: IInstalledPlugin[] = [];
-    const poulatedPlugins = tenant.populatePlugins;
-    tenant.plugins.forEach((pluginDoc, i) => {
-        pluginDoc = <IInstalledPlugin>pluginDoc.toJSON();
-        pluginDoc.plugin = <IPlugin>poulatedPlugins[i].toJSON();
-        pluginsList.push(pluginDoc);
-    });
+    const pluginsList = getPopulatedInstalledPlugins(tenant);
     return pluginsList;
 };
 
@@ -111,7 +113,7 @@ export const checkIsPluginAlreadyInstalled = async (
     pluginId: string,
     tenantId: string,
 ): Promise<boolean> => {
-    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
     const alreadyInstalled = await Tenant.exists({
         _id: tenantId,
         'plugins.plugin': pluginId,
@@ -128,7 +130,7 @@ export const removePlugin = async (
 ): Promise<IInstalledPlugin[]> => {
     // plugin validation
     const Plugin = DbConnectionManager.getCoreModel<IPlugin>(MONGOOSE_MODELS.CORE_DB.PLUGIN);
-    const plugin = await Plugin.findOne({ pluginId }).populate('dependantPlugins');
+    const plugin = await Plugin.findOne({ pluginId });
     if (!plugin) {
         logger.error('Invalid Plugin installation intent');
         throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Invalid Plugin');
@@ -141,25 +143,27 @@ export const removePlugin = async (
     pluginsToUninstall.push(...(<string[]>(<unknown>plugin?.dependantPlugins))); // temp - remove while implementing above logic
 
     // tenant validation
-    const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
-    // structing the array of plugin object to push all at one shot
-    const structuredPluginsToUnInstall: { plugin: string }[] = pluginsToUninstall.map(
-        (pluginToUnInstall: string) => ({
-            plugin: pluginToUnInstall,
-        }),
-    );
-    const tenant = await Tenant.findByIdAndUpdate(
-        tenantId,
-        {
-            $pullAll: { plugins: structuredPluginsToUnInstall },
-        },
-        { new: true },
-    ).populate('populatePlugins');
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const tenant = await Tenant.findByIdAndUpdate(tenantId);
 
+    tenant.plugins = tenant.plugins.filter(
+        (installedPlugin) => !pluginsToUninstall.includes(<string>installedPlugin.plugin),
+    );
+
+    await tenant.save();
+
+    await tenant.populate('populatePlugins').execPopulate();
+
+    const pluginsList = getPopulatedInstalledPlugins(tenant);
+
+    return pluginsList;
+};
+
+const getPopulatedInstalledPlugins = (pluginsPopulatedTenant: ITenant): IInstalledPlugin[] => {
     //it works ;)
     const pluginsList: IInstalledPlugin[] = [];
-    const poulatedPlugins = tenant.populatePlugins;
-    tenant.plugins.forEach((pluginDoc, i) => {
+    const poulatedPlugins = pluginsPopulatedTenant.populatePlugins;
+    pluginsPopulatedTenant.plugins.forEach((pluginDoc, i) => {
         pluginDoc = <IInstalledPlugin>pluginDoc.toJSON();
         pluginDoc.plugin = <IPlugin>poulatedPlugins[i].toJSON();
         pluginsList.push(pluginDoc);

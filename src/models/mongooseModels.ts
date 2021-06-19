@@ -20,7 +20,6 @@ export const MONGOOSE_MODELS = {
         },
         CATALOGUE: {
             // catalogue collections goes here
-            // point of sale collections goes here
             PRODUCT: 'CATALOGUE_PRODUCT',
             STOCKUNIT: 'CATALOGUE_STOCKUNIT',
             CATEGORY: 'CATALOGUE_CATEGORY',

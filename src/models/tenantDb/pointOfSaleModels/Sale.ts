@@ -157,8 +157,6 @@ export interface ISale {
     customer: Types.ObjectId | ICustomer;
     user: Types.ObjectId | IUser;
     outlet: string | IOutlet;
-}
-export interface ISaleDoc extends Document, ISale {
     id?: string;
     createdAt?: string;
     updatedAt?: string;

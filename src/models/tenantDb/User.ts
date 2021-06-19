@@ -45,13 +45,10 @@ UserSchema.pre('save', async function (done) {
     done();
 });
 
-export interface IUser {
+export interface IUser extends Document {
     name: string;
-    email?: string;
     password: string;
+    email?: string;
 }
-
-//methods in model can be added here
-export interface IUserDoc extends IUser, Document {}
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.USER, UserSchema);

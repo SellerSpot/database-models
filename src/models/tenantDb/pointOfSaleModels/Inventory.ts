@@ -42,7 +42,7 @@ InventorySchema.index({ outlet: 1, product: 1 }, { unique: true });
 // text index with tag (full text search)
 InventorySchema.index({ tags: 'text' });
 
-export interface IInventory {
+export interface IInventory extends Document {
     product: Types.ObjectId | IProduct;
     isActive: boolean;
     tags: [string];
@@ -54,9 +54,6 @@ export interface IInventory {
     sellingPrice: number;
     taxBracket: Types.ObjectId | ITaxBracket;
     outlet: Types.ObjectId | IOutlet;
-}
-
-export interface IInventoryDoc extends Document, IInventory {
     id: string;
     createdAt?: string;
     updatedAt?: string;
