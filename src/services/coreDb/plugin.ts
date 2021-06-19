@@ -1,5 +1,5 @@
-import { BadRequestError, logger } from '@sellerspot/universal-functions';
-import { ERROR_CODE, IPlugin } from '@sellerspot/universal-types';
+import { logger } from '@sellerspot/universal-functions';
+import { IPlugin } from '@sellerspot/universal-types';
 import { LeanDocument } from 'mongoose';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { coreDbModels, MONGOOSE_MODELS } from '../../models';
@@ -7,14 +7,9 @@ import { coreDbModels, MONGOOSE_MODELS } from '../../models';
 export const createPlugin = async (
     plugin: IPlugin,
 ): Promise<LeanDocument<coreDbModels.IPlugin>> => {
-    const { name } = plugin;
     const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
         MONGOOSE_MODELS.CORE_DB.PLUGIN,
     );
-    if (await checkPluginAlreadyExist(name)) {
-        logger.error(`Plugin with the same name ${name} already exist`);
-        throw new BadRequestError(ERROR_CODE.OPERATION_FAILURE, 'Plugin already exist');
-    }
     const pluginDocument = await Plugin.create({ ...plugin });
     logger.info(`New Plugin ${pluginDocument.name} has been added`);
     return pluginDocument.toJSON();
@@ -26,7 +21,7 @@ export const getPluginById = async (
     const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
         MONGOOSE_MODELS.CORE_DB.PLUGIN,
     );
-    const plugin = await Plugin.findById(pluginId);
+    const plugin = await Plugin.findOne({ pluginId });
     return plugin;
 };
 
@@ -41,42 +36,8 @@ export const deletePluginById = async (
     const Domain = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
         MONGOOSE_MODELS.CORE_DB.PLUGIN,
     );
-    const deletePlugin = await Domain.findByIdAndDelete(pluginId);
+    const deletePlugin = await Domain.findOneAndDelete({ pluginId });
     return deletePlugin.toJSON();
-};
-
-/**
- * updates the properties for a plugin
- *
- * @param pluginId id of the plugin to be updated
- * @param pluginUpdateData name of the new plugin
- *
- * @returns updated plugin document
- */
-export const updatePluginById = async (
-    pluginId: string,
-    pluginUpdateData: Partial<IPlugin>,
-): Promise<LeanDocument<coreDbModels.IPlugin>> => {
-    const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
-        MONGOOSE_MODELS.CORE_DB.PLUGIN,
-    );
-    const plugin = await Plugin.findByIdAndUpdate(
-        pluginId,
-        { $set: { ...pluginUpdateData } },
-        { new: true },
-    );
-    return plugin.toJSON();
-};
-
-/**
- * checks whether the passed plugin is already exist
- */
-export const checkPluginAlreadyExist = async (pluginName: string): Promise<boolean> => {
-    const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
-        MONGOOSE_MODELS.CORE_DB.PLUGIN,
-    );
-    const existingPlugin = await Plugin.findOne({ name: pluginName });
-    return !!existingPlugin;
 };
 
 /**
@@ -86,6 +47,6 @@ export const getAllPlugins = async (): Promise<coreDbModels.IPlugin[]> => {
     const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
         MONGOOSE_MODELS.CORE_DB.PLUGIN,
     );
-    const plugins = await Plugin.find();
+    const plugins = await Plugin.find({ isVisibleInPluginStore: true });
     return plugins;
 };

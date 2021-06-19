@@ -3,33 +3,54 @@ import { MONGOOSE_MODELS } from '../mongooseModels';
 import { SchemaService } from '../SchemaService';
 
 export interface IPlugin extends Document {
+    pluginId: string;
     name: string;
-    uniqueName: string;
+    isVisibleInPluginMenu: boolean;
+    isVisibleInPluginStore: boolean;
+    dependantPlugins: string[] | IPlugin[];
     shortDescription: string;
     longDescription: string;
-    iconName: string;
+    icon: string;
     image: string;
     bannerImages: string[];
-    id?: string;
     createdAt?: string;
     updatedAt?: string;
 }
 
 export const PluginSchema = new Schema(
     {
+        pluginId: {
+            type: Schema.Types.String,
+            required: true,
+            unique: true,
+            index: true,
+            trim: true,
+        },
         name: {
             type: Schema.Types.String,
             required: true,
         },
-        uniqueName: {
+        isVisibleInPluginMenu: {
+            type: Schema.Types.Boolean,
+            default: true,
+        },
+        isVisibleInPluginStore: {
+            type: Schema.Types.Boolean,
+            default: true,
+        },
+        dependantPlugins: [
+            {
+                type: Schema.Types.String,
+                unique: true,
+                default: [],
+            },
+        ],
+        shortDescription: {
             type: Schema.Types.String,
             required: true,
         },
-        shortDescription: {
-            type: Schema.Types.String,
-        },
         longDescription: { type: Schema.Types.String },
-        iconName: { type: Schema.Types.String },
+        icon: { type: Schema.Types.String },
         image: { type: Schema.Types.String },
         bannerImages: [
             {
@@ -48,5 +69,14 @@ export const PluginSchema = new Schema(
         },
     },
 );
+
+/**
+ * using unique Id as foreign key to populate instead _id
+ */
+PluginSchema.virtual('populateDependantPlugins', {
+    ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
+    localField: 'uniqueId',
+    foreignField: 'dependantPlugins',
+});
 
 SchemaService.set(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);

@@ -55,8 +55,8 @@ export const addPlugin = async (
 ): Promise<IInstalledPlugin[]> => {
     // plugin validation
     const Plugin = DbConnectionManager.getCoreModel<IPlugin>(MONGOOSE_MODELS.CORE_DB.PLUGIN);
-    const isValidPlugin = await Plugin.exists({ _id: pluginId });
-    if (!isValidPlugin) {
+    const plugin = await Plugin.findOne({ pluginId });
+    if (!plugin) {
         logger.error('Invalid Plugin installation intent');
         throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Invalid Plugin');
     }
@@ -68,16 +68,36 @@ export const addPlugin = async (
     }
 
     // tenant validation
+    const pluginsToInstall = [pluginId];
+
+    // push any dependant plugins for the current plugin
+    pluginsToInstall.push(...(((plugin.dependantPlugins ?? []) as unknown) as string[]));
+
     const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+
+    // structing the array of plugin object to push all at one shot
+    const structuredPluginsToInstall: { plugin: string }[] = pluginsToInstall.map(
+        (pluginToInstall) => ({
+            plugin: pluginToInstall,
+        }),
+    );
     const tenant = await Tenant.findByIdAndUpdate(
         tenantId,
         {
-            $push: { plugins: { plugin: pluginId } },
+            $push: { plugins: { $each: structuredPluginsToInstall } },
         },
         { new: true },
-    ).populate(<PopulateOptions>{ path: 'plugins.plugin' });
+    ).populate('populatePlugins');
 
-    return tenant.plugins;
+    //it works ;)
+    const pluginsList: IInstalledPlugin[] = [];
+    const poulatedPlugins = tenant.populatePlugins;
+    tenant.plugins.forEach((pluginDoc, i) => {
+        pluginDoc = <IInstalledPlugin>pluginDoc.toJSON();
+        pluginDoc.plugin = <IPlugin>poulatedPlugins[i].toJSON();
+        pluginsList.push(pluginDoc);
+    });
+    return pluginsList;
 };
 
 /**
@@ -108,21 +128,41 @@ export const removePlugin = async (
 ): Promise<IInstalledPlugin[]> => {
     // plugin validation
     const Plugin = DbConnectionManager.getCoreModel<IPlugin>(MONGOOSE_MODELS.CORE_DB.PLUGIN);
-    const isValidPlugin = await Plugin.exists({ _id: pluginId });
-    if (!isValidPlugin) {
+    const plugin = await Plugin.findOne({ pluginId }).populate('dependantPlugins');
+    if (!plugin) {
         logger.error('Invalid Plugin installation intent');
         throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Invalid Plugin');
     }
 
+    const pluginsToUninstall = [pluginId];
+
+    // check if any one of the current dependant plugin is dependant plugin to others and insert it into pluginToUninstall array
+    // (<string[]>(<unknown>plugin.dependantPlugins))?.forEach((dependantPlugin) => {});
+    pluginsToUninstall.push(...(<string[]>(<unknown>plugin?.dependantPlugins))); // temp - remove while implementing above logic
+
     // tenant validation
     const Tenant = DbConnectionManager.getCoreModel<ITenantDoc>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    // structing the array of plugin object to push all at one shot
+    const structuredPluginsToUnInstall: { plugin: string }[] = pluginsToUninstall.map(
+        (pluginToUnInstall: string) => ({
+            plugin: pluginToUnInstall,
+        }),
+    );
     const tenant = await Tenant.findByIdAndUpdate(
         tenantId,
         {
-            $pull: { plugins: { plugin: pluginId } },
+            $pullAll: { plugins: structuredPluginsToUnInstall },
         },
         { new: true },
-    ).populate(<PopulateOptions>{ path: 'plugins.plugin' });
+    ).populate('populatePlugins');
 
-    return tenant.plugins;
+    //it works ;)
+    const pluginsList: IInstalledPlugin[] = [];
+    const poulatedPlugins = tenant.populatePlugins;
+    tenant.plugins.forEach((pluginDoc, i) => {
+        pluginDoc = <IInstalledPlugin>pluginDoc.toJSON();
+        pluginDoc.plugin = <IPlugin>poulatedPlugins[i].toJSON();
+        pluginsList.push(pluginDoc);
+    });
+    return pluginsList;
 };
