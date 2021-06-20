@@ -1,10 +1,14 @@
-import { ERROR_CODE, ITaxBracketRequest, ITaxGroupRequest } from '@sellerspot/universal-types';
+import {
+    ERROR_CODE,
+    ICreateTaxBracketRequest,
+    ICreateTaxGroupRequest,
+} from '@sellerspot/universal-types';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { ITaxBracket } from '../../../models/tenantDb/catalogueModels';
 import { MONGOOSE_MODELS } from '../../../models';
 import { BadRequestError } from '@sellerspot/universal-functions';
 
-export const createTaxBracket = async (bracket: ITaxBracketRequest): Promise<ITaxBracket> => {
+export const createTaxBracket = async (bracket: ICreateTaxBracketRequest): Promise<ITaxBracket> => {
     const { name, rate } = bracket;
     const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracket>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
@@ -20,7 +24,7 @@ export const createTaxBracket = async (bracket: ITaxBracketRequest): Promise<ITa
     return newTaxBracket;
 };
 
-export const createTaxGroup = async (group: ITaxGroupRequest): Promise<ITaxBracket> => {
+export const createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITaxBracket> => {
     const { name, bracket } = group;
     const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracket>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
