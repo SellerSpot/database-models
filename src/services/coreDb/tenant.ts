@@ -184,9 +184,15 @@ export const updateStoreCurrencyById = async (
     currencyId: string,
 ): Promise<IStoreCurrency> => {
     const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
-    const tenant = await Tenant.findByIdAndUpdate(tenantId, {
-        storeCurrency: currencyId,
-    }).populate(MONGOOSE_MODELS.CORE_DB.STORE_CURRENCY);
+    const tenant = await Tenant.findByIdAndUpdate(
+        tenantId,
+        {
+            storeCurrency: currencyId,
+        },
+        { new: true },
+    ).populate({
+        path: 'storeCurrency',
+    });
     if (!tenant) {
         logger.error(`Tenant with id not found ${tenantId}`);
         throw new BadRequestError(ERROR_CODE.TENANT_INVALID, `Tenant with id not found.`);
