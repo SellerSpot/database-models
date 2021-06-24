@@ -1,10 +1,11 @@
 import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { LeanDocument, PopulateOptions } from 'mongoose';
+import { LeanDocument } from 'mongoose';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
-import { IPlugin } from '../../models/coreDb';
+import { IPlugin, IStoreCurrency } from '../../models/coreDb';
 import { ITenant, IInstalledPlugin } from '../../models/coreDb/Tenant';
+import { getDefaultStoreCurrencyId } from '../../seeds';
 
 type TTenantAttrs = Pick<ITenant, 'storeName' | 'primaryEmail'>;
 
@@ -19,28 +20,44 @@ export const createTenant = async (tenantDetails: TTenantAttrs): Promise<ITenant
             `Tenant with email ${primaryEmail} already exist.`,
         );
     }
-    const tenant = await Tenant.create({ storeName, primaryEmail });
+    let tenant = await Tenant.create({
+        storeName,
+        primaryEmail,
+        storeCurrency: getDefaultStoreCurrencyId(),
+    });
+    tenant = await tenant.populate(MONGOOSE_MODELS.CORE_DB.STORE_CURRENCY).execPopulate();
     logger.info(`Tenant registered successfully ${primaryEmail} - ${tenant.id}`);
     return tenant;
 };
 
 export const getTenantById = async (
     tenantId: string,
-    populatePlugins: boolean,
+    options?: {
+        populatePlugins?: boolean;
+        populateStoreCurrency?: boolean;
+    },
 ): Promise<ITenant> => {
     const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
-    const tenant = await (populatePlugins
-        ? Tenant.findById(tenantId).populate('populatePlugins')
-        : Tenant.findById(tenantId));
+    const tenantQuery = Tenant.findById(tenantId);
+    if (options?.populatePlugins) tenantQuery.populate('populatePlugins');
+    if (options?.populateStoreCurrency)
+        tenantQuery.populate({
+            path: 'storeCurrency',
+        });
+    const tenant = await tenantQuery.exec();
+
     let flatPlugins = tenant.toJSON().plugins;
-    if (populatePlugins) {
+
+    if (options?.populatePlugins) {
         flatPlugins = getPopulatedInstalledPlugins(tenant);
     }
+
     const leanTenant: LeanDocument<ITenant> = {
         id: tenant._id.toString(),
         plugins: flatPlugins,
         primaryEmail: tenant.primaryEmail.toString(),
         storeName: tenant.storeName.toString(),
+        storeCurrency: tenant.storeCurrency,
     };
     return <ITenant>leanTenant;
 };
@@ -157,6 +174,24 @@ export const removePlugin = async (
     const pluginsList = getPopulatedInstalledPlugins(tenant);
 
     return pluginsList;
+};
+
+/**
+ * udpate the store currency by currencyId and tenantID
+ */
+export const updateStoreCurrencyById = async (
+    tenantId: string,
+    currencyId: string,
+): Promise<IStoreCurrency> => {
+    const Tenant = DbConnectionManager.getCoreModel<ITenant>(MONGOOSE_MODELS.CORE_DB.TENANT);
+    const tenant = await Tenant.findByIdAndUpdate(tenantId, {
+        storeCurrency: currencyId,
+    }).populate(MONGOOSE_MODELS.CORE_DB.STORE_CURRENCY);
+    if (!tenant) {
+        logger.error(`Tenant with id not found ${tenantId}`);
+        throw new BadRequestError(ERROR_CODE.TENANT_INVALID, `Tenant with id not found.`);
+    }
+    return tenant.toJSON().storeCurrency as IStoreCurrency;
 };
 
 const getPopulatedInstalledPlugins = (pluginsPopulatedTenant: ITenant): IInstalledPlugin[] => {

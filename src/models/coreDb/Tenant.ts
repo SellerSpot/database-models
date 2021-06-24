@@ -3,6 +3,7 @@ import { CONFIG } from '../../configs/config';
 import { MONGOOSE_MODELS } from '../mongooseModels';
 import { SchemaService } from '../SchemaService';
 import { IPlugin } from './Plugin';
+import { IStoreCurrency } from './StoreCurrency';
 
 export interface IInstalledPlugin extends Document {
     plugin: string | IPlugin;
@@ -14,8 +15,9 @@ export interface ITenant extends Document {
     storeName: string;
     primaryEmail: string;
     plugins: IInstalledPlugin[];
+    storeCurrency: string | IStoreCurrency;
     /**
-     * virtuals
+     * virtuals , need to modify plugins into valid seed flow
      */
     populatePlugins?: IPlugin[];
 }
@@ -46,6 +48,11 @@ export const TenantSchema = new Schema(
             trim: true,
         },
         plugins: [pluginSchema],
+        storeCurrency: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: MONGOOSE_MODELS.CORE_DB.STORE_CURRENCY,
+        },
     },
     {
         timestamps: true,

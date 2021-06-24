@@ -1,8 +1,12 @@
 import { IStockUnit } from '../../../models/tenantDb/catalogueModels';
 
-const stockUnits: string[] = ['Kilogram(s)', 'Litre(s)', 'Piece(s)'];
+export enum EStockUnits {
+    'Kilogram(s)',
+    'Litre(s)',
+    'Piece(s)',
+}
 
-export const defaultStockUnits: IStockUnit[] = stockUnits.map((stockUnit) => ({
+export const defaultStockUnits: IStockUnit[] = Object.keys(EStockUnits).map((stockUnit) => ({
     name: stockUnit,
     isDefault: true,
 }));
