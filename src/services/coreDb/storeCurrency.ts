@@ -5,7 +5,7 @@ import { getStoreCurrenciesSeed } from '../../seeds/coreDb/storeCurreny';
 
 /**
  *
- * @returns the streo currency model
+ * @returns the store currency model
  */
 const getStoreCurrencyModel = () =>
     DbConnectionManager.getCoreModel<coreDbModels.IStoreCurrencyDoc>(

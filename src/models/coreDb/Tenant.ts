@@ -10,21 +10,24 @@ export interface IInstalledPlugin extends Document {
     createdAt?: string;
     updatedAt?: string;
 }
-export interface ITenant extends Document {
+export interface ITenant {
     id: string;
     storeName: string;
     primaryEmail: string;
     plugins: IInstalledPlugin[];
     storeCurrency: string | IStoreCurrency;
-    /**
-     * virtuals , need to modify plugins into valid seed flow
-     */
-    populatePlugins?: IPlugin[];
 }
+
+export type ITenantDoc = ITenant & Document;
 
 const pluginSchema = new Schema(
     {
-        plugin: { type: Schema.Types.String },
+        plugin: {
+            type: Schema.Types.ObjectId,
+            ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
+            index: true,
+            required: true,
+        },
     },
     {
         timestamps: true,
@@ -58,15 +61,5 @@ export const TenantSchema = new Schema(
         timestamps: true,
     },
 );
-
-/**
- * using unique Id as foreign key to populate instead _id
- */
-TenantSchema.virtual('populatePlugins', {
-    ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
-    localField: 'plugins.plugin',
-    foreignField: 'pluginId',
-    justOne: false,
-});
 
 SchemaService.set(MONGOOSE_MODELS.CORE_DB.TENANT, TenantSchema);
