@@ -1,7 +1,7 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { SchemaService } from '../../SchemaService';
-import { IOutlet, IProduct, IStockUnit, ITaxBracket } from '../catalogueModels';
+import { IOutletDoc, IProductDoc, ITaxBracketDoc } from '../catalogueModels';
 
 export const InventorySchema = new Schema(
     {
@@ -13,11 +13,7 @@ export const InventorySchema = new Schema(
         isActive: { type: Schema.Types.Boolean, default: true },
         tags: { type: [Schema.Types.String] },
         stock: { type: Schema.Types.Number, default: 0 },
-        stockUnit: {
-            type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
-        },
-        isTrack: { type: Schema.Types.Boolean, default: false },
+        isTrack: { type: Schema.Types.Boolean, default: true },
         markup: { type: Schema.Types.Number },
         landingCost: { type: Schema.Types.Number },
         sellingPrice: { type: Schema.Types.Number, required: true },
@@ -43,18 +39,17 @@ InventorySchema.index({ outlet: 1, product: 1 }, { unique: true });
 InventorySchema.index({ tags: 'text' });
 
 export interface IInventory extends Document {
-    product: Types.ObjectId | IProduct;
-    isActive: boolean;
-    tags: [string];
-    stock: number;
-    stockUnit: Types.ObjectId | IStockUnit;
-    isTrack: true;
-    markup: number;
-    landingCost: number;
-    sellingPrice: number;
-    taxBracket: Types.ObjectId | ITaxBracket;
-    outlet: Types.ObjectId | IOutlet;
     id: string;
+    product: Types.ObjectId | IProductDoc;
+    isActive: boolean;
+    tags?: [string];
+    stock: number;
+    isTrack: boolean;
+    markup?: number;
+    landingCost?: number;
+    sellingPrice: number;
+    taxBracket?: Types.ObjectId | ITaxBracketDoc;
+    outlet: Types.ObjectId | IOutletDoc;
     createdAt?: string;
     updatedAt?: string;
 }

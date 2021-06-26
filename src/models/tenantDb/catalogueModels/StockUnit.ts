@@ -5,21 +5,19 @@ import { SchemaService } from '../../SchemaService';
 export const StockUnitSchema = new Schema(
     {
         name: { type: Schema.Types.String, required: true },
-        isDefault: { type: Schema.Types.Boolean, required: true, default: false },
+        isDefault: { type: Schema.Types.Boolean, default: false },
     },
     {
         timestamps: true,
     },
 );
 
-export interface IStockUnit {
+export interface IStockUnitDoc extends Document {
+    id: string;
     name: string;
-    isDefault: boolean;
-    id?: string;
+    isDefault?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
-
-export type IStockUnitDoc = IStockUnit & Document;
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT, StockUnitSchema);

@@ -3,15 +3,15 @@ import { ERROR_CODE, IProductRequest } from '@sellerspot/universal-types';
 import { PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
-import { IProduct } from '../../../models/tenantDb/catalogueModels';
+import { IProductDoc } from '../../../models/tenantDb/catalogueModels';
 
-export const createProduct = async (productProps: IProductRequest): Promise<IProduct> => {
+export const createProduct = async (productProps: IProductRequest): Promise<IProductDoc> => {
     const { brand, category, ...args } = productProps;
-    const Product = DbConnectionManager.getTenantModel<IProduct>(
+    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
     );
     if (brand) {
-        const Brand = DbConnectionManager.getTenantModel<IProduct>(
+        const Brand = DbConnectionManager.getTenantModel<IProductDoc>(
             MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
         );
         const isBrand = await Brand.exists({ _id: brand });
@@ -19,7 +19,7 @@ export const createProduct = async (productProps: IProductRequest): Promise<IPro
             throw new BadRequestError(ERROR_CODE.BRAND_NOT_FOUND, 'Invalid Brand is assigned');
     }
     if (category) {
-        const Category = DbConnectionManager.getTenantModel<IProduct>(
+        const Category = DbConnectionManager.getTenantModel<IProductDoc>(
             MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
         );
         const isCategory = await Category.exists({ _id: category });
@@ -43,8 +43,8 @@ export const createProduct = async (productProps: IProductRequest): Promise<IPro
     return product;
 };
 
-export const getProduct = async (productId: string): Promise<IProduct> => {
-    const Product = DbConnectionManager.getTenantModel<IProduct>(
+export const getProduct = async (productId: string): Promise<IProductDoc> => {
+    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
     );
     const product = await Product.findById(productId);

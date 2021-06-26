@@ -1,6 +1,6 @@
 import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE } from '@sellerspot/universal-types';
-import { LeanDocument, PopulateOptions } from 'mongoose';
+import { LeanDocument } from 'mongoose';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../models';
 import { IPlugin } from '../../models/coreDb';
