@@ -5,6 +5,7 @@ export const MONGOOSE_MODELS = {
         CUSTOMER: 'CUSTOMER',
         DOMAIN: 'DOMAIN',
         PLUGIN: 'PLUGIN',
+        STORE_CURRENCY: 'STORE_CURRENCY',
     },
     TENANT_DB: {
         // billing model needs to added once confirmed
