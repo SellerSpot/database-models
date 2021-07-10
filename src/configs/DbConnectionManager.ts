@@ -14,6 +14,8 @@ export class DbConnectionManager {
     }
 
     private static getTenantDb(tenantId?: string): Connection {
+        if (!tenantId) return null;
+        // **** risk of core_db is being sent as an response, if tenantId is invalid ****
         return DbConnectionManager._core?.useDb(tenantId ?? AuthUtil.getCurrentTenantId(), {
             useCache: true,
             /**
@@ -39,7 +41,7 @@ export class DbConnectionManager {
      * @returns {boolean}
      */
     public static async deleteTenantDb(tenantId: string): Promise<void> {
-        return await DbConnectionManager.getTenantDb(tenantId).dropDatabase();
+        if (tenantId) return await DbConnectionManager.getTenantDb(tenantId).dropDatabase();
     }
 
     /**

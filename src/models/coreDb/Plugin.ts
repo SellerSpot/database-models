@@ -2,9 +2,12 @@ import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../mongooseModels';
 import { SchemaService } from '../SchemaService';
 
-export interface IPlugin extends Document {
-    pluginId: string;
+export interface IPlugin {
     name: string;
+    /**
+     * should be assigned through universal-types EPLUGIN enum
+     */
+    uniqueName: string;
     isVisibleInPluginMenu: boolean;
     isVisibleInPluginStore: boolean;
     dependantPlugins: string[] | IPlugin[];
@@ -13,22 +16,27 @@ export interface IPlugin extends Document {
     icon: string;
     image: string;
     bannerImages: string[];
+    /**
+     * custom id should be passed
+     */
+    _id?: string;
     createdAt?: string;
     updatedAt?: string;
-    /**
-     * virtuals
-     */
-    populateDependantPlugins?: IPlugin[];
 }
+
+export type IPluginDoc = IPlugin & Document;
 
 export const PluginSchema = new Schema(
     {
-        pluginId: {
-            type: Schema.Types.String,
+        _id: {
+            type: Schema.Types.ObjectId,
             required: true,
-            unique: true,
             index: true,
-            trim: true,
+        },
+        uniqueName: {
+            type: Schema.Types.String,
+            unique: true,
+            required: true,
         },
         name: {
             type: Schema.Types.String,
@@ -44,8 +52,8 @@ export const PluginSchema = new Schema(
         },
         dependantPlugins: [
             {
-                type: Schema.Types.String,
-                unique: true,
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
                 default: [],
             },
         ],
@@ -64,24 +72,8 @@ export const PluginSchema = new Schema(
     },
     {
         timestamps: true,
-        toJSON: {
-            //Arg 1 -> actual doc Arg2 -> doc to be returned
-            transform(_, ret) {
-                (ret.id = ret._id), delete ret._id;
-            },
-            versionKey: false,
-        },
+        _id: false,
     },
 );
-
-/**
- * using unique Id as foreign key to populate instead _id
- */
-PluginSchema.virtual('populateDependantPlugins', {
-    ref: MONGOOSE_MODELS.CORE_DB.PLUGIN,
-    localField: 'dependantPlugins',
-    foreignField: 'pluginId',
-    justOne: false,
-});
 
 SchemaService.set(MONGOOSE_MODELS.CORE_DB.PLUGIN, PluginSchema);
