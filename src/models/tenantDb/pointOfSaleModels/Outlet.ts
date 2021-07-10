@@ -12,9 +12,12 @@ export const OutletSchema = new Schema(
     },
 );
 
-export interface IOutlet extends Document {
+export interface IOutletDoc extends Document {
+    id: string;
     name: string;
     address: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
-SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET, OutletSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET, OutletSchema);

@@ -1,12 +1,12 @@
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
-import { IBrand } from '../../../models/tenantDb/catalogueModels';
+import { IBrandDoc } from '../../../models/tenantDb/catalogueModels';
 import { ERROR_CODE, ICreateBrandRequest, IEditBrandRequest } from '@sellerspot/universal-types';
 import { BadRequestError } from '@sellerspot/universal-functions';
 
-export const createBrand = async (newBrand: ICreateBrandRequest): Promise<IBrand> => {
+export const createBrand = async (newBrand: ICreateBrandRequest): Promise<IBrandDoc> => {
     const { name } = newBrand;
-    const Brand = DbConnectionManager.getTenantModel<IBrand>(
+    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
     );
     const isBrandExist = await Brand.exists({ name });
@@ -17,16 +17,16 @@ export const createBrand = async (newBrand: ICreateBrandRequest): Promise<IBrand
     return brand;
 };
 
-export const getAllBrand = async (): Promise<IBrand[]> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrand>(
+export const getAllBrand = async (): Promise<IBrandDoc[]> => {
+    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
     );
     const allBrands = await Brand.find({});
     return allBrands;
 };
 
-export const getBrand = async (brandId: string): Promise<IBrand> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrand>(
+export const getBrand = async (brandId: string): Promise<IBrandDoc> => {
+    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
     );
     const brand = await Brand.findById(brandId);
@@ -36,8 +36,8 @@ export const getBrand = async (brandId: string): Promise<IBrand> => {
 export const editBrand = async (
     brandId: string,
     updatedDoc: IEditBrandRequest,
-): Promise<IBrand> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrand>(
+): Promise<IBrandDoc> => {
+    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
     );
     const { name } = updatedDoc;
@@ -52,7 +52,7 @@ export const editBrand = async (
 };
 
 export const deleteBrand = async (brandId: string): Promise<void> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrand>(
+    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
     );
     await Brand.deleteOne({ _id: brandId });

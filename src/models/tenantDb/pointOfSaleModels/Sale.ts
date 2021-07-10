@@ -1,8 +1,8 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { ICustomer } from '../../coreDb';
-import { IOutlet, IProduct, IStockUnit, ITaxBracket } from '../catalogueModels';
-import { IUser } from '../User';
+import { IOutletDoc, IProductDoc, IStockUnitDoc, ITaxBracketDoc } from '../catalogueModels';
+import { IUserDoc } from '../User';
 import { SchemaService } from '../../SchemaService';
 
 export enum DiscountTypesEnum {
@@ -108,7 +108,7 @@ export const SaleSchema = new Schema(
             },
             ref: {
                 type: Schema.Types.ObjectId,
-                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
+                ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET,
             },
         },
     },
@@ -120,11 +120,11 @@ export const SaleSchema = new Schema(
 export interface ICartDetails {
     product: {
         name: string;
-        reference: Types.ObjectId | IProduct;
+        reference: Types.ObjectId | IProductDoc;
     };
     stockUnit: {
         name: string;
-        reference: Types.ObjectId | IStockUnit;
+        reference: Types.ObjectId | IStockUnitDoc;
     };
     quantity: number;
     unitPrice: number;
@@ -139,7 +139,7 @@ export interface ICartDetails {
                 rate: number;
             },
         ];
-        reference: Types.ObjectId | ITaxBracket;
+        reference: Types.ObjectId | ITaxBracketDoc;
     };
 }
 
@@ -155,8 +155,8 @@ export interface ISale {
         balance: number;
     };
     customer: Types.ObjectId | ICustomer;
-    user: Types.ObjectId | IUser;
-    outlet: string | IOutlet;
+    user: Types.ObjectId | IUserDoc;
+    outlet: string | IOutletDoc;
     id?: string;
     createdAt?: string;
     updatedAt?: string;

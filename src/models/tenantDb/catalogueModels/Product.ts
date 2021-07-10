@@ -1,14 +1,20 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { SchemaService } from '../../SchemaService';
-import { IBrand } from './Brand';
-import { ICategory } from './Category';
+import { IBrandDoc } from './Brand';
+import { ICategoryDoc } from './Category';
+import { IStockUnitDoc } from './StockUnit';
 
 export const ProductSchema = new Schema(
     {
         name: { type: Schema.Types.String, required: true },
         barcode: { type: Schema.Types.String },
         description: { type: Schema.Types.String },
+        stockUnit: {
+            type: Schema.Types.ObjectId,
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+            required: true,
+        },
         brand: {
             type: Schema.Types.ObjectId,
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
@@ -23,13 +29,14 @@ export const ProductSchema = new Schema(
     },
 );
 
-export interface IProduct extends Document {
+export interface IProductDoc extends Document {
     id: string;
     name: string;
-    barcode: string;
-    description: string;
-    brand: Types.ObjectId | IBrand;
-    category: Types.ObjectId | ICategory;
+    barcode?: string;
+    description?: string;
+    stockUnit?: Types.ObjectId | IStockUnitDoc;
+    brand?: Types.ObjectId | IBrandDoc;
+    category?: Types.ObjectId | ICategoryDoc;
     createdAt?: string;
     updatedAt?: string;
 }

@@ -18,6 +18,7 @@ export const TaxBracketSchema = new Schema(
         },
         rate: {
             type: Schema.Types.Number,
+            default: 0,
         },
         group: {
             type: [Schema.Types.ObjectId],
@@ -30,19 +31,21 @@ export const TaxBracketSchema = new Schema(
 );
 
 //utility property to check if current document is taxBracket / taxGroup
-TaxBracketSchema.virtual('isGroup').get(function (this: ITaxBracket) {
+TaxBracketSchema.virtual('isGroup').get(function (this: ITaxBracketDoc) {
     return isEmpty(this.group) ? false : true;
 });
 
-export interface ITaxBracket extends Document {
+export interface ITaxBracketDoc extends Document {
     id: string;
     name: string;
-    rate: number;
-    group: Types.ObjectId[] | ITaxBracket[];
+    rate?: number;
+    group?: Types.ObjectId[] | ITaxBracketDoc[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
      */
     isGroup: boolean;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET, TaxBracketSchema);

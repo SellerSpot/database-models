@@ -146,9 +146,9 @@ export const removePlugin = async (
 
     // check if any one of the current dependant plugin is dependant plugin to others and insert it into pluginToUninstall array
     pluginsToUninstall.push(
-        ...(<string[]>(
-            plugin?.dependantPlugins.map((dependantPlugin) => dependantPlugin.toString())
-        )),
+        ...(<string[]>plugin?.dependantPlugins).map((dependantPlugin) =>
+            dependantPlugin.toString(),
+        ),
     ); // temp - remove while implementing above logic
 
     // tenant validation

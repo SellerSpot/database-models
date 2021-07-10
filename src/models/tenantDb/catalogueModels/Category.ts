@@ -1,4 +1,4 @@
-import { Document, Model, Schema } from 'mongoose';
+import { Document, Model, Schema, Types } from 'mongoose';
 import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { BadRequestError, CustomError, logger, ServerError } from '@sellerspot/universal-functions';
@@ -6,15 +6,12 @@ import { ERROR_CODE } from '@sellerspot/universal-types';
 import { CONFIG } from '../../../configs/config';
 import { SchemaService } from '../../SchemaService';
 
-export interface ICategory {
-    title: string;
-    parent?: string | ICategory | null;
-    ancestors?: string[] | ICategory[];
-    children?: string[] | ICategory[];
-}
-
-export interface ICategoryDoc extends ICategory, Document {
+export interface ICategoryDoc extends Document {
     id: string;
+    title: string;
+    parent?: Types.ObjectId | ICategoryDoc | null;
+    ancestors?: Types.ObjectId[] | ICategoryDoc[];
+    children?: Types.ObjectId[] | ICategoryDoc[];
     buildAncestorsAndAddAsChild(): Promise<void>;
     checkTitleAvailability(): Promise<void>;
     createdAt?: string;
@@ -47,13 +44,6 @@ export const CategorySchema = new Schema(
     },
     {
         timestamps: true,
-        toJSON: {
-            //Arg 1 -> actual doc Arg2 -> doc to be returned
-            transform(_, ret) {
-                (ret.id = ret._id), delete ret._id;
-            },
-            versionKey: false,
-        },
     },
 );
 
@@ -73,13 +63,13 @@ CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICate
             }
 
             //Append child id to children array in parent doc
-            const parentChildren = <string[]>parent.children;
-            parentChildren.push(<string>this.id);
+            const parentChildren = <Types.ObjectId[]>parent.children;
+            parentChildren.push(<Types.ObjectId>this._id);
             await Category.findByIdAndUpdate(parent.id, { children: parentChildren });
 
             //Unshift parent id to ancestors array in child doc
-            const parentAncestors = <string[]>parent.ancestors;
-            parentAncestors.unshift(<string>parentId);
+            const parentAncestors = <Types.ObjectId[]>parent.ancestors;
+            parentAncestors.unshift(<Types.ObjectId>parentId);
             this.set('ancestors', parentAncestors);
         }
     } catch (error) {
@@ -104,8 +94,8 @@ CategorySchema.methods.checkTitleAvailability = async function (this: ICategoryD
                 );
             }
             if (!isEmpty(parent.children)) {
-                const filterSameTitleArr = (<ICategory[]>parent.children).filter(
-                    (child: ICategory) => this.title.toUpperCase() === child.title.toUpperCase(),
+                const filterSameTitleArr = (<ICategoryDoc[]>parent.children).filter(
+                    (child: ICategoryDoc) => this.title.toUpperCase() === child.title.toUpperCase(),
                 );
                 if (!isEmpty(filterSameTitleArr)) {
                     throw new BadRequestError(

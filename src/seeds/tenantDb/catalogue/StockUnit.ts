@@ -1,6 +1,6 @@
-import { IStockUnit } from '../../../models/tenantDb/catalogueModels';
+import { IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
 
-export const defaultStockUnits: IStockUnit[] = [
+export const defaultStockUnits: Partial<IStockUnitDoc>[] = [
     { name: 'Kilogram(s)', isDefault: true },
     { name: 'Litre(s)', isDefault: true },
     { name: 'Piece(s)', isDefault: true },

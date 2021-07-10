@@ -4,13 +4,15 @@ import {
     ICreateTaxGroupRequest,
 } from '@sellerspot/universal-types';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
-import { ITaxBracket } from '../../../models/tenantDb/catalogueModels';
+import { ITaxBracketDoc } from '../../../models/tenantDb/catalogueModels';
 import { MONGOOSE_MODELS } from '../../../models';
 import { BadRequestError } from '@sellerspot/universal-functions';
 
-export const createTaxBracket = async (bracket: ICreateTaxBracketRequest): Promise<ITaxBracket> => {
+export const createTaxBracket = async (
+    bracket: ICreateTaxBracketRequest,
+): Promise<ITaxBracketDoc> => {
     const { name, rate } = bracket;
-    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracket>(
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
     );
     const isBracketExist = await TaxBracket.exists({ name });
@@ -24,9 +26,9 @@ export const createTaxBracket = async (bracket: ICreateTaxBracketRequest): Promi
     return newTaxBracket;
 };
 
-export const createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITaxBracket> => {
+export const createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITaxBracketDoc> => {
     const { name, bracket } = group;
-    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracket>(
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
     );
     const matchedCount = await TaxBracket.countDocuments({ _id: { $in: bracket } });
@@ -50,8 +52,8 @@ export const createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITa
     return newTaxGroup;
 };
 
-export const getAllTaxBrackets = async (): Promise<ITaxBracket[]> => {
-    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracket>(
+export const getAllTaxBrackets = async (): Promise<ITaxBracketDoc[]> => {
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
     );
     const allTaxBracket = await TaxBracket.find({}).populate({

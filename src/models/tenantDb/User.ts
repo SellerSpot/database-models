@@ -25,14 +25,6 @@ export const UserSchema = new Schema(
     },
     {
         timestamps: true,
-        toJSON: {
-            //Arg 1 -> actual doc Arg2 -> doc to be returned
-            transform(_, ret) {
-                (ret.id = ret._id), delete ret._id;
-                delete ret.password;
-            },
-            versionKey: false,
-        },
     },
 );
 
@@ -45,7 +37,7 @@ UserSchema.pre('save', async function (done) {
     done();
 });
 
-export interface IUser extends Document {
+export interface IUserDoc extends Document {
     name: string;
     password: string;
     email?: string;

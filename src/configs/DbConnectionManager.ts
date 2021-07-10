@@ -14,9 +14,10 @@ export class DbConnectionManager {
     }
 
     private static getTenantDb(tenantId?: string): Connection {
-        if (!tenantId) return null;
+        const currTenantId = AuthUtil.getCurrentTenantId();
+        if (!tenantId && !currTenantId) return null;
         // **** risk of core_db is being sent as an response, if tenantId is invalid ****
-        return DbConnectionManager._core?.useDb(tenantId ?? AuthUtil.getCurrentTenantId(), {
+        return DbConnectionManager._core?.useDb(tenantId ?? currTenantId, {
             useCache: true,
             /**
              * By defualt there will be EventEmitter be attaced to parent connection, which shoot up memory usage
