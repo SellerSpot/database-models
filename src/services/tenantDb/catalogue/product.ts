@@ -5,7 +5,6 @@ import { PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
-import { DbUtil } from '../../../utilities';
 
 export const createProduct = async (productProps: IProductRequest): Promise<IProductDoc> => {
     const { brand, category, stockUnit, ...args } = productProps;
