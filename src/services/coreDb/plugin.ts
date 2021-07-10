@@ -1,28 +1,50 @@
-import { logger } from '@sellerspot/universal-functions';
-import { IPlugin } from '@sellerspot/universal-types';
-import { LeanDocument } from 'mongoose';
+import { ERROR_CODE, IPlugin } from '@sellerspot/universal-types';
+import { LeanDocument, Model } from 'mongoose';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { coreDbModels, MONGOOSE_MODELS } from '../../models';
+import { getPluginsSeed } from '../../seeds/coreDb/plugin';
 
-export const createPlugin = async (
-    plugin: IPlugin,
-): Promise<LeanDocument<coreDbModels.IPlugin>> => {
-    const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
-        MONGOOSE_MODELS.CORE_DB.PLUGIN,
+/**
+ *
+ * @returns the plugin model
+ */
+export const getPluginModel = <T extends coreDbModels.IPluginDoc>(): Model<T> =>
+    DbConnectionManager.getCoreModel<T>(MONGOOSE_MODELS.CORE_DB.PLUGIN);
+
+/**
+ * seeds the store currencies into storeCurrency collection
+ */
+export const seedPlugins = async (): Promise<void> => {
+    const Plugin = getPluginModel();
+    const seeds = getPluginsSeed();
+    await Plugin.bulkWrite(
+        seeds.map((seed) => ({
+            updateOne: {
+                filter: { _id: seed._id },
+                update: { $set: seed },
+                upsert: true,
+                new: true,
+            },
+        })),
     );
-    const pluginDocument = await Plugin.create({ ...plugin });
-    logger.info(`New Plugin ${pluginDocument.name} has been added`);
-    return pluginDocument.toJSON();
 };
 
 export const getPluginById = async (
     pluginId: string,
-): Promise<LeanDocument<coreDbModels.IPlugin>> => {
-    const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
-        MONGOOSE_MODELS.CORE_DB.PLUGIN,
-    );
-    const plugin = await Plugin.findOne({ pluginId });
-    return plugin;
+    options?: {
+        populateDependantPlugins?: boolean;
+    },
+): Promise<LeanDocument<coreDbModels.IPluginDoc>> => {
+    const Plugin = getPluginModel();
+    const pluginQuery = Plugin.findById(pluginId);
+    if (options?.populateDependantPlugins) pluginQuery.populate({ path: 'dependantPlugins' });
+    const plugin = await pluginQuery.exec();
+    if (!plugin) {
+        logger.error('Invalid Plugin installation intent');
+        throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Invalid Plugin');
+    }
+    return plugin.toJSON();
 };
 
 /**
@@ -32,21 +54,25 @@ export const getPluginById = async (
  */
 export const deletePluginById = async (
     pluginId: string,
-): Promise<LeanDocument<coreDbModels.IPlugin>> => {
-    const Domain = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
+): Promise<LeanDocument<coreDbModels.IPluginDoc>> => {
+    const Domain = DbConnectionManager.getCoreModel<coreDbModels.IPluginDoc>(
         MONGOOSE_MODELS.CORE_DB.PLUGIN,
     );
-    const deletePlugin = await Domain.findOneAndDelete({ pluginId });
+    const deletePlugin = await Domain.findByIdAndDelete(pluginId);
     return deletePlugin.toJSON();
 };
 
 /**
  * checks whether the passed plugin is already exist
  */
-export const getAllPlugins = async (): Promise<coreDbModels.IPlugin[]> => {
-    const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPlugin>(
+export const getAllPlugins = async (options?: {
+    populateDependantPlugins?: boolean;
+}): Promise<coreDbModels.IPlugin[]> => {
+    const Plugin = DbConnectionManager.getCoreModel<coreDbModels.IPluginDoc>(
         MONGOOSE_MODELS.CORE_DB.PLUGIN,
     );
-    const plugins = await Plugin.find({ isVisibleInPluginStore: true });
+    const pluginsQuery = Plugin.find();
+    if (options?.populateDependantPlugins) pluginsQuery.populate({ path: 'dependantPlugins' });
+    const plugins = await pluginsQuery.exec();
     return plugins;
 };
