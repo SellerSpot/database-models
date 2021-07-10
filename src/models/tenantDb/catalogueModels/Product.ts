@@ -13,6 +13,7 @@ export const ProductSchema = new Schema(
         stockUnit: {
             type: Schema.Types.ObjectId,
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+            required: true,
         },
         brand: {
             type: Schema.Types.ObjectId,
@@ -33,7 +34,7 @@ export interface IProductDoc extends Document {
     name: string;
     barcode?: string;
     description?: string;
-    stockUnit: Types.ObjectId | IStockUnitDoc;
+    stockUnit?: Types.ObjectId | IStockUnitDoc;
     brand?: Types.ObjectId | IBrandDoc;
     category?: Types.ObjectId | ICategoryDoc;
     createdAt?: string;

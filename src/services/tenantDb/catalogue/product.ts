@@ -1,12 +1,14 @@
 import { BadRequestError } from '@sellerspot/universal-functions';
 import { ERROR_CODE, IProductRequest } from '@sellerspot/universal-types';
+import { isEmpty, merge } from 'lodash';
 import { PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
-import { IProductDoc } from '../../../models/tenantDb/catalogueModels';
+import { IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
+import { DbUtil } from '../../../utilities';
 
 export const createProduct = async (productProps: IProductRequest): Promise<IProductDoc> => {
-    const { brand, category, ...args } = productProps;
+    const { brand, category, stockUnit, ...args } = productProps;
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
     );
@@ -29,10 +31,22 @@ export const createProduct = async (productProps: IProductRequest): Promise<IPro
                 'Invalid Category is assigned',
             );
     }
-    let product = await Product.create({ brand, category, ...args });
+    if (stockUnit) {
+        const StockUnit = DbConnectionManager.getTenantModel<IStockUnitDoc>(
+            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+        );
+        const isStockUnit = await StockUnit.exists({ _id: stockUnit });
+        if (!isStockUnit)
+            throw new BadRequestError(
+                ERROR_CODE.STOCK_UNIT_NOT_FOUND,
+                'Invalid stock unit is assigned',
+            );
+    }
+    let product = await Product.create({ brand, category, stockUnit, ...args });
     const populateArrOpts: PopulateOptions[] = [];
     if (brand) populateArrOpts.push({ path: 'brand', select: 'id name' });
     if (category) populateArrOpts.push({ path: 'category', select: 'id title' });
+    if (stockUnit) populateArrOpts.push({ path: 'stockUnit', select: 'id title' });
     if (populateArrOpts.length > 0) {
         /**
          * On Documnent we should use execPopulate to actually execute it
@@ -43,10 +57,50 @@ export const createProduct = async (productProps: IProductRequest): Promise<IPro
     return product;
 };
 
+export const editProduct = async (
+    productId: string,
+    productProps: Partial<IProductRequest>,
+): Promise<IProductDoc> => {
+    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+    );
+    let product = await Product.findById(productId);
+    if (!product) {
+        throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
+    }
+    merge(product, productProps);
+    await product.save();
+    product = await product.populate(getProductDefaultPopulationList()).execPopulate();
+    return product;
+};
+
 export const getProduct = async (productId: string): Promise<IProductDoc> => {
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
     );
-    const product = await Product.findById(productId);
+    const product = await Product.findById(productId).populate(getProductDefaultPopulationList());
     return product;
+};
+
+export const getAllProduct = async (): Promise<IProductDoc[]> => {
+    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+    );
+    const productList = await Product.find({}).populate(getProductDefaultPopulationList());
+    return productList;
+};
+
+export const deleteProduct = async (productId: string): Promise<void> => {
+    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+    );
+    await Product.deleteOne({ _id: productId });
+};
+
+const getProductDefaultPopulationList = (): PopulateOptions[] => {
+    const populateArrOpts: PopulateOptions[] = [];
+    populateArrOpts.push({ path: 'brand', select: 'id name' });
+    populateArrOpts.push({ path: 'category', select: 'id title' });
+    populateArrOpts.push({ path: 'stockUnit', select: 'id title' });
+    return populateArrOpts;
 };

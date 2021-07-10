@@ -14,6 +14,7 @@ export const MONGOOSE_MODELS = {
             // point of sale collections goes here
             INVENTORY: 'POINT_OF_SALE_INVENTORY',
             SALE: 'POINT_OF_SALE_SALE',
+            OUTLET: 'POINT_OF_SALE_OUTLET',
         },
         ECOMMERCE: {
             // ecommerce collections goes here
@@ -25,7 +26,6 @@ export const MONGOOSE_MODELS = {
             CATEGORY: 'CATALOGUE_CATEGORY',
             BRAND: 'CATALOGUE_BRAND',
             TAXBRACKET: 'CATALOGUE_TAXBRACKET',
-            OUTLET: 'CATALOGUE_OUTLET',
         },
     },
 };

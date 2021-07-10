@@ -20,4 +20,4 @@ export interface IOutletDoc extends Document {
     updatedAt?: string;
 }
 
-SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET, OutletSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET, OutletSchema);

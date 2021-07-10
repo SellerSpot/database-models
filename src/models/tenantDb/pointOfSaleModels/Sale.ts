@@ -108,7 +108,7 @@ export const SaleSchema = new Schema(
             },
             ref: {
                 type: Schema.Types.ObjectId,
-                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
+                ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET,
             },
         },
     },

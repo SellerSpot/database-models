@@ -24,7 +24,7 @@ export const InventorySchema = new Schema(
         outlet: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
+            ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET,
         },
     },
     {
@@ -38,7 +38,7 @@ InventorySchema.index({ outlet: 1, product: 1 }, { unique: true });
 // text index with tag (full text search)
 InventorySchema.index({ tags: 'text' });
 
-export interface IInventory extends Document {
+export interface IInventoryDoc extends Document {
     id: string;
     product: Types.ObjectId | IProductDoc;
     isActive: boolean;
