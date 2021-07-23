@@ -34,7 +34,15 @@ export class DbConnectionManager {
      */
     public static getTenantModel<T extends Document>(modelName: string): Model<T> {
         const schema = SchemaService.get(modelName);
-        return DbConnectionManager.getTenantDb().model<T>(modelName, schema);
+        let modal: Model<T>;
+        // try catch to solve the modal re-register bug (by only reinitializing if not already initialized)
+        try {
+            modal = DbConnectionManager.getTenantDb().model<T>(modelName);
+        } catch (err) {
+            modal = DbConnectionManager.getTenantDb().model<T>(modelName, schema);
+        } finally {
+            return modal;
+        }
     }
 
     /**
@@ -52,6 +60,14 @@ export class DbConnectionManager {
      */
     public static getCoreModel<T extends Document>(modelName: string): Model<T> {
         const schema = SchemaService.get(modelName);
-        return DbConnectionManager.getCoreDb().model<T>(modelName, schema);
+        let modal: Model<T>;
+        // try catch to solve the modal re-register bug (by only reinitializing if not already initialized)
+        try {
+            modal = DbConnectionManager.getCoreDb().model<T>(modelName);
+        } catch (err) {
+            modal = DbConnectionManager.getCoreDb().model<T>(modelName, schema);
+        } finally {
+            return modal;
+        }
     }
 }
