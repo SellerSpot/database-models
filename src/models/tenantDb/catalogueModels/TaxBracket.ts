@@ -32,13 +32,13 @@ export const TaxBracketSchema = new Schema(
 
 //utility property to check if current document is taxBracket / taxGroup
 TaxBracketSchema.virtual('isGroup').get(function (this: ITaxBracketDoc) {
-    return isEmpty(this.group) ? false : true;
+    return !isEmpty(this.group);
 });
 
 export interface ITaxBracketDoc extends Document {
     id: string;
     name: string;
-    rate?: number;
+    rate: number;
     group?: Types.ObjectId[] | ITaxBracketDoc[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
