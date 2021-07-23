@@ -39,11 +39,11 @@ export interface ITaxBracketDoc extends Document {
     id: string;
     name: string;
     rate: number;
-    group?: Types.ObjectId[] | ITaxBracketDoc[];
+    group?: string[] | ITaxBracketDoc[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
      */
-    isGroup: boolean;
+    isGroup?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }

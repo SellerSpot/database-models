@@ -4,6 +4,7 @@ import {
     ICreateTaxBracketRequest,
     ICreateTaxGroupRequest,
     IEditTaxBracketRequest,
+    IEditTaxGroupRequest,
 } from '@sellerspot/universal-types';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
@@ -28,7 +29,7 @@ export const createTaxBracket = async (
     return newTaxBracket;
 };
 
-export const getAllTaxBrackets = async (): Promise<ITaxBracketDoc[]> => {
+export const getAllTaxBracket = async (): Promise<ITaxBracketDoc[]> => {
     const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
     );
@@ -56,6 +57,7 @@ export const editTaxBracket = async (
     });
     return newTaxBracket;
 };
+
 export const deleteTaxBracket = async (bracketId: string): Promise<void> => {
     const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
@@ -64,6 +66,28 @@ export const deleteTaxBracket = async (bracketId: string): Promise<void> => {
 };
 
 // tax group
+export const getAllTaxGroup = async (): Promise<ITaxBracketDoc[]> => {
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+    );
+    const allTaxBracket = await TaxBracket.find({}).populate({
+        path: 'group',
+        select: 'id name rate',
+    });
+    return allTaxBracket.filter((bracket) => bracket.isGroup === true);
+};
+
+export const getTaxGroup = async (taxGroupId: string): Promise<ITaxBracketDoc> => {
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+    );
+    const taxGroup = await TaxBracket.findOne({ _id: taxGroupId }).populate({
+        path: 'group',
+        select: 'id name rate',
+    });
+    return taxGroup;
+};
+
 export const createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITaxBracketDoc> => {
     const { name, bracket } = group;
     const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
@@ -88,4 +112,32 @@ export const createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITa
         })
         .execPopulate();
     return newTaxGroup;
+};
+
+export const editTaxGroup = async (
+    newTaxGroup: IEditTaxGroupRequest,
+    taxGroupId: string,
+): Promise<ITaxBracketDoc> => {
+    const { bracket, name } = newTaxGroup;
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+    );
+    const updatedTaxGroup = await TaxBracket.findByIdAndUpdate(
+        taxGroupId,
+        { name, group: bracket },
+        {
+            new: true,
+        },
+    ).populate({
+        path: 'group',
+        select: 'id name rate',
+    });
+    return updatedTaxGroup;
+};
+
+export const deleteTaxGroup = async (taxGroupId: string): Promise<void> => {
+    const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+    );
+    await TaxBracket.deleteOne({ _id: taxGroupId });
 };
