@@ -64,12 +64,12 @@ CategorySchema.methods.buildAncestorsAndAddAsChild = async function (this: ICate
 
             //Append child id to children array in parent doc
             const parentChildren = <Types.ObjectId[]>parent.children;
-            parentChildren.push(<Types.ObjectId>this._id);
+            parentChildren.unshift(<Types.ObjectId>this._id);
             await Category.findByIdAndUpdate(parent.id, { children: parentChildren });
 
             //Unshift parent id to ancestors array in child doc
             const parentAncestors = <Types.ObjectId[]>parent.ancestors;
-            parentAncestors.unshift(<Types.ObjectId>parentId);
+            parentAncestors.push(<Types.ObjectId>parentId);
             this.set('ancestors', parentAncestors);
         }
     } catch (error) {

@@ -1,15 +1,15 @@
-import { DbConnectionManager } from '../../../configs/DbConnectionManager';
-import { isEmpty } from 'lodash';
-import { MONGOOSE_MODELS } from '../../../models';
-import { ICategoryDoc } from '../../../models/tenantDb/catalogueModels';
 import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import {
     ERROR_CODE,
     ICreateCategoryRequest,
+    IEditCategoryChildrenOrderRequest,
     IEditCategoryRequest,
-    IEditCategorySiblingOrderRequest,
 } from '@sellerspot/universal-types';
+import { isEmpty } from 'lodash';
 import { Model, Types } from 'mongoose';
+import { DbConnectionManager } from '../../../configs/DbConnectionManager';
+import { MONGOOSE_MODELS } from '../../../models';
+import { ICategoryDoc } from '../../../models/tenantDb/catalogueModels';
 
 export const createCategory = async (
     categoryProps: ICreateCategoryRequest,
@@ -18,14 +18,13 @@ export const createCategory = async (
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
     const { title } = categoryProps;
-    let rootCategory;
     let { parentId } = categoryProps;
-    if (isEmpty(parentId)) {
-        rootCategory = await checkAndGetRootCategory(Category);
+    if (!parentId) {
+        const rootCategory = await checkAndGetRootCategory(Category);
         parentId = rootCategory.id;
     }
     const category = await Category.create({ title, parent: parentId });
-    logger.info(`Category got created successfully`);
+    logger.info(`Category ${title} created successfully`);
     return category;
 };
 
@@ -42,14 +41,18 @@ export const editCategoryContent = async (
         { $set: { title } },
         { new: true }, //to get updated doc
     );
-    return updatedCategory;
+
+    const populatedUpdatedCategory = await updatedCategory
+        .populate({ path: 'children', select: 'id title' })
+        .execPopulate();
+    return populatedUpdatedCategory;
 };
 
-export const editCategorySiblingOrder = async (
+export const editCategoryChildrenOrder = async (
     parentId: string,
-    props: IEditCategorySiblingOrderRequest,
+    props: IEditCategoryChildrenOrderRequest,
 ): Promise<ICategoryDoc> => {
-    const { siblingOrder } = props;
+    const { childrenOrder } = props;
     const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
@@ -58,13 +61,13 @@ export const editCategorySiblingOrder = async (
         throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `cannot find parent category`);
     }
     const isNonChild = (<Types.ObjectId[]>tobeUpdated.children).find((childId) => {
-        return siblingOrder.indexOf(childId.toHexString()) === -1;
+        return childrenOrder.indexOf(childId.toHexString()) === -1;
     });
-    if (isNonChild || tobeUpdated.children.length !== siblingOrder.length) {
+    if (isNonChild || tobeUpdated.children.length !== childrenOrder.length) {
         logger.error(`contains non child value`);
         throw new BadRequestError(ERROR_CODE.NOT_FOUND, `contains invalid child category values`);
     }
-    tobeUpdated.children = siblingOrder.map((idStr) => new Types.ObjectId(idStr));
+    tobeUpdated.children = childrenOrder.map((idStr) => new Types.ObjectId(idStr));
     await tobeUpdated.populate({ path: 'children', select: 'id title' }).execPopulate();
     await tobeUpdated.save();
     return tobeUpdated;
@@ -79,12 +82,23 @@ export const editCategoryPosition = async (
     categoryId: string,
     props: ICategoryPosition,
 ): Promise<ICategoryDoc> => {
-    const { newParentId, oldParentId } = props;
+    let { oldParentId, newParentId } = props;
     const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
     );
 
-    //removes categoryId from old parent children
+    // getting root category id if no parent id is provided
+    if (!newParentId || !oldParentId) {
+        const rootCategory = await checkAndGetRootCategory(Category);
+        if (!newParentId) {
+            newParentId = rootCategory.id;
+        }
+        if (!oldParentId) {
+            oldParentId = rootCategory.id;
+        }
+    }
+
+    // removes categoryId from old parent children
     await Category.updateOne(
         {
             _id: oldParentId,
@@ -97,11 +111,8 @@ export const editCategoryPosition = async (
     const isNewParentExist = await Category.exists({ _id: newParentId });
 
     if (!isNewParentExist) {
-        logger.error(`contains invalid parent category id...`);
-        throw new BadRequestError(
-            ERROR_CODE.CATEGORY_NOT_FOUND,
-            `contains invalid parent category id...`,
-        );
+        logger.error(`Parent category invalid`);
+        throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `Parent category invalid`);
     }
     //Gets the category changes the parent and updates
     //Done this way insead on direct update -> to trigger save middleware
