@@ -1,12 +1,16 @@
 import { BadRequestError } from '@sellerspot/universal-functions';
-import { ERROR_CODE, IProductRequest } from '@sellerspot/universal-types';
-import { isEmpty, merge } from 'lodash';
+import {
+    ERROR_CODE,
+    ICreateProductRequest,
+    IEditProductRequest,
+} from '@sellerspot/universal-types';
+import { merge } from 'lodash';
 import { PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
 
-export const createProduct = async (productProps: IProductRequest): Promise<IProductDoc> => {
+export const createProduct = async (productProps: ICreateProductRequest): Promise<IProductDoc> => {
     const { brand, category, stockUnit, ...args } = productProps;
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
@@ -58,7 +62,7 @@ export const createProduct = async (productProps: IProductRequest): Promise<IPro
 
 export const editProduct = async (
     productId: string,
-    productProps: Partial<IProductRequest>,
+    productProps: IEditProductRequest,
 ): Promise<IProductDoc> => {
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
@@ -88,6 +92,14 @@ export const getAllProduct = async (): Promise<IProductDoc[]> => {
     const productList = await Product.find({}).populate(getProductDefaultPopulationList());
     return productList;
 };
+
+// export const searchProduct = async (query: string): Promise<IProductDoc> => {
+//     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
+//         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+//     );
+//     const product = await Product(productId).populate(getProductDefaultPopulationList());
+//     return product;
+// };
 
 export const deleteProduct = async (productId: string): Promise<void> => {
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(

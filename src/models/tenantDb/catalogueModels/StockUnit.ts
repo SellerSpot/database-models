@@ -5,6 +5,7 @@ import { SchemaService } from '../../SchemaService';
 export const StockUnitSchema = new Schema(
     {
         name: { type: Schema.Types.String, required: true },
+        unit: { type: Schema.Types.String, required: true },
         isDefault: { type: Schema.Types.Boolean, default: false },
     },
     {
@@ -15,6 +16,7 @@ export const StockUnitSchema = new Schema(
 export interface IStockUnitDoc extends Document {
     id: string;
     name: string;
+    unit: string;
     isDefault?: boolean;
     createdAt?: string;
     updatedAt?: string;
