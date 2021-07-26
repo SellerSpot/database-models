@@ -1,7 +1,7 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { SchemaService } from '../../SchemaService';
-import { IOutletDoc, IProductDoc, ITaxBracketDoc } from '../catalogueModels';
+import { IOutletDoc, IProductDoc, ITaxSettingDoc } from '../catalogueModels';
 
 export const InventorySchema = new Schema(
     {
@@ -19,7 +19,7 @@ export const InventorySchema = new Schema(
         sellingPrice: { type: Schema.Types.Number, required: true },
         taxBracket: {
             type: Schema.Types.ObjectId,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
         },
         outlet: {
             type: Schema.Types.ObjectId,
@@ -48,7 +48,7 @@ export interface IInventoryDoc extends Document {
     markup?: number;
     landingCost?: number;
     sellingPrice: number;
-    taxBracket?: Types.ObjectId | ITaxBracketDoc;
+    taxBracket?: Types.ObjectId | ITaxSettingDoc;
     outlet: Types.ObjectId | IOutletDoc;
     createdAt?: string;
     updatedAt?: string;

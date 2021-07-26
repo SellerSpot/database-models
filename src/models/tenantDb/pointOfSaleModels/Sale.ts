@@ -1,7 +1,7 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { ICustomer } from '../../coreDb';
-import { IOutletDoc, IProductDoc, IStockUnitDoc, ITaxBracketDoc } from '../catalogueModels';
+import { IOutletDoc, IProductDoc, IStockUnitDoc, ITaxSettingDoc } from '../catalogueModels';
 import { IUserDoc } from '../User';
 import { SchemaService } from '../../SchemaService';
 
@@ -61,7 +61,7 @@ export const SaleSchema = new Schema(
                     ],
                     reference: {
                         type: Schema.Types.ObjectId,
-                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
                     },
                 },
             },
@@ -139,7 +139,7 @@ export interface ICartDetails {
                 rate: number;
             },
         ];
-        reference: Types.ObjectId | ITaxBracketDoc;
+        reference: Types.ObjectId | ITaxSettingDoc;
     };
 }
 
