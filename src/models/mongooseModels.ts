@@ -13,6 +13,7 @@ export const MONGOOSE_MODELS = {
         // point of sale models
         POINT_OF_SALE: {
             // point of sale collections goes here
+            INFO: 'POINT_OF_SALE_INFO',
             INVENTORY: 'POINT_OF_SALE_INVENTORY',
             SALE: 'POINT_OF_SALE_SALE',
             OUTLET: 'POINT_OF_SALE_OUTLET',
