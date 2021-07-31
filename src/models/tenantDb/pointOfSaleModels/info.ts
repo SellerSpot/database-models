@@ -7,59 +7,66 @@ export enum EPOSInfoType {
     BILL_SETTINGS = 'BILL_SETTINGS',
 }
 
-export const BillSettingsSchema = new Schema({
-    bills: {
-        [EBILL_SIZES.BILL_A4]: {
-            storeDetails: {
-                name: Schema.Types.String,
-                address: Schema.Types.String,
-            },
-            GSTNumber: {
-                show: Schema.Types.Boolean,
-                data: Schema.Types.String,
-            },
-            purchaseInvoiceSection: {
-                show: Schema.Types.Boolean,
-                discountColumn: Schema.Types.Boolean,
-                taxColumn: Schema.Types.Boolean,
-                MRPColumn: Schema.Types.Boolean,
-            },
-            purchaseSummarySection: {
-                totalDiscount: Schema.Types.Boolean,
-                youSaved: Schema.Types.Boolean,
-            },
-            taxSplitUpSection: {
-                show: Schema.Types.Boolean,
-            },
-            remarkMessage: {
-                show: Schema.Types.Boolean,
-                data: Schema.Types.String,
-            },
-            termsAndConditions: {
-                show: Schema.Types.Boolean,
-                data: Schema.Types.String,
-            },
-            signature: {
-                authorised: Schema.Types.Boolean,
-                customer: Schema.Types.Boolean,
-            },
-            footerMessage: {
-                show: Schema.Types.Boolean,
-                data: Schema.Types.String,
-            },
+export const BillSettingsSchema = new Schema(
+    {
+        defaultBill: {
+            type: Schema.Types.String,
+            enum: EBILL_SIZES,
         },
-        [EBILL_SIZES.BILL_90MM]: {
-            storeDetails: {
-                name: Schema.Types.String,
-                address: Schema.Types.String,
+        bills: {
+            [EBILL_SIZES.BILL_A4]: {
+                storeDetails: {
+                    name: Schema.Types.String,
+                    address: Schema.Types.String,
+                },
+                GSTNumber: {
+                    show: Schema.Types.Boolean,
+                    data: Schema.Types.String,
+                },
+                purchaseInvoiceSection: {
+                    show: Schema.Types.Boolean,
+                    discountColumn: Schema.Types.Boolean,
+                    taxColumn: Schema.Types.Boolean,
+                    MRPColumn: Schema.Types.Boolean,
+                },
+                purchaseSummarySection: {
+                    totalDiscount: Schema.Types.Boolean,
+                    youSaved: Schema.Types.Boolean,
+                },
+                taxSplitUpSection: {
+                    show: Schema.Types.Boolean,
+                },
+                remarkMessage: {
+                    show: Schema.Types.Boolean,
+                    data: Schema.Types.String,
+                },
+                termsAndConditions: {
+                    show: Schema.Types.Boolean,
+                    data: Schema.Types.String,
+                },
+                signature: {
+                    authorised: Schema.Types.Boolean,
+                    customer: Schema.Types.Boolean,
+                },
+                footerMessage: {
+                    show: Schema.Types.Boolean,
+                    data: Schema.Types.String,
+                },
             },
-            footerMessage: {
-                show: Schema.Types.Boolean,
-                data: Schema.Types.String,
+            [EBILL_SIZES.BILL_90MM]: {
+                storeDetails: {
+                    name: Schema.Types.String,
+                    address: Schema.Types.String,
+                },
+                footerMessage: {
+                    show: Schema.Types.Boolean,
+                    data: Schema.Types.String,
+                },
             },
         },
     },
-});
+    { _id: false, versionKey: false },
+);
 
 export const InfoSchema = new Schema(
     {
@@ -74,7 +81,7 @@ export const InfoSchema = new Schema(
     },
 );
 
-export interface IInfoSchema extends Document {
+export interface IInfoDoc extends Document {
     id: string;
     infoType: EPOSInfoType;
     [EPOSInfoType.BILL_SETTINGS]?: IBillSettings;
