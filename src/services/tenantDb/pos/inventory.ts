@@ -1,5 +1,5 @@
 import { ERROR_CODE, ICreateInventoryRequest } from '@sellerspot/universal-types';
-import { BadRequestError } from '../../../../.yalc/@sellerspot/universal-functions/dist';
+import { BadRequestError } from '@sellerspot/universal-functions';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IOutletDoc, IProductDoc, ITaxSettingDoc } from '../../../models/tenantDb/catalogueModels';
