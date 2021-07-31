@@ -29,6 +29,16 @@ export const createStockUnit = async (
     return stockUnit;
 };
 
+export const searchStockUnit = async (query: string): Promise<IStockUnitDoc[]> => {
+    const StockUnit = DbConnectionManager.getTenantModel<IStockUnitDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+    );
+    const matchingStockUnits = await StockUnit.find({
+        $or: [{ name: new RegExp(`^${query}`, 'i') }, { unit: new RegExp(`^${query}`, 'i') }],
+    });
+    return matchingStockUnits;
+};
+
 export const getAllStockUnit = async (): Promise<IStockUnitDoc[]> => {
     const StockUnit = DbConnectionManager.getTenantModel<IStockUnitDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,

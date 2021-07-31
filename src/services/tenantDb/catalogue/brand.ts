@@ -2,7 +2,7 @@ import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IBrandDoc } from '../../../models/tenantDb/catalogueModels';
 import { ERROR_CODE, ICreateBrandRequest, IEditBrandRequest } from '@sellerspot/universal-types';
-import { BadRequestError } from '@sellerspot/universal-functions';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 
 export const createBrand = async (newBrand: ICreateBrandRequest): Promise<IBrandDoc> => {
     const { name } = newBrand;
@@ -31,6 +31,14 @@ export const getBrand = async (brandId: string): Promise<IBrandDoc> => {
     );
     const brand = await Brand.findById(brandId);
     return brand;
+};
+
+export const searchBrand = async (query: string): Promise<IBrandDoc[]> => {
+    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
+        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
+    );
+    const matchingBrands = await Brand.find({ name: new RegExp(`^${query}`, 'i') });
+    return matchingBrands;
 };
 
 export const editBrand = async (

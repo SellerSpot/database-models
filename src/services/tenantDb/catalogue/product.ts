@@ -1,13 +1,17 @@
-import { BadRequestError } from '@sellerspot/universal-functions';
-import { ERROR_CODE, IProductRequest } from '@sellerspot/universal-types';
-import { isEmpty, merge } from 'lodash';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import {
+    ERROR_CODE,
+    ICreateProductRequest,
+    IEditProductRequest,
+} from '@sellerspot/universal-types';
+import { merge } from 'lodash';
 import { PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
 
-export const createProduct = async (productProps: IProductRequest): Promise<IProductDoc> => {
-    const { brand, category, stockUnit, ...args } = productProps;
+export const createProduct = async (productsProps: ICreateProductRequest): Promise<IProductDoc> => {
+    const { brand, category, stockUnit, ...args } = productsProps;
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
     );
@@ -41,24 +45,20 @@ export const createProduct = async (productProps: IProductRequest): Promise<IPro
                 'Invalid stock unit is assigned',
             );
     }
-    let product = await Product.create({ brand, category, stockUnit, ...args });
-    const populateArrOpts: PopulateOptions[] = [];
-    if (brand) populateArrOpts.push({ path: 'brand', select: 'id name' });
-    if (category) populateArrOpts.push({ path: 'category', select: 'id title' });
-    if (stockUnit) populateArrOpts.push({ path: 'stockUnit', select: 'id title' });
-    if (populateArrOpts.length > 0) {
-        /**
-         * On Documnent we should use execPopulate to actually execute it
-         * @link https://mongoosejs.com/docs/api.html#document_Document-populate
-         **/
-        product = await product.populate(populateArrOpts).execPopulate();
-    }
-    return product;
+    const createdProductDoc = await Product.create({ brand, category, stockUnit, ...args });
+    /**
+     * On Documnent we should use execPopulate to actually execute it
+     * @link https://mongoosejs.com/docs/api.html#document_Document-populate
+     **/
+    const createdProduct = await createdProductDoc
+        .populate(getProductDefaultPopulationList())
+        .execPopulate();
+    return createdProduct;
 };
 
 export const editProduct = async (
     productId: string,
-    productProps: Partial<IProductRequest>,
+    productProps: IEditProductRequest,
 ): Promise<IProductDoc> => {
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
@@ -89,6 +89,14 @@ export const getAllProduct = async (): Promise<IProductDoc[]> => {
     return productList;
 };
 
+// export const searchProduct = async (query: string): Promise<IProductDoc> => {
+//     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
+//         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+//     );
+//     const product = await Product(productId).populate(getProductDefaultPopulationList());
+//     return product;
+// };
+
 export const deleteProduct = async (productId: string): Promise<void> => {
     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
@@ -100,6 +108,6 @@ const getProductDefaultPopulationList = (): PopulateOptions[] => {
     const populateArrOpts: PopulateOptions[] = [];
     populateArrOpts.push({ path: 'brand', select: 'id name' });
     populateArrOpts.push({ path: 'category', select: 'id title' });
-    populateArrOpts.push({ path: 'stockUnit', select: 'id title' });
+    populateArrOpts.push({ path: 'stockUnit', select: 'id name unit' });
     return populateArrOpts;
 };

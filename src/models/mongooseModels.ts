@@ -27,7 +27,7 @@ export const MONGOOSE_MODELS = {
             STOCKUNIT: 'CATALOGUE_STOCKUNIT',
             CATEGORY: 'CATALOGUE_CATEGORY',
             BRAND: 'CATALOGUE_BRAND',
-            TAXBRACKET: 'CATALOGUE_TAXBRACKET',
+            TAXSETTING: 'CATALOGUE_TAXSETTING',
         },
     },
 };

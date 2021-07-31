@@ -2,7 +2,7 @@ import { ERROR_CODE, ICreateInventoryRequest } from '@sellerspot/universal-types
 import { BadRequestError } from '@sellerspot/universal-functions';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
-import { IOutletDoc, IProductDoc, ITaxBracketDoc } from '../../../models/tenantDb/catalogueModels';
+import { IOutletDoc, IProductDoc, ITaxSettingDoc } from '../../../models/tenantDb/catalogueModels';
 import { IInventoryDoc } from '../../../models/tenantDb/pointOfSaleModels/Inventory';
 
 export const addProductToInventory = async (
@@ -29,8 +29,8 @@ export const addProductToInventory = async (
     }
 
     if (taxBracketId) {
-        const TaxBracket = DbConnectionManager.getTenantModel<ITaxBracketDoc>(
-            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+        const TaxBracket = DbConnectionManager.getTenantModel<ITaxSettingDoc>(
+            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
         );
         const isTaxBracketExist = await TaxBracket.exists({ _id: taxBracketId });
         if (!isTaxBracketExist) {

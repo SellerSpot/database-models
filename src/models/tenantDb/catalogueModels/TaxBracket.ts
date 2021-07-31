@@ -7,9 +7,10 @@ import { isEmpty } from 'lodash';
 /**
  * TaxBracket -> entity with single tax info ie name & rate
  * TaxGroup -> collection of two or more tax bracket together is called TaxGroup
+ * TaxSetting -> both tax bracket and tax groups in one collection
  */
 
-export const TaxBracketSchema = new Schema(
+export const TaxSettingSchema = new Schema(
     {
         name: {
             type: Schema.Types.String,
@@ -22,7 +23,7 @@ export const TaxBracketSchema = new Schema(
         },
         group: {
             type: [Schema.Types.ObjectId],
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
         },
     },
     {
@@ -31,15 +32,15 @@ export const TaxBracketSchema = new Schema(
 );
 
 //utility property to check if current document is taxBracket / taxGroup
-TaxBracketSchema.virtual('isGroup').get(function (this: ITaxBracketDoc) {
+TaxSettingSchema.virtual('isGroup').get(function (this: ITaxSettingDoc) {
     return !isEmpty(this.group);
 });
 
-export interface ITaxBracketDoc extends Document {
+export interface ITaxSettingDoc extends Document {
     id: string;
     name: string;
     rate: number;
-    group?: string[] | ITaxBracketDoc[];
+    group?: string[] | ITaxSettingDoc[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
      */
@@ -48,4 +49,4 @@ export interface ITaxBracketDoc extends Document {
     updatedAt?: string;
 }
 
-SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET, TaxBracketSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING, TaxSettingSchema);
