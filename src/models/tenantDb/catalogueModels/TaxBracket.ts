@@ -1,8 +1,8 @@
 import { Document, Schema, Types } from 'mongoose';
+import { isEmpty } from 'lodash';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
 import { SchemaService } from '../../SchemaService';
 import { CONFIG } from '../../../configs/config';
-import { isEmpty } from 'lodash';
 
 /**
  * TaxBracket -> entity with single tax info ie name & rate
@@ -40,7 +40,7 @@ export interface ITaxSettingDoc extends Document {
     id: string;
     name: string;
     rate: number;
-    group?: string[] | ITaxSettingDoc[];
+    group?: string[] | Omit<ITaxSettingDoc, 'group'>[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
      */
