@@ -128,7 +128,7 @@ export interface ICartDetails {
     taxBracket: {
         name: string;
         rate: number;
-        group: [
+        group?: [
             {
                 name: string;
                 rate: number;
