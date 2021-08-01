@@ -132,6 +132,7 @@ export interface ICartDetails {
             {
                 name: string;
                 rate: number;
+                reference: Schema.Types.ObjectId | ITaxSettingDoc;
             },
         ];
         reference: Schema.Types.ObjectId | ITaxSettingDoc;
