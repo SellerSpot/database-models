@@ -175,6 +175,8 @@ export interface ISaleDoc extends Document {
         name: string;
         reference: Schema.Types.ObjectId | IOutletDoc;
     };
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);
