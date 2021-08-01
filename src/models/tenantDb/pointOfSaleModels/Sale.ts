@@ -4,24 +4,7 @@ import { ICustomerDoc } from '../../coreDb';
 import { IOutletDoc, IProductDoc, IStockUnitDoc, ITaxSettingDoc } from '../catalogueModels';
 import { IUserDoc } from '../User';
 import { SchemaService } from '../../SchemaService';
-
-export enum EDiscountTypes {
-    VALUE = 'VALUE',
-    PERCENT = 'PERCENT',
-}
-
-export enum ESaleStatus {
-    PARKED = 'PARKED',
-    COMPLETED = 'COMPLETED',
-    VOIDED = 'VOIDED',
-    // should we need QUOTED
-}
-
-export enum EPaymentMethods {
-    CASH = 'CASH',
-    CARD = 'CARD',
-    // might be DUE in next phase
-}
+import { EDiscountTypes, EPaymentMethods, ESaleStatus } from '@sellerspot/universal-types';
 
 export const CartSchema = new Schema(
     {

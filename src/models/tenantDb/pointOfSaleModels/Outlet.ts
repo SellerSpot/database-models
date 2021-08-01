@@ -13,7 +13,6 @@ export const OutletSchema = new Schema(
 );
 
 export interface IOutletDoc extends Document {
-    id: string;
     name: string;
     address: string;
     createdAt?: string;
