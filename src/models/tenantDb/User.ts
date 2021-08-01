@@ -39,8 +39,10 @@ UserSchema.pre('save', async function (done) {
 
 export interface IUserDoc extends Document {
     name: string;
+    email: string;
     password: string;
-    email?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.USER, UserSchema);

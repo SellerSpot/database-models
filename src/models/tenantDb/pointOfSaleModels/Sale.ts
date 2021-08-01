@@ -1,112 +1,122 @@
 import { Document, Schema, Types } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { ICustomer } from '../../coreDb';
+import { ICustomerDoc } from '../../coreDb';
 import { IOutletDoc, IProductDoc, IStockUnitDoc, ITaxSettingDoc } from '../catalogueModels';
 import { IUserDoc } from '../User';
 import { SchemaService } from '../../SchemaService';
 
-export enum DiscountTypesEnum {
+export enum EDiscountTypes {
     VALUE = 'VALUE',
     PERCENT = 'PERCENT',
 }
 
-export enum SaletatusEnum {
+export enum ESaleStatus {
     PARKED = 'PARKED',
     COMPLETED = 'COMPLETED',
     VOIDED = 'VOIDED',
+    // should we need QUOTED
 }
 
-export enum PaymentMethodsEnum {
+export enum EPaymentMethods {
     CASH = 'CASH',
     CARD = 'CARD',
+    // might be DUE in next phase
 }
+
+export const CartSchema = new Schema(
+    {
+        product: {
+            name: Schema.Types.String,
+            reference: {
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+            },
+        },
+        stockUnit: {
+            name: Schema.Types.String,
+            reference: {
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
+            },
+        },
+        quantity: Schema.Types.Number,
+        unitPrice: Schema.Types.Number, // should we need isModified flag?
+        productDiscount: {
+            discount: Schema.Types.Number,
+            discountType: {
+                type: Schema.Types.String,
+                enum: EDiscountTypes,
+            },
+        },
+        taxBracket: {
+            name: Schema.Types.String,
+            rate: Schema.Types.Number,
+            group: [
+                {
+                    name: Schema.Types.String,
+                    rate: Schema.Types.Number,
+                },
+            ],
+            reference: {
+                type: Schema.Types.ObjectId,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
+            },
+        },
+    },
+    { versionKey: false, _id: false },
+);
 
 export const SaleSchema = new Schema(
     {
-        cart: [
-            {
-                product: {
-                    name: {
-                        type: Schema.Types.String,
-                    },
-                    reference: {
-                        type: Schema.Types.ObjectId,
-                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-                    },
-                },
-                stockUnit: {
-                    name: {
-                        type: Schema.Types.String,
-                    },
-                    reference: {
-                        type: Schema.Types.ObjectId,
-                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
-                    },
-                },
-                quantity: { type: Schema.Types.Number },
-                unitPrice: { type: Schema.Types.Number },
-                productDiscount: { type: Schema.Types.Number },
-                productDiscountType: {
-                    type: Schema.Types.String,
-                    enum: DiscountTypesEnum,
-                },
-                taxBracket: {
-                    name: { type: Schema.Types.String },
-                    rate: { type: Schema.Types.Number },
-                    group: [
-                        {
-                            name: { type: Schema.Types.String },
-                            rate: { type: Schema.Types.Number },
-                        },
-                    ],
-                    reference: {
-                        type: Schema.Types.ObjectId,
-                        ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
-                    },
-                },
-            },
-        ],
+        cart: [CartSchema],
         status: {
             type: Schema.Types.String,
-            enum: SaletatusEnum,
+            enum: ESaleStatus,
         },
-        saleDiscount: { type: Schema.Types.Number },
-        saleDiscountType: {
-            type: Schema.Types.String,
-            enum: DiscountTypesEnum,
+        saleDiscount: {
+            discount: Schema.Types.Number,
+            discountType: {
+                type: Schema.Types.String,
+                enum: EDiscountTypes,
+            },
         },
         payment: {
             method: {
                 type: Schema.Types.String,
-                enum: PaymentMethodsEnum,
+                enum: EPaymentMethods,
             },
-            total: { type: Schema.Types.Number },
+            // all products discount and including total sale discount
+            totalDiscount: { type: Schema.Types.Number },
+            // all products consolidated taxes
+            totalTax: { type: Schema.Types.Number },
+            // total before applying tax and discount
+            subTotal: { type: Schema.Types.Number },
+            // total after applying tax and discount
+            grandTotal: { type: Schema.Types.Number },
+            // amount paid by the customer
             amountPaid: { type: Schema.Types.Number },
+            // balance given to the customer
             balance: { type: Schema.Types.Number },
         },
+        // client / customer
         customer: {
-            name: {
-                type: Schema.Types.String,
-            },
-            ref: {
+            name: Schema.Types.String,
+            reference: {
                 type: Schema.Types.ObjectId,
                 ref: MONGOOSE_MODELS.CORE_DB.CUSTOMER,
             },
         },
+        // employee / owner
         user: {
-            name: {
-                type: Schema.Types.String,
-            },
-            ref: {
+            name: Schema.Types.String,
+            reference: {
                 type: Schema.Types.ObjectId,
                 ref: MONGOOSE_MODELS.TENANT_DB.USER,
             },
         },
         outlet: {
-            name: {
-                type: Schema.Types.String,
-            },
-            ref: {
+            name: Schema.Types.String,
+            reference: {
                 type: Schema.Types.ObjectId,
                 ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET,
             },
@@ -120,17 +130,19 @@ export const SaleSchema = new Schema(
 export interface ICartDetails {
     product: {
         name: string;
-        reference: Types.ObjectId | IProductDoc;
+        reference: Schema.Types.ObjectId | IProductDoc;
     };
     stockUnit: {
         name: string;
-        reference: Types.ObjectId | IStockUnitDoc;
+        reference: Schema.Types.ObjectId | IStockUnitDoc;
     };
     quantity: number;
-    unitPrice: number;
-    productDiscount: number;
-    productDiscountType: DiscountTypesEnum;
-    taxDetails: {
+    unitPrice: number; // should we need isModified flag?
+    productDiscount: {
+        discount: number;
+        discountType: EDiscountTypes;
+    };
+    taxBracket: {
         name: string;
         rate: number;
         group: [
@@ -139,27 +151,47 @@ export interface ICartDetails {
                 rate: number;
             },
         ];
-        reference: Types.ObjectId | ITaxSettingDoc;
+        reference: Schema.Types.ObjectId | ITaxSettingDoc;
     };
 }
 
-export interface ISale {
+export interface ISaleDoc extends Document {
     cart: ICartDetails[];
-    status: SaletatusEnum;
-    saleDiscount: number;
-    saleDiscountType: DiscountTypesEnum;
-    payment: {
-        method: PaymentMethodsEnum;
-        total: { type: Schema.Types.Number };
-        amountPaid: number;
-        balance: number;
+    status: ESaleStatus;
+    saleDiscount: {
+        discount: number;
+        discountType: EDiscountTypes;
     };
-    customer: Types.ObjectId | ICustomer;
-    user: Types.ObjectId | IUserDoc;
-    outlet: string | IOutletDoc;
-    id?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    payment: {
+        method: EPaymentMethods;
+        // all products discount and including total sale discount
+        totalDiscount: number;
+        // all products consolidated taxes
+        totalTax: number;
+        // total before applying tax and discount
+        subTotal: number;
+        // total after applying tax and discount
+        grandTotal: number;
+        // amount paid by the customer
+        amountPaid: number;
+        // balance given to the customer
+        balanceGiven: number;
+        // need to incorporate due schema here in next phase
+    };
+    // client / customer
+    customer: {
+        name: string;
+        reference: Schema.Types.ObjectId | ICustomerDoc;
+    };
+    // employee / owner
+    user: {
+        name: string;
+        reference: Schema.Types.ObjectId | IUserDoc;
+    };
+    outlet: {
+        name: string;
+        reference: Schema.Types.ObjectId | IOutletDoc;
+    };
 }
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);
