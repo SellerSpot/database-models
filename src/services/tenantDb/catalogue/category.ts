@@ -11,152 +11,148 @@ import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { ICategoryDoc } from '../../../models/tenantDb/catalogueModels';
 
-export const createCategory = async (
-    categoryProps: ICreateCategoryRequest,
-): Promise<ICategoryDoc> => {
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-    const { title } = categoryProps;
-    let { parentId } = categoryProps;
-    if (!parentId) {
-        const rootCategory = await checkAndGetRootCategory(Category);
-        parentId = rootCategory.id;
-    }
-    const category = await Category.create({ title, parent: parentId });
-    logger.info(`Category ${title} created successfully`);
-    return category;
-};
-
-export const editCategoryContent = async (
-    categoryId: string,
-    props: IEditCategoryRequest,
-): Promise<ICategoryDoc> => {
-    const { title } = props;
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-    const updatedCategory = await Category.findOneAndUpdate(
-        { _id: categoryId },
-        { $set: { title } },
-        { new: true }, //to get updated doc
-    );
-
-    const populatedUpdatedCategory = await updatedCategory
-        .populate({ path: 'children', select: 'id title' })
-        .execPopulate();
-    return populatedUpdatedCategory;
-};
-
-export const editCategoryChildrenOrder = async (
-    parentId: string,
-    props: IEditCategoryChildrenOrderRequest,
-): Promise<ICategoryDoc> => {
-    const { childrenOrder } = props;
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-    const tobeUpdated = await Category.findById(parentId);
-    if (isEmpty(tobeUpdated)) {
-        throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `cannot find parent category`);
-    }
-    const isNonChild = (<Types.ObjectId[]>tobeUpdated.children).find((childId) => {
-        return childrenOrder.indexOf(childId.toHexString()) === -1;
-    });
-    if (isNonChild || tobeUpdated.children.length !== childrenOrder.length) {
-        logger.error(`contains non child value`);
-        throw new BadRequestError(ERROR_CODE.NOT_FOUND, `contains invalid child category values`);
-    }
-    tobeUpdated.children = childrenOrder.map((idStr) => new Types.ObjectId(idStr));
-    await tobeUpdated.populate({ path: 'children', select: 'id title' }).execPopulate();
-    await tobeUpdated.save();
-    return tobeUpdated;
-};
-
 export interface ICategoryPosition {
     newParentId: string;
     oldParentId: string;
 }
+export class CategoryDbService {
+    static getModal = (): Model<ICategoryDoc> => {
+        return DbConnectionManager.getTenantModel<ICategoryDoc>(
+            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
+        );
+    };
 
-export const editCategoryPosition = async (
-    categoryId: string,
-    props: ICategoryPosition,
-): Promise<ICategoryDoc> => {
-    let { oldParentId, newParentId } = props;
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-
-    // getting root category id if no parent id is provided
-    if (!newParentId || !oldParentId) {
-        const rootCategory = await checkAndGetRootCategory(Category);
-        if (!newParentId) {
-            newParentId = rootCategory.id;
+    static createCategory = async (
+        categoryProps: ICreateCategoryRequest,
+    ): Promise<ICategoryDoc> => {
+        const Category = CategoryDbService.getModal();
+        const { title } = categoryProps;
+        let { parentId } = categoryProps;
+        if (!parentId) {
+            const rootCategory = await CategoryDbService.checkAndGetRootCategory(Category);
+            parentId = rootCategory.id;
         }
-        if (!oldParentId) {
-            oldParentId = rootCategory.id;
+        const category = await Category.create({ title, parent: parentId });
+        logger.info(`Category ${title} created successfully`);
+        return category;
+    };
+
+    static editCategoryContent = async (
+        categoryId: string,
+        props: IEditCategoryRequest,
+    ): Promise<ICategoryDoc> => {
+        const { title } = props;
+        const Category = CategoryDbService.getModal();
+        const updatedCategory = await Category.findOneAndUpdate(
+            { _id: categoryId },
+            { $set: { title } },
+            { new: true }, //to get updated doc
+        );
+
+        const populatedUpdatedCategory = await updatedCategory
+            .populate({ path: 'children', select: 'id title' })
+            .execPopulate();
+        return populatedUpdatedCategory;
+    };
+
+    static editCategoryChildrenOrder = async (
+        parentId: string,
+        props: IEditCategoryChildrenOrderRequest,
+    ): Promise<ICategoryDoc> => {
+        const { childrenOrder } = props;
+        const Category = CategoryDbService.getModal();
+        const tobeUpdated = await Category.findById(parentId);
+        if (isEmpty(tobeUpdated)) {
+            throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `cannot find parent category`);
         }
-    }
+        const isNonChild = (<Types.ObjectId[]>tobeUpdated.children).find((childId) => {
+            return childrenOrder.indexOf(childId.toHexString()) === -1;
+        });
+        if (isNonChild || tobeUpdated.children.length !== childrenOrder.length) {
+            logger.error(`contains non child value`);
+            throw new BadRequestError(
+                ERROR_CODE.NOT_FOUND,
+                `contains invalid child category values`,
+            );
+        }
+        tobeUpdated.children = childrenOrder.map((idStr) => new Types.ObjectId(idStr));
+        await tobeUpdated.populate({ path: 'children', select: 'id title' }).execPopulate();
+        await tobeUpdated.save();
+        return tobeUpdated;
+    };
 
-    // removes categoryId from old parent children
-    await Category.updateOne(
-        {
-            _id: oldParentId,
-        },
-        {
-            $pull: { children: categoryId },
-        },
-    );
+    static editCategoryPosition = async (
+        categoryId: string,
+        props: ICategoryPosition,
+    ): Promise<ICategoryDoc> => {
+        let { oldParentId, newParentId } = props;
+        const Category = CategoryDbService.getModal();
 
-    const isNewParentExist = await Category.exists({ _id: newParentId });
+        // getting root category id if no parent id is provided
+        if (!newParentId || !oldParentId) {
+            const rootCategory = await CategoryDbService.checkAndGetRootCategory(Category);
+            if (!newParentId) {
+                newParentId = rootCategory.id;
+            }
+            if (!oldParentId) {
+                oldParentId = rootCategory.id;
+            }
+        }
 
-    if (!isNewParentExist) {
-        logger.error(`Parent category invalid`);
-        throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `Parent category invalid`);
-    }
-    //Gets the category changes the parent and updates
-    //Done this way insead on direct update -> to trigger save middleware
-    const category = await Category.findById(categoryId);
-    category.parent = new Types.ObjectId(newParentId);
-    await category.save();
-    return category;
-};
+        // removes categoryId from old parent children
+        await Category.updateOne(
+            {
+                _id: oldParentId,
+            },
+            {
+                $pull: { children: categoryId },
+            },
+        );
 
-export const checkAndGetRootCategory = async (
-    Category: Model<ICategoryDoc>,
-): Promise<ICategoryDoc> => {
-    let rootCategory = await Category.findOne({ title: 'root' });
-    if (isEmpty(rootCategory)) {
-        rootCategory = await Category.create({ title: 'root', parent: null });
-    }
-    return rootCategory;
-};
+        const isNewParentExist = await Category.exists({ _id: newParentId });
 
-export const getCategoryById = async (categoryId: string): Promise<ICategoryDoc> => {
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-    return await Category.findById(categoryId).populate('children').exec();
-};
+        if (!isNewParentExist) {
+            logger.error(`Parent category invalid`);
+            throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `Parent category invalid`);
+        }
+        //Gets the category changes the parent and updates
+        //Done this way insead on direct update -> to trigger save middleware
+        const category = await Category.findById(categoryId);
+        category.parent = new Types.ObjectId(newParentId);
+        await category.save();
+        return category;
+    };
 
-export const getAllCategory = async (): Promise<ICategoryDoc[]> => {
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-    const rootCategory = await checkAndGetRootCategory(Category);
-    let allCategory: ICategoryDoc[] = [];
-    if (rootCategory) {
-        const rootId = rootCategory.id;
-        allCategory = await Category.find({ ancestors: { $in: [Types.ObjectId(rootId)] } });
-        allCategory.unshift(rootCategory);
-    }
-    return allCategory;
-};
+    static checkAndGetRootCategory = async (
+        Category: Model<ICategoryDoc>,
+    ): Promise<ICategoryDoc> => {
+        let rootCategory = await Category.findOne({ title: 'root' });
+        if (isEmpty(rootCategory)) {
+            rootCategory = await Category.create({ title: 'root', parent: null });
+        }
+        return rootCategory;
+    };
 
-export const deleteCategory = async (categoryId: string): Promise<ICategoryDoc> => {
-    const Category = DbConnectionManager.getTenantModel<ICategoryDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-    );
-    //remove should be called on returned document and not on Model itself
-    return (await Category.findById(categoryId))?.remove();
-};
+    static getCategoryById = async (categoryId: string): Promise<ICategoryDoc> => {
+        const Category = CategoryDbService.getModal();
+        return await Category.findById(categoryId).populate('children').exec();
+    };
+
+    static getAllCategory = async (): Promise<ICategoryDoc[]> => {
+        const Category = CategoryDbService.getModal();
+        const rootCategory = await CategoryDbService.checkAndGetRootCategory(Category);
+        let allCategory: ICategoryDoc[] = [];
+        if (rootCategory) {
+            const rootId = rootCategory.id;
+            allCategory = await Category.find({ ancestors: { $in: [Types.ObjectId(rootId)] } });
+            allCategory.unshift(rootCategory);
+        }
+        return allCategory;
+    };
+
+    static deleteCategory = async (categoryId: string): Promise<ICategoryDoc> => {
+        const Category = CategoryDbService.getModal();
+        //remove should be called on returned document and not on Model itself
+        return (await Category.findById(categoryId))?.remove();
+    };
+}
