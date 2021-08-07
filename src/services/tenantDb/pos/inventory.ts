@@ -15,6 +15,20 @@ export class InventoryDbService {
         );
     };
 
+    static getInventoryDefaultPopulationList = (): PopulateOptions[] => {
+        const populateArrOpts: PopulateOptions[] = [];
+        populateArrOpts.push({
+            path: 'product',
+            populate: ProductDbService.getProductDefaultPopulationList(),
+        });
+        populateArrOpts.push({
+            path: 'taxBracket',
+            populate: TaxSettingDbService.getDefaultPopulateOptions(),
+        });
+        populateArrOpts.push({ path: 'outlet', select: OutletDbService.fieldsToFetchString });
+        return populateArrOpts;
+    };
+
     static getAllInventoryProducts = async (): Promise<IInventoryDoc[]> => {
         const Inventory = InventoryDbService.getModal();
         const allProducts = await Inventory.find({}).populate(
@@ -77,20 +91,6 @@ export class InventoryDbService {
         });
 
         return inventoryProduct;
-    };
-
-    private static getInventoryDefaultPopulationList = (): PopulateOptions[] => {
-        const populateArrOpts: PopulateOptions[] = [];
-        populateArrOpts.push({
-            path: 'product',
-            populate: ProductDbService.getProductDefaultPopulationList(),
-        });
-        populateArrOpts.push({
-            path: 'taxBracket',
-            populate: TaxSettingDbService.getDefaultPopulateOptions(),
-        });
-        populateArrOpts.push({ path: 'outlet', select: 'id name address' });
-        return populateArrOpts;
     };
 }
 

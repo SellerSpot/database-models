@@ -5,16 +5,23 @@ import {
     ICreateTaxGroupRequest,
     IEditTaxBracketRequest,
     IEditTaxGroupRequest,
+    ITaxBracketData,
+    ITaxGroupData,
 } from '@sellerspot/universal-types';
+import { pick } from 'lodash';
 import { Model, PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { ITaxSettingDoc } from '../../../models/tenantDb/catalogueModels';
 
 export class TaxBracketDbService {
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof ITaxBracketData> = ['id', 'name', 'rate'];
+    static fieldsToFetchString = TaxBracketDbService.fieldsToFetch.join(' ');
+
     static createTaxBracket = async (
         bracket: ICreateTaxBracketRequest,
-    ): Promise<ITaxSettingDoc> => {
+    ): Promise<ITaxBracketData> => {
         const { name, rate } = bracket;
         const TaxSetting = TaxSettingDbService.getModal();
         const isBracketExist = await TaxSetting.exists({ name });
@@ -25,18 +32,22 @@ export class TaxBracketDbService {
             );
         }
         const newTaxBracket = await TaxSetting.create({ name, rate });
-        return newTaxBracket;
+        return pick(newTaxBracket, TaxBracketDbService.fieldsToFetch) as ITaxBracketData;
     };
 
-    static getAllTaxBracket = async (): Promise<ITaxSettingDoc[]> => {
+    static getAllTaxBracket = async (): Promise<ITaxBracketData[]> => {
         const TaxSetting = TaxSettingDbService.getModal();
-        const allTaxBracket = await TaxSetting.find({});
-        return allTaxBracket.filter((bracket) => bracket.isGroup === false);
+        const allTaxBracket = await TaxSetting.find({}).select(
+            TaxBracketDbService.fieldsToFetchString,
+        );
+        return allTaxBracket.filter((bracket) => bracket.isGroup === false) as ITaxBracketData[];
     };
 
     static getTaxBracket = async (bracketId: string): Promise<ITaxSettingDoc> => {
         const TaxSetting = TaxSettingDbService.getModal();
-        const requiredTaxBracket = await TaxSetting.findById(bracketId);
+        const requiredTaxBracket = await TaxSetting.findById(bracketId).select(
+            TaxBracketDbService.fieldsToFetchString,
+        );
         return requiredTaxBracket;
     };
 
@@ -47,7 +58,7 @@ export class TaxBracketDbService {
         const TaxSetting = TaxSettingDbService.getModal();
         const newTaxBracket = await TaxSetting.findByIdAndUpdate(bracketId, updatedBracket, {
             new: true,
-        });
+        }).select(TaxBracketDbService.fieldsToFetchString);
         return newTaxBracket;
     };
 
@@ -58,24 +69,33 @@ export class TaxBracketDbService {
 }
 
 export class TaxGroupDbService {
-    static getAllTaxGroup = async (): Promise<ITaxSettingDoc[]> => {
-        const TaxSetting = TaxSettingDbService.getModal();
-        const allTaxGroup = await TaxSetting.find({}).populate({
-            path: 'group',
-            select: 'id name rate',
-        });
-        return allTaxGroup.filter((bracket) => bracket.isGroup === true);
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof ITaxGroupData> = ['id', 'name', 'bracket', 'rate'];
+    static fieldsToFetchString = TaxGroupDbService.fieldsToFetch.join(' ');
+
+    static getDefaultPopulateOptions = (): PopulateOptions[] => {
+        const populateArrOpts: PopulateOptions[] = [];
+        populateArrOpts.push({ path: 'bracket', select: TaxBracketDbService.fieldsToFetchString });
+        return populateArrOpts;
     };
 
-    static getTaxGroup = async (taxGroupId: string): Promise<ITaxSettingDoc> => {
+    static getAllTaxGroup = async (): Promise<ITaxGroupData[]> => {
         const TaxSetting = TaxSettingDbService.getModal();
-        const taxGroup = await TaxSetting.findOne({ _id: taxGroupId }).populate(
-            TaxGroupDbService.getDefaultPopulateOptions(),
-        );
-        return taxGroup;
+        const allTaxGroup = await TaxSetting.find({})
+            .select(TaxGroupDbService.fieldsToFetchString)
+            .populate(TaxGroupDbService.getDefaultPopulateOptions());
+        return allTaxGroup.filter((bracket) => bracket.isGroup === true) as ITaxGroupData[];
     };
 
-    static createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITaxSettingDoc> => {
+    static getTaxGroup = async (taxGroupId: string): Promise<ITaxGroupData> => {
+        const TaxSetting = TaxSettingDbService.getModal();
+        const taxGroup = await TaxSetting.findOne({ _id: taxGroupId })
+            .select(TaxGroupDbService.fieldsToFetchString)
+            .populate(TaxGroupDbService.getDefaultPopulateOptions());
+        return taxGroup as ITaxGroupData;
+    };
+
+    static createTaxGroup = async (group: ICreateTaxGroupRequest): Promise<ITaxGroupData> => {
         const { name, bracket } = group;
         const TaxSetting = TaxSettingDbService.getModal();
         const matchedCount = await TaxSetting.countDocuments({ _id: { $in: bracket } });
@@ -93,13 +113,13 @@ export class TaxGroupDbService {
         newTaxGroup = await newTaxGroup
             .populate(TaxGroupDbService.getDefaultPopulateOptions())
             .execPopulate();
-        return newTaxGroup;
+        return pick(newTaxGroup, TaxGroupDbService.fieldsToFetch) as ITaxGroupData;
     };
 
     static editTaxGroup = async (
         newTaxGroup: IEditTaxGroupRequest,
         taxGroupId: string,
-    ): Promise<ITaxSettingDoc> => {
+    ): Promise<ITaxGroupData> => {
         const { bracket, name } = newTaxGroup;
         const TaxSetting = TaxSettingDbService.getModal();
         const updatedTaxGroup = await TaxSetting.findByIdAndUpdate(
@@ -108,19 +128,15 @@ export class TaxGroupDbService {
             {
                 new: true,
             },
-        ).populate(TaxGroupDbService.getDefaultPopulateOptions());
-        return updatedTaxGroup;
+        )
+            .select(TaxGroupDbService.fieldsToFetchString)
+            .populate(TaxGroupDbService.getDefaultPopulateOptions());
+        return updatedTaxGroup as ITaxGroupData;
     };
 
     static deleteTaxGroup = async (taxGroupId: string): Promise<void> => {
         const TaxSetting = TaxSettingDbService.getModal();
         await TaxSetting.deleteOne({ _id: taxGroupId });
-    };
-
-    static getDefaultPopulateOptions = (): PopulateOptions[] => {
-        const populateArrOpts: PopulateOptions[] = [];
-        populateArrOpts.push({ path: 'group', select: 'id name rate' });
-        return populateArrOpts;
     };
 }
 
@@ -151,7 +167,7 @@ export class TaxSettingDbService {
 
     static getDefaultPopulateOptions = (): PopulateOptions[] => {
         const populateArrOpts: PopulateOptions[] = [];
-        populateArrOpts.push({ path: 'group', select: 'id name rate' });
+        populateArrOpts.push({ path: 'bracket', select: TaxBracketDbService.fieldsToFetchString });
         return populateArrOpts;
     };
 }
