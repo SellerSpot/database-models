@@ -15,6 +15,7 @@ export const InventorySchema = new Schema(
         stock: { type: Schema.Types.Number, default: 0 },
         isTrack: { type: Schema.Types.Boolean, default: true },
         markup: { type: Schema.Types.Number },
+        mrp: { type: Schema.Types.Number },
         landingCost: { type: Schema.Types.Number },
         sellingPrice: { type: Schema.Types.Number, required: true },
         taxSetting: {
@@ -53,6 +54,7 @@ export interface IInventoryDoc extends Document {
     tags?: [string];
     stock: number;
     isTrack: boolean;
+    mrp: number;
     markup?: number;
     landingCost?: number;
     sellingPrice: number;

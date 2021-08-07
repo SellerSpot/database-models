@@ -34,7 +34,8 @@ export class InventoryDbService {
             markup,
             landingCost,
             sellingPrice,
-            taxBracketId,
+            mrp,
+            taxSettingId,
         } = inventoryProps;
 
         // checking product data
@@ -44,10 +45,10 @@ export class InventoryDbService {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
 
-        // checking tax bracket data
-        if (taxBracketId) {
+        // checking tax settings data
+        if (taxSettingId) {
             const TaxBracket = TaxSettingDbService.getModal();
-            const isTaxBracketExist = await TaxBracket.exists({ _id: taxBracketId });
+            const isTaxBracketExist = await TaxBracket.exists({ _id: taxSettingId });
             if (!isTaxBracketExist) {
                 throw new BadRequestError(
                     ERROR_CODE.TAX_BRACKET_INVALID,
@@ -68,9 +69,10 @@ export class InventoryDbService {
             stock,
             isTrack,
             markup,
+            mrp,
             landingCost,
             sellingPrice,
-            taxBracket: taxBracketId,
+            taxBracket: taxSettingId,
             outlet: mainOutlet,
         });
 
