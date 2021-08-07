@@ -1,113 +1,137 @@
-import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import { BadRequestError } from '@sellerspot/universal-functions';
 import {
     ERROR_CODE,
     ICreateProductRequest,
     IEditProductRequest,
+    IProductData,
 } from '@sellerspot/universal-types';
-import { merge } from 'lodash';
-import { PopulateOptions } from 'mongoose';
+import { pick } from 'lodash';
+import { Model, PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
-import { IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
+import { IProductDoc } from '../../../models/tenantDb/catalogueModels';
+import { BrandDbService } from './brand';
+import { CategoryDbService } from './category';
+import { StockUnitDbService } from './stockUnit';
 
-export const createProduct = async (productsProps: ICreateProductRequest): Promise<IProductDoc> => {
-    const { brand, category, stockUnit, ...args } = productsProps;
-    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    );
-    if (brand) {
-        const Brand = DbConnectionManager.getTenantModel<IProductDoc>(
-            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
+export class ProductDbService {
+    static getModal = (): Model<IProductDoc> => {
+        return DbConnectionManager.getTenantModel<IProductDoc>(
+            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
         );
-        const isBrand = await Brand.exists({ _id: brand });
-        if (!isBrand)
-            throw new BadRequestError(ERROR_CODE.BRAND_NOT_FOUND, 'Invalid Brand is assigned');
-    }
-    if (category) {
-        const Category = DbConnectionManager.getTenantModel<IProductDoc>(
-            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
-        );
-        const isCategory = await Category.exists({ _id: category });
-        if (!isCategory)
-            throw new BadRequestError(
-                ERROR_CODE.CATEGORY_NOT_FOUND,
-                'Invalid Category is assigned',
-            );
-    }
-    if (stockUnit) {
-        const StockUnit = DbConnectionManager.getTenantModel<IStockUnitDoc>(
-            MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
-        );
-        const isStockUnit = await StockUnit.exists({ _id: stockUnit });
-        if (!isStockUnit)
-            throw new BadRequestError(
-                ERROR_CODE.STOCK_UNIT_NOT_FOUND,
-                'Invalid stock unit is assigned',
-            );
-    }
-    const createdProductDoc = await Product.create({ brand, category, stockUnit, ...args });
-    /**
-     * On Documnent we should use execPopulate to actually execute it
-     * @link https://mongoosejs.com/docs/api.html#document_Document-populate
-     **/
-    const createdProduct = await createdProductDoc
-        .populate(getProductDefaultPopulationList())
-        .execPopulate();
-    return createdProduct;
-};
+    };
 
-export const editProduct = async (
-    productId: string,
-    productProps: IEditProductRequest,
-): Promise<IProductDoc> => {
-    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    );
-    let product = await Product.findById(productId);
-    if (!product) {
-        throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
-    }
-    merge(product, productProps);
-    await product.save();
-    product = await product.populate(getProductDefaultPopulationList()).execPopulate();
-    return product;
-};
+    static getProductDefaultPopulationList = (): PopulateOptions[] => {
+        const populateArrOpts: PopulateOptions[] = [];
+        populateArrOpts.push({ path: 'brand', select: 'id name' });
+        populateArrOpts.push({ path: 'category', select: 'id title' });
+        populateArrOpts.push({ path: 'stockUnit', select: 'id name unit' });
+        return populateArrOpts;
+    };
 
-export const getProduct = async (productId: string): Promise<IProductDoc> => {
-    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    );
-    const product = await Product.findById(productId).populate(getProductDefaultPopulationList());
-    return product;
-};
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof IProductData> = [
+        'id',
+        'name',
+        'description',
+        'stockUnit',
+        'brand',
+        'category',
+    ];
 
-export const getAllProduct = async (): Promise<IProductDoc[]> => {
-    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    );
-    const productList = await Product.find({}).populate(getProductDefaultPopulationList());
-    return productList;
-};
+    // create a new product
+    static createProduct = async (productsProps: ICreateProductRequest): Promise<IProductData> => {
+        const { brand, category, stockUnit, name, barcode, description } = productsProps;
+        const Product = ProductDbService.getModal();
 
-// export const searchProduct = async (query: string): Promise<IProductDoc> => {
-//     const Product = DbConnectionManager.getTenantModel<IProductDoc>(
-//         MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-//     );
-//     const product = await Product(productId).populate(getProductDefaultPopulationList());
-//     return product;
-// };
+        if (brand) {
+            const Brand = BrandDbService.getModal();
 
-export const deleteProduct = async (productId: string): Promise<void> => {
-    const Product = DbConnectionManager.getTenantModel<IProductDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
-    );
-    await Product.deleteOne({ _id: productId });
-};
+            const isBrand = await Brand.exists({ _id: brand });
+            if (!isBrand)
+                throw new BadRequestError(ERROR_CODE.BRAND_NOT_FOUND, 'Invalid Brand is assigned');
+        }
+        if (category) {
+            const Category = CategoryDbService.getModal();
 
-const getProductDefaultPopulationList = (): PopulateOptions[] => {
-    const populateArrOpts: PopulateOptions[] = [];
-    populateArrOpts.push({ path: 'brand', select: 'id name' });
-    populateArrOpts.push({ path: 'category', select: 'id title' });
-    populateArrOpts.push({ path: 'stockUnit', select: 'id name unit' });
-    return populateArrOpts;
-};
+            const isCategory = await Category.exists({ _id: category });
+            if (!isCategory)
+                throw new BadRequestError(
+                    ERROR_CODE.CATEGORY_NOT_FOUND,
+                    'Invalid Category is assigned',
+                );
+        }
+        if (stockUnit) {
+            const StockUnit = StockUnitDbService.getModal();
+
+            const isStockUnit = await StockUnit.exists({ _id: stockUnit });
+            if (!isStockUnit)
+                throw new BadRequestError(
+                    ERROR_CODE.STOCK_UNIT_NOT_FOUND,
+                    'Invalid stock unit is assigned',
+                );
+        }
+        const createdProductDoc = await Product.create({
+            brand,
+            category,
+            stockUnit,
+            name,
+            barcode,
+            description,
+        });
+        const createdProduct = await createdProductDoc
+            .populate(ProductDbService.getProductDefaultPopulationList())
+            .execPopulate();
+        return pick(createdProduct, ProductDbService.fieldsToFetch) as IProductData;
+    };
+
+    // edit specific product
+    static editProduct = async (
+        productId: string,
+        productProps: IEditProductRequest,
+    ): Promise<IProductData> => {
+        const Product = ProductDbService.getModal();
+        // checking if product exists
+        const isProduct = await Product.exists({ _id: productId });
+        if (!isProduct) {
+            throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
+        }
+        const updatedDocument = await Product.findByIdAndUpdate(productId, productProps)
+            .select(ProductDbService.fieldsToFetch.join(' '))
+            .populate(ProductDbService.getProductDefaultPopulationList());
+        return updatedDocument as IProductData;
+    };
+
+    // get specific product
+    static getProduct = async (productId: string): Promise<IProductData> => {
+        const Product = ProductDbService.getModal();
+        const product = await Product.findById(productId)
+            .select(ProductDbService.fieldsToFetch.join(' '))
+            .populate(ProductDbService.getProductDefaultPopulationList());
+        return product as IProductData;
+    };
+
+    // get all products
+    static getAllProduct = async (): Promise<IProductData[]> => {
+        const Product = ProductDbService.getModal();
+        const productList = await Product.find({})
+            .select(ProductDbService.fieldsToFetch.join(' '))
+            .populate(ProductDbService.getProductDefaultPopulationList());
+        return productList as IProductData[];
+    };
+
+    // search for product based on query
+    static searchProduct = async (query: string): Promise<IProductData[]> => {
+        const Product = ProductDbService.getModal();
+        const matchedProducts = await Product.find({ name: new RegExp(`^${query}`, 'i') })
+            .select(ProductDbService.fieldsToFetch.join(' '))
+            .populate(ProductDbService.getProductDefaultPopulationList());
+        return matchedProducts as IProductData[];
+    };
+
+    // delete specific product
+    static deleteProduct = async (productId: string): Promise<void> => {
+        const Product = ProductDbService.getModal();
+        await Product.deleteOne({ _id: productId });
+    };
+}

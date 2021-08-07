@@ -1,6 +1,6 @@
 export * from './Brand';
 export * from './Category';
-export * from '../pointOfSaleModels/Outlet';
+export * from './Outlet';
 export * from './Product';
 export * from './StockUnit';
 export * from './TaxBracket';

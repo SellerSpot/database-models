@@ -24,11 +24,19 @@ export const InventorySchema = new Schema(
         outlet: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET,
+            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
         },
     },
     {
         timestamps: true,
+        toJSON: {
+            //Arg 1 -> actual doc Arg2 -> doc to be returned
+            transform(_, ret) {
+                ret.id = ret._id;
+                delete ret._id;
+            },
+            versionKey: false,
+        },
     },
 );
 

@@ -5,10 +5,11 @@ import {
     ERROR_CODE,
     ICreateStockUnitRequest,
     IEditStockUnitRequest,
+    IStockUnitData,
 } from '@sellerspot/universal-types';
 import { BadRequestError } from '@sellerspot/universal-functions';
 import { defaultStockUnits } from '../../../seeds/tenantDb/catalogue/StockUnit';
-import { isEmpty } from 'lodash';
+import { isEmpty, pick } from 'lodash';
 import { Model } from 'mongoose';
 
 export class StockUnitDbService {
@@ -18,9 +19,21 @@ export class StockUnitDbService {
         );
     };
 
+    private static insertDefaultStockUnit = async (
+        StockUnit: Model<IStockUnitDoc>,
+    ): Promise<IStockUnitData[]> => {
+        const stockUnits = await StockUnit.insertMany(defaultStockUnits, { lean: true });
+        return stockUnits.map((stockUnit) =>
+            pick(stockUnit, StockUnitDbService.fieldsToFetch),
+        ) as IStockUnitData[];
+    };
+
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof IStockUnitData> = ['id', 'name', 'unit'];
+
     static createStockUnit = async (
         newStockUnit: ICreateStockUnitRequest,
-    ): Promise<IStockUnitDoc> => {
+    ): Promise<IStockUnitData> => {
         const { name } = newStockUnit;
         const StockUnit = StockUnitDbService.getModal();
         const isStockUnitExist = await StockUnit.exists({ name });
@@ -31,51 +44,49 @@ export class StockUnitDbService {
             );
         }
         const stockUnit = await StockUnit.create(newStockUnit);
-        return stockUnit;
+        return pick(stockUnit, StockUnitDbService.fieldsToFetch);
     };
 
-    static searchStockUnit = async (query: string): Promise<IStockUnitDoc[]> => {
+    static searchStockUnit = async (query: string): Promise<IStockUnitData[]> => {
         const StockUnit = StockUnitDbService.getModal();
         const matchingStockUnits = await StockUnit.find({
             $or: [{ name: new RegExp(`^${query}`, 'i') }, { unit: new RegExp(`^${query}`, 'i') }],
-        });
+        }).select(StockUnitDbService.fieldsToFetch.join(' '));
         return matchingStockUnits;
     };
 
-    static getAllStockUnit = async (): Promise<IStockUnitDoc[]> => {
+    static getAllStockUnit = async (): Promise<IStockUnitData[]> => {
         const StockUnit = StockUnitDbService.getModal();
-        let allStockUnit = await StockUnit.find({});
-        if (isEmpty(allStockUnit))
+        let allStockUnit: IStockUnitData[] = await StockUnit.find({}).select(
+            StockUnitDbService.fieldsToFetch,
+        );
+        if (isEmpty(allStockUnit)) {
             allStockUnit = await StockUnitDbService.insertDefaultStockUnit(StockUnit);
+        }
         return allStockUnit;
     };
 
-    static getStockUnit = async (brandId: string): Promise<IStockUnitDoc> => {
+    static getStockUnit = async (brandId: string): Promise<IStockUnitData> => {
         const StockUnit = StockUnitDbService.getModal();
-        const stockUnit = await StockUnit.findById(brandId);
+        const stockUnit = await StockUnit.findById(brandId).select(
+            StockUnitDbService.fieldsToFetch.join(' '),
+        );
         return stockUnit;
     };
 
     static editStockUnit = async (
         stockUnitId: string,
         updatedStockUnit: IEditStockUnitRequest,
-    ): Promise<IStockUnitDoc> => {
+    ): Promise<IStockUnitData> => {
         const StockUnit = StockUnitDbService.getModal();
         const stock = await StockUnit.findByIdAndUpdate(stockUnitId, updatedStockUnit, {
             new: true,
-        });
+        }).select(StockUnitDbService.fieldsToFetch.join(' '));
         return stock;
     };
 
     static deleteStockUnit = async (stockUnit: string): Promise<void> => {
         const StockUnit = StockUnitDbService.getModal();
         await StockUnit.deleteOne({ _id: stockUnit });
-    };
-
-    private static insertDefaultStockUnit = async (
-        StockUnit: Model<IStockUnitDoc>,
-    ): Promise<IStockUnitDoc[]> => {
-        const stockUnits = await StockUnit.insertMany(defaultStockUnits, { lean: true });
-        return stockUnits;
     };
 }

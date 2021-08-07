@@ -44,6 +44,14 @@ export const CategorySchema = new Schema(
     },
     {
         timestamps: true,
+        toJSON: {
+            //Arg 1 -> actual doc Arg2 -> doc to be returned
+            transform(_, ret) {
+                ret.id = ret._id;
+                delete ret._id;
+            },
+            versionKey: false,
+        },
     },
 );
 
