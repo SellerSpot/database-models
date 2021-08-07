@@ -38,6 +38,8 @@ export class ProductDbService {
         'brand',
         'category',
     ];
+    // to use in mongoose select()
+    static fieldsToFetchString = ProductDbService.fieldsToFetch.join(' ');
 
     // create a new product
     static createProduct = async (productsProps: ICreateProductRequest): Promise<IProductData> => {
@@ -97,8 +99,9 @@ export class ProductDbService {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
         const updatedDocument = await Product.findByIdAndUpdate(productId, productProps)
-            .select(ProductDbService.fieldsToFetch.join(' '))
+            .select(ProductDbService.fieldsToFetchString)
             .populate(ProductDbService.getProductDefaultPopulationList());
+
         return updatedDocument as IProductData;
     };
 
@@ -106,7 +109,7 @@ export class ProductDbService {
     static getProduct = async (productId: string): Promise<IProductData> => {
         const Product = ProductDbService.getModal();
         const product = await Product.findById(productId)
-            .select(ProductDbService.fieldsToFetch.join(' '))
+            .select(ProductDbService.fieldsToFetchString)
             .populate(ProductDbService.getProductDefaultPopulationList());
         return product as IProductData;
     };
@@ -115,7 +118,7 @@ export class ProductDbService {
     static getAllProduct = async (): Promise<IProductData[]> => {
         const Product = ProductDbService.getModal();
         const productList = await Product.find({})
-            .select(ProductDbService.fieldsToFetch.join(' '))
+            .select(ProductDbService.fieldsToFetchString)
             .populate(ProductDbService.getProductDefaultPopulationList());
         return productList as IProductData[];
     };
@@ -124,7 +127,7 @@ export class ProductDbService {
     static searchProduct = async (query: string): Promise<IProductData[]> => {
         const Product = ProductDbService.getModal();
         const matchedProducts = await Product.find({ name: new RegExp(`^${query}`, 'i') })
-            .select(ProductDbService.fieldsToFetch.join(' '))
+            .select(ProductDbService.fieldsToFetchString)
             .populate(ProductDbService.getProductDefaultPopulationList());
         return matchedProducts as IProductData[];
     };

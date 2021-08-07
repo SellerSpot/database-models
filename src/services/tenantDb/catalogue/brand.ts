@@ -20,11 +20,13 @@ export class BrandDbService {
 
     // holds the fields to fetch when getting or populating the modal
     static fieldsToFetch: Array<keyof IBrandData> = ['id', 'name'];
+    // to use in mongoose select()
+    static fieldsToFetchString = BrandDbService.fieldsToFetch.join(' ');
 
     // get all brands
     static getAllBrand = async (): Promise<IBrandData[]> => {
         const Brand = BrandDbService.getModal();
-        const allBrands = await Brand.find({}).select(BrandDbService.fieldsToFetch.join(' '));
+        const allBrands = await Brand.find({}).select(BrandDbService.fieldsToFetchString);
         return allBrands as IBrandData[];
     };
 
@@ -43,7 +45,7 @@ export class BrandDbService {
     // get a specific brand
     static getBrand = async (brandId: string): Promise<IBrandData> => {
         const Brand = BrandDbService.getModal();
-        const brand = await Brand.findById(brandId).select(BrandDbService.fieldsToFetch.join(' '));
+        const brand = await Brand.findById(brandId).select(BrandDbService.fieldsToFetchString);
         return brand as IBrandData;
     };
 
@@ -51,7 +53,7 @@ export class BrandDbService {
     static searchBrand = async (query: string): Promise<IBrandData[]> => {
         const Brand = BrandDbService.getModal();
         const matchingBrands = await Brand.find({ name: new RegExp(`^${query}`, 'i') }).select(
-            BrandDbService.fieldsToFetch.join(' '),
+            BrandDbService.fieldsToFetchString,
         );
         return matchingBrands as IBrandData[];
     };
@@ -69,7 +71,7 @@ export class BrandDbService {
             {
                 new: true,
             },
-        ).select(BrandDbService.fieldsToFetch.join(' '));
+        ).select(BrandDbService.fieldsToFetchString);
         return brand as IBrandData;
     };
 

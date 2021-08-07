@@ -49,7 +49,7 @@ export interface ITaxSettingDoc extends Document {
     id: string;
     name: string;
     rate: number;
-    bracket?: string[] | Omit<ITaxSettingDoc, 'group'>[];
+    bracket?: string[] | Omit<ITaxSettingDoc, 'bracket'>[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
      */

@@ -12,6 +12,7 @@ export class OutletDbService {
 
     // holds the fields to fetch when getting or populating the modal
     static fieldsToFetch: Array<keyof IOutletData> = ['id', 'name', 'address'];
+    // to use in mongoose select()
     static fieldsToFetchString = OutletDbService.fieldsToFetch.join(' ');
 
     // get all outlets

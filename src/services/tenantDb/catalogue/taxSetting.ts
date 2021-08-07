@@ -7,6 +7,7 @@ import {
     IEditTaxGroupRequest,
     ITaxBracketData,
     ITaxGroupData,
+    ITaxSettingData,
 } from '@sellerspot/universal-types';
 import { pick } from 'lodash';
 import { Model, PopulateOptions } from 'mongoose';
@@ -17,6 +18,7 @@ import { ITaxSettingDoc } from '../../../models/tenantDb/catalogueModels';
 export class TaxBracketDbService {
     // holds the fields to fetch when getting or populating the modal
     static fieldsToFetch: Array<keyof ITaxBracketData> = ['id', 'name', 'rate'];
+    // to use in mongoose select()
     static fieldsToFetchString = TaxBracketDbService.fieldsToFetch.join(' ');
 
     static createTaxBracket = async (
@@ -70,7 +72,8 @@ export class TaxBracketDbService {
 
 export class TaxGroupDbService {
     // holds the fields to fetch when getting or populating the modal
-    static fieldsToFetch: Array<keyof ITaxGroupData> = ['id', 'name', 'bracket', 'rate'];
+    static fieldsToFetch: Array<keyof ITaxGroupData> = ['id', 'name', 'bracket'];
+    // to use in mongoose select()
     static fieldsToFetchString = TaxGroupDbService.fieldsToFetch.join(' ');
 
     static getDefaultPopulateOptions = (): PopulateOptions[] => {
@@ -109,7 +112,7 @@ export class TaxGroupDbService {
                 'Tax Group with same name already exist',
             );
         }
-        let newTaxGroup = await TaxSetting.create({ name, group: bracket });
+        let newTaxGroup = await TaxSetting.create({ name, bracket });
         newTaxGroup = await newTaxGroup
             .populate(TaxGroupDbService.getDefaultPopulateOptions())
             .execPopulate();
@@ -150,18 +153,33 @@ export class TaxSettingDbService {
     static searchTaxSetting = async (
         query: string,
         searchFor: 'bracket' | 'group' | 'all',
-    ): Promise<ITaxSettingDoc[]> => {
+    ): Promise<ITaxSettingData[]> => {
         const TaxSetting = TaxSettingDbService.getModal();
+        let selectOptions = '';
+        switch (searchFor) {
+            case 'bracket':
+                selectOptions = TaxBracketDbService.fieldsToFetchString;
+                break;
+            case 'group':
+                selectOptions = TaxGroupDbService.fieldsToFetchString;
+                break;
+        }
         const matchedTaxSetting = await TaxSetting.find({
             name: new RegExp(`^${query}`, 'i'),
-        }).populate(TaxSettingDbService.getDefaultPopulateOptions());
+        })
+            .populate(TaxSettingDbService.getDefaultPopulateOptions())
+            .select(selectOptions);
         switch (searchFor) {
             case 'all':
-                return matchedTaxSetting;
+                return matchedTaxSetting as ITaxSettingData[];
             case 'bracket':
-                return matchedTaxSetting.filter((setting) => setting.isGroup === false);
+                return matchedTaxSetting.filter(
+                    (setting) => setting.isGroup === false,
+                ) as ITaxBracketData[];
             case 'group':
-                return matchedTaxSetting.filter((setting) => setting.isGroup === true);
+                return matchedTaxSetting.filter(
+                    (setting) => setting.isGroup === true,
+                ) as ITaxGroupData[];
         }
     };
 

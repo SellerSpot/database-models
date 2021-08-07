@@ -30,6 +30,8 @@ export class StockUnitDbService {
 
     // holds the fields to fetch when getting or populating the modal
     static fieldsToFetch: Array<keyof IStockUnitData> = ['id', 'name', 'unit'];
+    // to use in mongoose select()
+    static fieldsToFetchString = StockUnitDbService.fieldsToFetch.join(' ');
 
     static createStockUnit = async (
         newStockUnit: ICreateStockUnitRequest,
@@ -51,7 +53,7 @@ export class StockUnitDbService {
         const StockUnit = StockUnitDbService.getModal();
         const matchingStockUnits = await StockUnit.find({
             $or: [{ name: new RegExp(`^${query}`, 'i') }, { unit: new RegExp(`^${query}`, 'i') }],
-        }).select(StockUnitDbService.fieldsToFetch.join(' '));
+        }).select(StockUnitDbService.fieldsToFetchString);
         return matchingStockUnits;
     };
 
@@ -69,7 +71,7 @@ export class StockUnitDbService {
     static getStockUnit = async (brandId: string): Promise<IStockUnitData> => {
         const StockUnit = StockUnitDbService.getModal();
         const stockUnit = await StockUnit.findById(brandId).select(
-            StockUnitDbService.fieldsToFetch.join(' '),
+            StockUnitDbService.fieldsToFetchString,
         );
         return stockUnit;
     };
@@ -81,7 +83,7 @@ export class StockUnitDbService {
         const StockUnit = StockUnitDbService.getModal();
         const stock = await StockUnit.findByIdAndUpdate(stockUnitId, updatedStockUnit, {
             new: true,
-        }).select(StockUnitDbService.fieldsToFetch.join(' '));
+        }).select(StockUnitDbService.fieldsToFetchString);
         return stock;
     };
 
