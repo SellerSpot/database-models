@@ -17,7 +17,7 @@ export const InventorySchema = new Schema(
         markup: { type: Schema.Types.Number },
         landingCost: { type: Schema.Types.Number },
         sellingPrice: { type: Schema.Types.Number, required: true },
-        taxBracket: {
+        taxSetting: {
             type: Schema.Types.ObjectId,
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
         },
@@ -56,7 +56,7 @@ export interface IInventoryDoc extends Document {
     markup?: number;
     landingCost?: number;
     sellingPrice: number;
-    taxBracket?: Types.ObjectId | ITaxSettingDoc;
+    taxSetting?: Types.ObjectId | ITaxSettingDoc;
     outlet: Types.ObjectId | IOutletDoc;
     createdAt?: string;
     updatedAt?: string;
