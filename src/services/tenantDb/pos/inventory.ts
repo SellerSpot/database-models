@@ -74,6 +74,15 @@ export class InventoryDbService {
         return matchingProducts as IInventoryData[];
     };
 
+    // get a specific inventory product
+    static getInventoryProduct = async (productId: string): Promise<IInventoryData> => {
+        const Inventory = InventoryDbService.getModal();
+        const inventoryProduct = await Inventory.findById(productId)
+            .select(InventoryDbService.fieldsToFetchString)
+            .populate(InventoryDbService.getInventoryDefaultPopulationList());
+        return inventoryProduct as IInventoryData;
+    };
+
     // add a new product to inventory
     static addProductToInventory = async (
         inventoryProps: IAddProductToInventoryRequest,
