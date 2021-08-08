@@ -6,9 +6,12 @@ import { IOutletDoc, IProductDoc, ITaxSettingDoc } from '../catalogueModels';
 export const InventorySchema = new Schema(
     {
         product: {
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+            name: Schema.Types.String,
+            reference: {
+                type: Schema.Types.ObjectId,
+                required: true,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
+            },
         },
         isActive: { type: Schema.Types.Boolean, default: true },
         tags: { type: [Schema.Types.String] },
@@ -49,7 +52,10 @@ InventorySchema.index({ tags: 'text' });
 
 export interface IInventoryDoc extends Document {
     id: string;
-    product: Types.ObjectId | IProductDoc;
+    product: {
+        name: string;
+        reference: string | IProductDoc;
+    };
     isActive: boolean;
     tags?: [string];
     stock: number;

@@ -41,7 +41,7 @@ export class InventoryDbService {
     static getInventoryDefaultPopulationList = (): PopulateOptions[] => {
         const populateArrOpts: PopulateOptions[] = [];
         populateArrOpts.push({
-            path: 'product',
+            path: 'product.reference',
             select: ProductDbService.fieldsToFetchString,
             populate: ProductDbService.getProductDefaultPopulationList(),
         });
@@ -66,7 +66,9 @@ export class InventoryDbService {
     // search for products in inventory
     static searchInventoryProducts = async (query: string): Promise<IInventoryData[]> => {
         const Inventory = InventoryDbService.getModal();
-        const matchingProducts = await Inventory.find({})
+        const matchingProducts = await Inventory.find({
+            'product.name': new RegExp(`^${query}`, 'i'),
+        })
             .select(InventoryDbService.fieldsToFetchString)
             .populate(InventoryDbService.getInventoryDefaultPopulationList());
         return matchingProducts as IInventoryData[];
@@ -91,10 +93,13 @@ export class InventoryDbService {
 
         // checking product data
         const Product = ProductDbService.getModal();
-        const isProductExist = await Product.exists({ _id: productId });
-        if (!isProductExist) {
+        const productData = await Product.findById(productId);
+        if (!productData) {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
+
+        // getting product name for denormalisation (cause this is a search tag)
+        const productName = productData.name;
 
         // checking tax settings data
         if (taxSettingId) {
@@ -119,7 +124,10 @@ export class InventoryDbService {
 
         // creating product in inventory
         const newInventoryProductDoc = await Inventory.create({
-            product: productId,
+            product: {
+                name: productName,
+                reference: productId,
+            },
             tags,
             stock,
             isTrack,

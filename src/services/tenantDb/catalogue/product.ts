@@ -1,5 +1,6 @@
-import { BadRequestError } from '@sellerspot/universal-functions';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import {
+    DeepPartial,
     ERROR_CODE,
     ICreateProductRequest,
     IEditProductRequest,
@@ -10,9 +11,12 @@ import { Model, PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IProductDoc } from '../../../models/tenantDb/catalogueModels';
+import { InventoryDbService } from '../pos';
 import { BrandDbService } from './brand';
 import { CategoryDbService } from './category';
 import { StockUnitDbService } from './stockUnit';
+import flat from 'flat';
+import { IInventoryDoc } from '../../../models/tenantDb/pointOfSaleModels';
 
 export class ProductDbService {
     static getModal = (): Model<IProductDoc> => {
@@ -101,6 +105,24 @@ export class ProductDbService {
         const updatedDocument = await Product.findByIdAndUpdate(productId, productProps)
             .select(ProductDbService.fieldsToFetchString)
             .populate(ProductDbService.getProductDefaultPopulationList());
+
+        // queuing functions
+        // updating product name stored in pos inventory
+        const Inventory = InventoryDbService.getModal();
+        // getting flat version of collection path for nested mongoose search
+        const pathToSearch = flat({
+            product: {
+                reference: productId,
+            },
+        } as DeepPartial<IInventoryDoc>);
+        // fetching the required document
+        const productInventoryInstance = await Inventory.findOne(pathToSearch);
+        if (productInventoryInstance) {
+            // updating doc and collection
+            productInventoryInstance.product.name = updatedDocument.name;
+            // pushing update to inventory collection
+            Inventory.findOneAndUpdate(pathToSearch, productInventoryInstance);
+        }
 
         return updatedDocument as IProductData;
     };
