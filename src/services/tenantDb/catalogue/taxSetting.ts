@@ -150,6 +150,17 @@ export class TaxSettingDbService {
         );
     };
 
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof ITaxSettingDoc> = ['id', 'name', 'bracket', 'rate'];
+    // to use in mongoose select()
+    static fieldsToFetchString = TaxSettingDbService.fieldsToFetch.join(' ');
+
+    static getDefaultPopulateOptions = (): PopulateOptions[] => {
+        const populateArrOpts: PopulateOptions[] = [];
+        populateArrOpts.push({ path: 'bracket', select: TaxBracketDbService.fieldsToFetchString });
+        return populateArrOpts;
+    };
+
     static searchTaxSetting = async (
         query: string,
         searchFor: 'bracket' | 'group' | 'all',
@@ -181,11 +192,5 @@ export class TaxSettingDbService {
                     (setting) => setting.isGroup === true,
                 ) as ITaxGroupData[];
         }
-    };
-
-    static getDefaultPopulateOptions = (): PopulateOptions[] => {
-        const populateArrOpts: PopulateOptions[] = [];
-        populateArrOpts.push({ path: 'bracket', select: TaxBracketDbService.fieldsToFetchString });
-        return populateArrOpts;
     };
 }

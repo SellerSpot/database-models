@@ -1,4 +1,4 @@
-import { BadRequestError } from '@sellerspot/universal-functions';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import {
     ERROR_CODE,
     IAddProductToInventoryRequest,
@@ -47,6 +47,7 @@ export class InventoryDbService {
         });
         populateArrOpts.push({
             path: 'taxSetting',
+            select: TaxSettingDbService.fieldsToFetchString,
             populate: TaxSettingDbService.getDefaultPopulateOptions(),
         });
         populateArrOpts.push({ path: 'outlet', select: OutletDbService.fieldsToFetchString });
