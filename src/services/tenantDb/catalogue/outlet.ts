@@ -18,7 +18,16 @@ export class OutletDbService {
     // get all outlets
     static getAllOutlet = async (): Promise<IOutletData[]> => {
         const Outlet = OutletDbService.getModal();
-        const allBrands = await Outlet.find({}).select(OutletDbService.fieldsToFetch.join(' '));
-        return allBrands as IOutletData[];
+        const allOutlets = await Outlet.find({}).select(OutletDbService.fieldsToFetchString);
+
+        // TEMPORARY - till main outlet creation is moved to db seen during initializtion
+        if (!allOutlets) {
+            const mainOutlet = await Outlet.create({
+                name: 'Main Outlet',
+                address: '12 A, New Raja Colony, Bheemanagar, Balajinagar, Trichy 1',
+            });
+            return [mainOutlet] as IOutletData[];
+        }
+        return allOutlets as IOutletData[];
     };
 }
