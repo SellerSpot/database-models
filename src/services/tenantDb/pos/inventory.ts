@@ -54,12 +54,12 @@ export class InventoryDbService {
     };
 
     // get all products from inventory
-    static getAllInventoryProducts = async (): Promise<IInventoryDoc[]> => {
+    static getAllInventoryProducts = async (): Promise<IInventoryData[]> => {
         const Inventory = InventoryDbService.getModal();
-        const allProducts = await Inventory.find({}).populate(
-            InventoryDbService.getInventoryDefaultPopulationList(),
-        );
-        return allProducts;
+        const allProducts = await Inventory.find({})
+            .select(InventoryDbService.fieldsToFetchString)
+            .populate(InventoryDbService.getInventoryDefaultPopulationList());
+        return allProducts as IInventoryData[];
     };
 
     // search for products in inventory
