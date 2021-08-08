@@ -77,72 +77,85 @@ export class InventoryDbService {
     // add a new product to inventory
     static addProductToInventory = async (
         inventoryProps: IAddProductToInventoryRequest,
-    ): Promise<IInventoryData> => {
-        const {
-            productId,
-            tags,
-            stock,
-            isTrack,
-            markup,
-            landingCost,
-            sellingPrice,
-            outletId,
-            mrp,
-            taxSettingId,
-        } = inventoryProps;
+    ): Promise<IInventoryData[]> => {
+        const { productId, tags, configurations } = inventoryProps;
+
+        // getting modals
+        const Product = ProductDbService.getModal();
+        const Outlet = OutletDbService.getModal();
+        const TaxSetting = TaxSettingDbService.getModal();
+        const Inventory = InventoryDbService.getModal();
 
         // checking product data
-        const Product = ProductDbService.getModal();
         const productData = await Product.findById(productId);
         if (!productData) {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
-
         // getting product name for denormalisation (cause this is a search tag)
         const productName = productData.name;
+        const createdCollectionOfProducts: IInventoryData[] = [];
 
-        // checking tax settings data
-        if (taxSettingId) {
-            const TaxSetting = TaxSettingDbService.getModal();
-            const isTaxSettingExist = await TaxSetting.exists({ _id: taxSettingId });
-            if (!isTaxSettingExist) {
-                throw new BadRequestError(
-                    ERROR_CODE.TAX_BRACKET_INVALID,
-                    'Invalid Tax Bracket Found',
+        // iterating throught each outlet configuration
+        await Promise.all(
+            configurations.map(async (outletConfiguration) => {
+                const {
+                    mrp,
+                    outletId,
+                    sellingPrice,
+                    isTrack,
+                    landingCost,
+                    markup,
+                    stock,
+                    taxSettingId,
+                } = outletConfiguration;
+
+                // checking outlet data
+                const isOutletExist = await Outlet.exists({ _id: outletId });
+                if (!isOutletExist) {
+                    throw new BadRequestError(
+                        ERROR_CODE.OUTLET_INVALID_OUTLET,
+                        'Invalid Outlet Found',
+                    );
+                }
+
+                // checking tax settings data
+                if (taxSettingId) {
+                    const isTaxSettingExist = await TaxSetting.exists({ _id: taxSettingId });
+                    if (!isTaxSettingExist) {
+                        throw new BadRequestError(
+                            ERROR_CODE.TAX_BRACKET_INVALID,
+                            'Invalid Tax Bracket Found',
+                        );
+                    }
+                }
+
+                // creating product in inventory for current outlet
+                const newInventoryProductDoc = await Inventory.create({
+                    product: {
+                        name: productName,
+                        reference: productId,
+                    },
+                    tags,
+                    stock,
+                    isTrack,
+                    markup,
+                    mrp,
+                    landingCost,
+                    sellingPrice,
+                    taxSetting: taxSettingId,
+                    outlet: outletId,
+                });
+
+                const newInventoryProduct = await newInventoryProductDoc
+                    .populate(InventoryDbService.getInventoryDefaultPopulationList())
+                    .execPopulate();
+
+                // pushing into array to send back to client
+                createdCollectionOfProducts.push(
+                    pick(newInventoryProduct, InventoryDbService.fieldsToFetch) as IInventoryData,
                 );
-            }
-        }
-
-        // checking outlet data
-        const Outlet = OutletDbService.getModal();
-        const isOutletExist = await Outlet.exists({ _id: outletId });
-        if (!isOutletExist) {
-            throw new BadRequestError(ERROR_CODE.OUTLET_INVALID_OUTLET, 'Invalid Outlet Found');
-        }
-
-        const Inventory = InventoryDbService.getModal();
-
-        // creating product in inventory
-        const newInventoryProductDoc = await Inventory.create({
-            product: {
-                name: productName,
-                reference: productId,
-            },
-            tags,
-            stock,
-            isTrack,
-            markup,
-            mrp,
-            landingCost,
-            sellingPrice,
-            taxSetting: taxSettingId,
-            outlet: outletId,
-        });
-
-        const newInventoryProduct = await newInventoryProductDoc
-            .populate(InventoryDbService.getInventoryDefaultPopulationList())
-            .execPopulate();
-
-        return pick(newInventoryProduct, InventoryDbService.fieldsToFetch) as IInventoryData;
+            }),
+        );
+        return createdCollectionOfProducts;
     };
 }
