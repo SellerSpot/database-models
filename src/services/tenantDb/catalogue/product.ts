@@ -102,7 +102,9 @@ export class ProductDbService {
         if (!isProduct) {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
-        const updatedDocument = await Product.findByIdAndUpdate(productId, productProps)
+        const updatedDocument = await Product.findByIdAndUpdate(productId, productProps, {
+            new: true,
+        })
             .select(ProductDbService.fieldsToFetchString)
             .populate(ProductDbService.getProductDefaultPopulationList());
 
@@ -115,14 +117,16 @@ export class ProductDbService {
                 reference: productId,
             },
         } as DeepPartial<IInventoryDoc>);
-        // fetching the required document
-        const productInventoryInstance = await Inventory.findOne(pathToSearch);
-        if (productInventoryInstance) {
-            // updating doc and collection
-            productInventoryInstance.product.name = updatedDocument.name;
-            // pushing update to inventory collection
-            Inventory.findOneAndUpdate(pathToSearch, productInventoryInstance);
-        }
+        // path of the object to update (product.name)
+        const pathToUpdate = flat({
+            product: {
+                name: updatedDocument.name,
+            },
+        } as DeepPartial<IInventoryDoc>);
+        // updating all relevant inventory entries
+        Inventory.updateMany(pathToSearch, {
+            $set: pathToUpdate,
+        });
 
         return updatedDocument as IProductData;
     };
