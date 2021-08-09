@@ -109,3 +109,6 @@ dist
 # yalc files
 yalc.lock
 .yalc
+
+# mongodb playground files
+*.mongodb
