@@ -7,7 +7,7 @@ import {
     IProductData,
 } from '@sellerspot/universal-types';
 import { pick } from 'lodash';
-import { Model, PopulateOptions } from 'mongoose';
+import { Model, PopulateOptions, UpdateQuery } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IProductDoc } from '../../../models/tenantDb/catalogueModels';
@@ -97,12 +97,22 @@ export class ProductDbService {
         productProps: IEditProductRequest,
     ): Promise<IProductData> => {
         const Product = ProductDbService.getModal();
+
         // checking if product exists
-        const isProduct = await Product.exists({ _id: productId });
-        if (!isProduct) {
+        const doesProductExists = await Product.exists({ _id: productId });
+        if (!doesProductExists) {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
-        const updatedDocument = await Product.findByIdAndUpdate(productId, productProps, {
+
+        const document: UpdateQuery<IProductDoc> = {
+            name: productProps.name,
+            barcode: productProps.barcode,
+            description: productProps.description,
+            stockUnit: productProps.stockUnit as string,
+            brand: productProps.brand as string,
+            category: productProps.category as string,
+        };
+        const updatedDocument = await Product.findByIdAndUpdate(productId, document, {
             new: true,
         })
             .select(ProductDbService.fieldsToFetchString)

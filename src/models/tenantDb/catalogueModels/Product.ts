@@ -42,9 +42,9 @@ export interface IProductDoc extends Document {
     name: string;
     barcode?: string;
     description?: string;
-    stockUnit?: Types.ObjectId | IStockUnitDoc;
-    brand?: Types.ObjectId | IBrandDoc;
-    category?: Types.ObjectId | ICategoryDoc;
+    stockUnit?: string | IStockUnitDoc;
+    brand?: string | IBrandDoc;
+    category?: string | ICategoryDoc;
     createdAt?: string;
     updatedAt?: string;
 }

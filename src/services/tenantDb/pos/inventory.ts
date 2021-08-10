@@ -19,24 +19,25 @@ export class InventoryDbService {
         );
     };
 
-    // holds the fields to fetch when getting or populating the modal
-    static fieldsToFetch: Array<keyof IInventoryData> = [
-        'id',
-        'isActive',
-        'isTrack',
-        'landingCost',
-        'markup',
-        'markup',
-        'mrp',
-        'outlet',
-        'product',
-        'sellingPrice',
-        'stock',
-        'tags',
-        'taxSetting',
-    ];
-    // to use in mongoose select()
-    static fieldsToFetchString = InventoryDbService.fieldsToFetch.join(' ');
+    // // holds the fields to fetch when getting or populating the modal
+    // static fieldsToFetch: Array<keyof IInventoryData> &
+    //     Array<keyof IInventoryData['configurations']> = [
+    //     'id',
+    //     'isActive',
+    //     'isTrack',
+    //     'landingCost',
+    //     'markup',
+    //     'markup',
+    //     'mrp',
+    //     'outlet',
+    //     'product',
+    //     'sellingPrice',
+    //     'stock',
+    //     'tags',
+    //     'taxSetting',
+    // ];
+    // // to use in mongoose select()
+    // static fieldsToFetchString = InventoryDbService.fieldsToFetch.join(' ');
 
     static getInventoryDefaultPopulationList = (): PopulateOptions[] => {
         const populateArrOpts: PopulateOptions[] = [];
@@ -57,114 +58,118 @@ export class InventoryDbService {
     // get all products from inventory
     static getAllInventoryProducts = async (): Promise<IInventoryData[]> => {
         const Inventory = InventoryDbService.getModal();
-        const allProducts = await Inventory.find({})
-            .select(InventoryDbService.fieldsToFetchString)
-            .populate(InventoryDbService.getInventoryDefaultPopulationList());
-        return allProducts as IInventoryData[];
+        // const allProducts = await Inventory.find({})
+        //     .select(InventoryDbService.fieldsToFetchString)
+        //     .populate(InventoryDbService.getInventoryDefaultPopulationList());
+        // return allProducts as IInventoryData[];
+        return null;
     };
 
     // search for products in inventory
     static searchInventoryProducts = async (query: string): Promise<IInventoryData[]> => {
-        const Inventory = InventoryDbService.getModal();
-        const matchingProducts = await Inventory.find({
-            'product.name': new RegExp(`^${query}`, 'i'),
-        })
-            .select(InventoryDbService.fieldsToFetchString)
-            .populate(InventoryDbService.getInventoryDefaultPopulationList());
-        return matchingProducts as IInventoryData[];
+        // const Inventory = InventoryDbService.getModal();
+        // const matchingProducts = await Inventory.find({
+        //     'product.name': new RegExp(`^${query}`, 'i'),
+        // })
+        //     .select(InventoryDbService.fieldsToFetchString)
+        //     .populate(InventoryDbService.getInventoryDefaultPopulationList());
+        // return matchingProducts as IInventoryData[];
+        return null;
     };
 
     // get a specific inventory product
     static getInventoryProduct = async (productId: string): Promise<IInventoryData> => {
-        const Inventory = InventoryDbService.getModal();
-        const inventoryProduct = await Inventory.findById(productId)
-            .select(InventoryDbService.fieldsToFetchString)
-            .populate(InventoryDbService.getInventoryDefaultPopulationList());
-        return inventoryProduct as IInventoryData;
+        // const Inventory = InventoryDbService.getModal();
+        // const inventoryProduct = await Inventory.findById(productId)
+        //     .select(InventoryDbService.fieldsToFetchString)
+        //     .populate(InventoryDbService.getInventoryDefaultPopulationList());
+        // return inventoryProduct as IInventoryData;
+        return null;
     };
 
     // add a new product to inventory
     static addProductToInventory = async (
         inventoryProps: IAddProductToInventoryRequest,
     ): Promise<IInventoryData[]> => {
-        const { productId, tags, configurations } = inventoryProps;
+        // const { productId, tags, configurations } = inventoryProps;
 
-        // getting modals
-        const Product = ProductDbService.getModal();
-        const Outlet = OutletDbService.getModal();
-        const TaxSetting = TaxSettingDbService.getModal();
-        const Inventory = InventoryDbService.getModal();
+        // // getting modals
+        // const Product = ProductDbService.getModal();
+        // const Outlet = OutletDbService.getModal();
+        // const TaxSetting = TaxSettingDbService.getModal();
+        // const Inventory = InventoryDbService.getModal();
 
-        // checking product data
-        const productData = await Product.findById(productId);
-        if (!productData) {
-            throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
-        }
-        // getting product name for denormalisation (cause this is a search tag)
-        const productName = productData.name;
-        const createdCollectionOfProducts: IInventoryData[] = [];
+        // // checking product data
+        // const productData = await Product.findById(productId);
+        // if (!productData) {
+        //     throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
+        // }
+        // // getting product name for denormalisation (cause this is a search tag)
+        // const productName = productData.name;
+        // const createdCollectionOfProducts: IInventoryData[] = [];
 
-        // iterating throught each outlet configuration
-        await Promise.all(
-            configurations.map(async (outletConfiguration) => {
-                const {
-                    mrp,
-                    outletId,
-                    sellingPrice,
-                    isTrack,
-                    landingCost,
-                    markup,
-                    stock,
-                    taxSettingId,
-                } = outletConfiguration;
+        // // iterating throught each outlet configuration
+        // await Promise.all(
+        //     configurations.map(async (outletConfiguration) => {
+        //         const {
+        //             mrp,
+        //             outletId,
+        //             sellingPrice,
+        //             isTrack,
+        //             landingCost,
+        //             markup,
+        //             stock,
+        //             taxSettingId,
+        //         } = outletConfiguration;
 
-                // checking outlet data
-                const isOutletExist = await Outlet.exists({ _id: outletId });
-                if (!isOutletExist) {
-                    throw new BadRequestError(
-                        ERROR_CODE.OUTLET_INVALID_OUTLET,
-                        'Invalid Outlet Found',
-                    );
-                }
+        //         // checking outlet data
+        //         const isOutletExist = await Outlet.exists({ _id: outletId });
+        //         if (!isOutletExist) {
+        //             throw new BadRequestError(
+        //                 ERROR_CODE.OUTLET_INVALID_OUTLET,
+        //                 'Invalid Outlet Found',
+        //             );
+        //         }
 
-                // checking tax settings data
-                if (taxSettingId) {
-                    const isTaxSettingExist = await TaxSetting.exists({ _id: taxSettingId });
-                    if (!isTaxSettingExist) {
-                        throw new BadRequestError(
-                            ERROR_CODE.TAX_BRACKET_INVALID,
-                            'Invalid Tax Bracket Found',
-                        );
-                    }
-                }
+        //         // checking tax settings data
+        //         if (taxSettingId) {
+        //             const isTaxSettingExist = await TaxSetting.exists({ _id: taxSettingId });
+        //             if (!isTaxSettingExist) {
+        //                 throw new BadRequestError(
+        //                     ERROR_CODE.TAX_BRACKET_INVALID,
+        //                     'Invalid Tax Bracket Found',
+        //                 );
+        //             }
+        //         }
 
-                // creating product in inventory for current outlet
-                const newInventoryProductDoc = await Inventory.create({
-                    product: {
-                        name: productName,
-                        reference: productId,
-                    },
-                    tags,
-                    stock,
-                    isTrack,
-                    markup,
-                    mrp,
-                    landingCost,
-                    sellingPrice,
-                    taxSetting: taxSettingId,
-                    outlet: outletId,
-                });
+        //         // creating product in inventory for current outlet
+        //         const newInventoryProductDoc = await Inventory.create({
+        //             product: {
+        //                 name: productName,
+        //                 reference: productId,
+        //             },
+        //             tags,
+        //             stock,
+        //             isTrack,
+        //             markup,
+        //             mrp,
+        //             landingCost,
+        //             sellingPrice,
+        //             taxSetting: taxSettingId,
+        //             outlet: outletId,
+        //         });
 
-                const newInventoryProduct = await newInventoryProductDoc
-                    .populate(InventoryDbService.getInventoryDefaultPopulationList())
-                    .execPopulate();
+        //         const newInventoryProduct = await newInventoryProductDoc
+        //             .populate(InventoryDbService.getInventoryDefaultPopulationList())
+        //             .execPopulate();
 
-                // pushing into array to send back to client
-                createdCollectionOfProducts.push(
-                    pick(newInventoryProduct, InventoryDbService.fieldsToFetch) as IInventoryData,
-                );
-            }),
-        );
-        return createdCollectionOfProducts;
+        //         // pushing into array to send back to client
+        //         createdCollectionOfProducts.push(
+        //             pick(newInventoryProduct, InventoryDbService.fieldsToFetch) as IInventoryData,
+        //         );
+        //     }),
+        // );
+        // return createdCollectionOfProducts;
+        return null;
     };
 }
