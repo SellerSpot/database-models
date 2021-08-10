@@ -66,7 +66,7 @@ export class OutletDbService {
     // to delete a specifig outlet
     static deleteOutlet = async (outletId: string): Promise<void> => {
         const Outlet = OutletDbService.getModal();
-        await Outlet.deleteOne({ _id: outletId });
+        await Outlet.deleteOne({ _id: outletId, default: false });
     };
 
     // to get a specific outlet
