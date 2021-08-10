@@ -76,7 +76,7 @@ export class OutletDbService {
             const mainOutlet = await OutletDbService.seedMainOutlet();
             return [OutletDbService.convertToIOutletDataFormat(mainOutlet)];
         }
-        return allOutlets as IOutletData[];
+        return allOutlets.map((outlet) => OutletDbService.convertToIOutletDataFormat(outlet));
     };
     // to delete a specifig outlet
     static deleteOutlet = async (outletId: string): Promise<void> => {
