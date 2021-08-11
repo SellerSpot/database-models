@@ -38,6 +38,7 @@ export class ProductDbService {
         'id',
         'name',
         'description',
+        'barcode',
         'stockUnit',
         'brand',
         'category',
