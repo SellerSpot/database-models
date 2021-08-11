@@ -9,10 +9,10 @@ export class BrandDbService {
     static getModal = (): Model<IBrandDoc> =>
         DbConnectionManager.getTenantModel<IBrandDoc>(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND);
 
-    // // holds the fields to fetch when getting or populating the modal
-    // static fieldsToFetch: Array<keyof IBrandData> = ['id', 'name'];
-    // // to use in mongoose select()
-    // static fieldsToFetchString = BrandDbService.fieldsToFetch.join(' ');
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof IBrandData> = ['id', 'name'];
+    // to use in mongoose select()
+    static fieldsToFetchString = BrandDbService.fieldsToFetch.join(' ');
 
     // to convert to IBrandData
     static convertToIBrandDataFormat = (brandDoc: IBrandDoc): IBrandData => {

@@ -9,10 +9,10 @@ export class OutletDbService {
     static getModal = (): Model<IOutletDoc> =>
         DbConnectionManager.getTenantModel<IOutletDoc>(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET);
 
-    // // holds the fields to fetch when getting or populating the modal
-    // static fieldsToFetch: Array<keyof IOutletData> = ['id', 'name', 'address'];
-    // // to use in mongoose select()
-    // static fieldsToFetchString = OutletDbService.fieldsToFetch.join(' ');
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof IOutletData> = ['id', 'name', 'address'];
+    // to use in mongoose select()
+    static fieldsToFetchString = OutletDbService.fieldsToFetch.join(' ');
 
     // to convert to IOutletData
     static convertToIOutletDataFormat = (outletDoc: IOutletDoc): IOutletData => {

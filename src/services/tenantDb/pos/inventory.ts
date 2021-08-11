@@ -3,21 +3,22 @@ import {
     ERROR_CODE,
     IAddProductToInventoryRequest,
     IInventoryData,
+    IProductData,
 } from '@sellerspot/universal-types';
-import { pick } from 'lodash';
+import { groupBy, pick } from 'lodash';
 import { Model, PopulateOptions } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
+import { IProductDoc } from '../../../models/tenantDb/catalogueModels';
 import { IInventoryDoc } from '../../../models/tenantDb/pointOfSaleModels/Inventory';
 import { ProductDbService, TaxSettingDbService } from '../catalogue';
 import { OutletDbService } from '../catalogue/outlet';
 
 export class InventoryDbService {
-    static getModal = (): Model<IInventoryDoc> => {
-        return DbConnectionManager.getTenantModel<IInventoryDoc>(
+    static getModal = (): Model<IInventoryDoc> =>
+        DbConnectionManager.getTenantModel<IInventoryDoc>(
             MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY,
         );
-    };
 
     // // holds the fields to fetch when getting or populating the modal
     // static fieldsToFetch: Array<keyof IInventoryData> &
@@ -55,14 +56,20 @@ export class InventoryDbService {
         return populateArrOpts;
     };
 
+    // to convert to IInventoryData
+    static convertToIInventoryDataFormat = (inventoryDoc: IInventoryDoc[]): IInventoryData[] => {
+        logger.info(groupBy(inventoryDoc, 'product.name'));
+        return [];
+    };
+
     // get all products from inventory
     static getAllInventoryProducts = async (): Promise<IInventoryData[]> => {
         const Inventory = InventoryDbService.getModal();
-        // const allProducts = await Inventory.find({})
-        //     .select(InventoryDbService.fieldsToFetchString)
-        //     .populate(InventoryDbService.getInventoryDefaultPopulationList());
-        // return allProducts as IInventoryData[];
-        return null;
+        const allProducts = await Inventory.find({}).populate(
+            InventoryDbService.getInventoryDefaultPopulationList(),
+        );
+        InventoryDbService.convertToIInventoryDataFormat(allProducts);
+        return [];
     };
 
     // search for products in inventory

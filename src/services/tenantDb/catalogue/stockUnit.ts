@@ -33,10 +33,10 @@ export class StockUnitDbService {
         return seedStockUnits;
     };
 
-    // // holds the fields to fetch when getting or populating the modal
-    // static fieldsToFetch: Array<keyof IStockUnitData> = ['id', 'name', 'unit'];
-    // // to use in mongoose select()
-    // static fieldsToFetchString = StockUnitDbService.fieldsToFetch.join(' ');
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof IStockUnitData> = ['id', 'name', 'unit'];
+    // to use in mongoose select()
+    static fieldsToFetchString = StockUnitDbService.fieldsToFetch.join(' ');
 
     static createStockUnit = async (
         newStockUnit: ICreateStockUnitRequest,
