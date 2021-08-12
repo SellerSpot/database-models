@@ -21,7 +21,8 @@ export const TaxSettingSchema = new Schema(
             type: Schema.Types.Number,
             default: 0,
         },
-        group: {
+        // holds all the brackets if this tax setting is a tax group
+        bracket: {
             type: [Schema.Types.ObjectId],
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
         },
@@ -33,14 +34,14 @@ export const TaxSettingSchema = new Schema(
 
 //utility property to check if current document is taxBracket / taxGroup
 TaxSettingSchema.virtual('isGroup').get(function (this: ITaxSettingDoc) {
-    return !isEmpty(this.group);
+    return !isEmpty(this.bracket);
 });
 
 export interface ITaxSettingDoc extends Document {
     id: string;
     name: string;
     rate: number;
-    group?: string[] | Omit<ITaxSettingDoc, 'group'>[];
+    bracket?: string[] | Omit<ITaxSettingDoc, 'bracket'>[];
     /**
      * isGroup - virtual to differentiate between tax bracket / tax group
      */

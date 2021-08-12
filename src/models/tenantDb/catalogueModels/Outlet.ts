@@ -6,6 +6,10 @@ export const OutletSchema = new Schema(
     {
         name: Schema.Types.String,
         address: Schema.Types.String,
+        default: {
+            default: false,
+            type: Schema.Types.Boolean,
+        },
     },
     {
         timestamps: true,
@@ -15,8 +19,9 @@ export const OutletSchema = new Schema(
 export interface IOutletDoc extends Document {
     name: string;
     address: string;
+    default?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
 
-SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET, OutletSchema);
+SchemaService.set(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET, OutletSchema);

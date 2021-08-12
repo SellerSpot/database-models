@@ -1,67 +1,77 @@
+import { BadRequestError } from '@sellerspot/universal-functions';
+import { ERROR_CODE, IBrandData, ICreateBrandRequest } from '@sellerspot/universal-types';
+import { Model } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IBrandDoc } from '../../../models/tenantDb/catalogueModels';
-import { ERROR_CODE, ICreateBrandRequest, IEditBrandRequest } from '@sellerspot/universal-types';
-import { BadRequestError, logger } from '@sellerspot/universal-functions';
 
-export const createBrand = async (newBrand: ICreateBrandRequest): Promise<IBrandDoc> => {
-    const { name } = newBrand;
-    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-    );
-    const isBrandExist = await Brand.exists({ name });
-    if (isBrandExist) {
-        throw new BadRequestError(ERROR_CODE.BRAND_NAME_INVALID, 'Brand name already exist');
-    }
-    const brand = await Brand.create({ name });
-    return brand;
-};
+export class BrandDbService {
+    static getModal = (): Model<IBrandDoc> =>
+        DbConnectionManager.getTenantModel<IBrandDoc>(MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND);
 
-export const getAllBrand = async (): Promise<IBrandDoc[]> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-    );
-    const allBrands = await Brand.find({});
-    return allBrands;
-};
+    // holds the fields to fetch when getting or populating the modal
+    static fieldsToFetch: Array<keyof IBrandData> = ['id', 'name'];
+    // to use in mongoose select()
+    static fieldsToFetchString = BrandDbService.fieldsToFetch.join(' ');
 
-export const getBrand = async (brandId: string): Promise<IBrandDoc> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-    );
-    const brand = await Brand.findById(brandId);
-    return brand;
-};
+    // to convert to IBrandData
+    static convertToIBrandDataFormat = (brandDoc: IBrandDoc): IBrandData => {
+        return {
+            id: brandDoc._id,
+            name: brandDoc.name,
+        };
+    };
 
-export const searchBrand = async (query: string): Promise<IBrandDoc[]> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-    );
-    const matchingBrands = await Brand.find({ name: new RegExp(`^${query}`, 'i') });
-    return matchingBrands;
-};
+    // get all brands
+    static getAllBrand = async (): Promise<IBrandData[]> => {
+        const Brand = BrandDbService.getModal();
+        const allBrands = await Brand.find({});
+        return allBrands.map((brandData) => BrandDbService.convertToIBrandDataFormat(brandData));
+    };
 
-export const editBrand = async (
-    brandId: string,
-    updatedDoc: IEditBrandRequest,
-): Promise<IBrandDoc> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-    );
-    const { name } = updatedDoc;
-    const brand = await Brand.findByIdAndUpdate(
-        brandId,
-        { name },
-        {
+    // create a new brand
+    static createBrand = async (newBrand: ICreateBrandRequest): Promise<IBrandData> => {
+        const { name } = newBrand;
+        const Brand = BrandDbService.getModal();
+        const isBrandExist = await Brand.exists({ name });
+        if (isBrandExist) {
+            throw new BadRequestError(ERROR_CODE.BRAND_NAME_INVALID, 'Brand name already exist');
+        }
+        const createdBrand = await Brand.create({ name });
+        return BrandDbService.convertToIBrandDataFormat(createdBrand);
+    };
+
+    // get a specific brand
+    static getBrand = async (brandId: string): Promise<IBrandData> => {
+        const Brand = BrandDbService.getModal();
+        const brand = await Brand.findById(brandId);
+        return BrandDbService.convertToIBrandDataFormat(brand);
+    };
+
+    // search for brands
+    static searchBrand = async (query: string): Promise<IBrandData[]> => {
+        const Brand = BrandDbService.getModal();
+        const matchingBrands = await Brand.find({ name: new RegExp(`^${query}`, 'i') });
+        return matchingBrands.map((brandData) =>
+            BrandDbService.convertToIBrandDataFormat(brandData),
+        );
+    };
+
+    // edit specific brand
+    static editBrand = async (
+        brandId: string,
+        brandDataToUpdate: IBrandData,
+    ): Promise<IBrandData> => {
+        const Brand = BrandDbService.getModal();
+        const updatedBrand = await Brand.findByIdAndUpdate(brandId, brandDataToUpdate, {
             new: true,
-        },
-    );
-    return brand;
-};
+        });
+        return BrandDbService.convertToIBrandDataFormat(updatedBrand);
+    };
 
-export const deleteBrand = async (brandId: string): Promise<void> => {
-    const Brand = DbConnectionManager.getTenantModel<IBrandDoc>(
-        MONGOOSE_MODELS.TENANT_DB.CATALOGUE.BRAND,
-    );
-    await Brand.deleteOne({ _id: brandId });
-};
+    // delete specific brand
+    static deleteBrand = async (brandId: string): Promise<void> => {
+        const Brand = BrandDbService.getModal();
+        await Brand.deleteOne({ _id: brandId });
+    };
+}

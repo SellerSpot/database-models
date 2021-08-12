@@ -101,7 +101,7 @@ export const SaleSchema = new Schema(
             name: Schema.Types.String,
             reference: {
                 type: Schema.Types.ObjectId,
-                ref: MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.OUTLET,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.OUTLET,
             },
         },
     },
