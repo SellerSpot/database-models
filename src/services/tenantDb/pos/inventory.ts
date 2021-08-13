@@ -2,16 +2,13 @@ import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import {
     ERROR_CODE,
     IAddProductToInventoryRequest,
-    IBrandData,
     ICategoryData,
     IEditProductInInventoryRequest,
     IInventoryData,
     IInventoryDataDynamic,
-    IOutletData,
-    IProductData,
-    ITaxSettingData,
+    ISearchInventoryProductsResponse,
 } from '@sellerspot/universal-types';
-import { groupBy, pick } from 'lodash';
+import { differenceWith, groupBy } from 'lodash';
 import { Model, PopulateOptions, Types } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
@@ -166,36 +163,58 @@ export class InventoryDbService {
     static searchInventoryProducts = async (
         query: string,
         outletId: string,
-    ): Promise<IInventoryData[]> => {
+    ): Promise<ISearchInventoryProductsResponse['data']> => {
         const Inventory = InventoryDbService.getModal();
         const CatalogueProduct = ProductDbService.getModal();
-        // if product exists in catalogue, find if it exists in
-        const doesProductExist = await CatalogueProduct.exists({
+        // if product does not exists in catalogue, no use searching in inventory
+        const matchingCatalogueProducts = await CatalogueProduct.find({
             name: new RegExp(`^${query}`, 'i'),
-        });
-        if (doesProductExist) {
+        }).populate(ProductDbService.getProductDefaultPopulationList());
+        if (matchingCatalogueProducts.length) {
             const inventoryFilterQuery = <{ [key: string]: string | RegExp }>{
                 'product.name': new RegExp(`^${query}`, 'i'),
             };
             if (outletId) {
                 inventoryFilterQuery['outlet'] = outletId;
             }
-            const matchingProducts = await Inventory.find(inventoryFilterQuery).populate(
+            const matchingInventoryProducts = await Inventory.find(inventoryFilterQuery).populate(
                 InventoryDbService.getInventoryDefaultPopulationList(),
             );
             // returning error if the product does not exist in inventory
-            if (!matchingProducts.length) {
-                throw new BadRequestError(
-                    ERROR_CODE.INVENTORY_PRODUCT_NOT_IN_INVENTORY,
-                    'Product not found in inventory',
-                );
+            if (!matchingInventoryProducts.length) {
+                return {
+                    products: {
+                        catalogueProducts: matchingCatalogueProducts.map((catalogueProduct) =>
+                            ProductDbService.convertToIProductDataFormat(catalogueProduct),
+                        ),
+                    },
+                    searchStatus: false,
+                    error: 'nonExistingInventory',
+                };
             }
-            return InventoryDbService.convertToIInventoryDataFormat(matchingProducts);
+            return {
+                products: {
+                    inventoryProducts: InventoryDbService.convertToIInventoryDataFormat(
+                        matchingInventoryProducts,
+                    ),
+                    catalogueProducts: differenceWith(
+                        matchingCatalogueProducts,
+                        matchingInventoryProducts,
+                        (catalogueProduct, inventoryProduct) => {
+                            return catalogueProduct.name === inventoryProduct.product.name;
+                        },
+                    ).map((catalogueProduct) => {
+                        return ProductDbService.convertToIProductDataFormat(catalogueProduct);
+                    }),
+                },
+                searchStatus: true,
+            };
         } else {
-            throw new BadRequestError(
-                ERROR_CODE.INVENTORY_PRODUCT_NOT_IN_CATALOGUE,
-                'Product not found in catalogue',
-            );
+            return {
+                products: {},
+                searchStatus: false,
+                error: 'nonExistingProduct',
+            };
         }
     };
 

@@ -6,13 +6,12 @@ import {
     ICreateProductRequest,
     IEditProductRequest,
     IProductData,
-    IStockUnitData,
 } from '@sellerspot/universal-types';
 import flat from 'flat';
 import { Model, PopulateOptions, UpdateQuery } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
-import { ICategoryDoc, IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
+import { IBrandDoc, IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
 import { IInventoryDoc } from '../../../models/tenantDb/pointOfSaleModels';
 import { InventoryDbService } from '../pos';
 import { BrandDbService } from './brand';
@@ -53,9 +52,9 @@ export class ProductDbService {
             id: _id,
             name,
             barcode,
-            brand,
+            brand: BrandDbService.convertToIBrandDataFormat(brand as IBrandDoc),
             description,
-            category: null,
+            category: category as ICategoryData,
             stockUnit: StockUnitDbService.convertToIStockUnitDataFormat(stockUnit as IStockUnitDoc),
         };
     };
