@@ -168,16 +168,35 @@ export class InventoryDbService {
         outletId: string,
     ): Promise<IInventoryData[]> => {
         const Inventory = InventoryDbService.getModal();
-        const filterQuery = <{ [key: string]: string | RegExp }>{
-            'product.name': new RegExp(`^${query}`, 'i'),
-        };
-        if (outletId) {
-            filterQuery['outlet'] = outletId;
+        const CatalogueProduct = ProductDbService.getModal();
+        // if product exists in catalogue, find if it exists in
+        const doesProductExist = await CatalogueProduct.exists({
+            name: new RegExp(`^${query}`, 'i'),
+        });
+        if (doesProductExist) {
+            const inventoryFilterQuery = <{ [key: string]: string | RegExp }>{
+                'product.name': new RegExp(`^${query}`, 'i'),
+            };
+            if (outletId) {
+                inventoryFilterQuery['outlet'] = outletId;
+            }
+            const matchingProducts = await Inventory.find(inventoryFilterQuery).populate(
+                InventoryDbService.getInventoryDefaultPopulationList(),
+            );
+            // returning error if the product does not exist in inventory
+            if (!matchingProducts.length) {
+                throw new BadRequestError(
+                    ERROR_CODE.INVENTORY_PRODUCT_NOT_IN_INVENTORY,
+                    'Product not found in inventory',
+                );
+            }
+            return InventoryDbService.convertToIInventoryDataFormat(matchingProducts);
+        } else {
+            throw new BadRequestError(
+                ERROR_CODE.INVENTORY_PRODUCT_NOT_IN_CATALOGUE,
+                'Product not found in catalogue',
+            );
         }
-        const matchingProducts = await Inventory.find(filterQuery).populate(
-            InventoryDbService.getInventoryDefaultPopulationList(),
-        );
-        return InventoryDbService.convertToIInventoryDataFormat(matchingProducts);
     };
 
     // to edit an already present product in inventory
