@@ -15,7 +15,7 @@ export interface ICategoryPosition {
     newParentId: string;
     oldParentId: string;
 }
-export class CategoryDbService {
+export class CategoryService {
     static getModal = (): Model<ICategoryDoc> => {
         return DbConnectionManager.getTenantModel<ICategoryDoc>(
             MONGOOSE_MODELS.TENANT_DB.CATALOGUE.CATEGORY,
@@ -25,11 +25,11 @@ export class CategoryDbService {
     static createCategory = async (
         categoryProps: ICreateCategoryRequest,
     ): Promise<ICategoryDoc> => {
-        const Category = CategoryDbService.getModal();
+        const Category = CategoryService.getModal();
         const { title } = categoryProps;
         let { parentId } = categoryProps;
         if (!parentId) {
-            const rootCategory = await CategoryDbService.checkAndGetRootCategory(Category);
+            const rootCategory = await CategoryService.checkAndGetRootCategory(Category);
             parentId = rootCategory.id;
         }
         const category = await Category.create({ title, parent: parentId });
@@ -42,7 +42,7 @@ export class CategoryDbService {
         props: IEditCategoryRequest,
     ): Promise<ICategoryDoc> => {
         const { title } = props;
-        const Category = CategoryDbService.getModal();
+        const Category = CategoryService.getModal();
         const updatedCategory = await Category.findOneAndUpdate(
             { _id: categoryId },
             { $set: { title } },
@@ -60,7 +60,7 @@ export class CategoryDbService {
         props: IEditCategoryChildrenOrderRequest,
     ): Promise<ICategoryDoc> => {
         const { childrenOrder } = props;
-        const Category = CategoryDbService.getModal();
+        const Category = CategoryService.getModal();
         const tobeUpdated = await Category.findById(parentId);
         if (isEmpty(tobeUpdated)) {
             throw new BadRequestError(ERROR_CODE.CATEGORY_NOT_FOUND, `cannot find parent category`);
@@ -86,11 +86,11 @@ export class CategoryDbService {
         props: ICategoryPosition,
     ): Promise<ICategoryDoc> => {
         let { oldParentId, newParentId } = props;
-        const Category = CategoryDbService.getModal();
+        const Category = CategoryService.getModal();
 
         // getting root category id if no parent id is provided
         if (!newParentId || !oldParentId) {
-            const rootCategory = await CategoryDbService.checkAndGetRootCategory(Category);
+            const rootCategory = await CategoryService.checkAndGetRootCategory(Category);
             if (!newParentId) {
                 newParentId = rootCategory.id;
             }
@@ -134,13 +134,13 @@ export class CategoryDbService {
     };
 
     static getCategoryById = async (categoryId: string): Promise<ICategoryDoc> => {
-        const Category = CategoryDbService.getModal();
+        const Category = CategoryService.getModal();
         return await Category.findById(categoryId).populate('children').exec();
     };
 
     static getAllCategory = async (): Promise<ICategoryDoc[]> => {
-        const Category = CategoryDbService.getModal();
-        const rootCategory = await CategoryDbService.checkAndGetRootCategory(Category);
+        const Category = CategoryService.getModal();
+        const rootCategory = await CategoryService.checkAndGetRootCategory(Category);
         let allCategory: ICategoryDoc[] = [];
         if (rootCategory) {
             const rootId = rootCategory.id;
@@ -151,7 +151,7 @@ export class CategoryDbService {
     };
 
     static deleteCategory = async (categoryId: string): Promise<ICategoryDoc> => {
-        const Category = CategoryDbService.getModal();
+        const Category = CategoryService.getModal();
         //remove should be called on returned document and not on Model itself
         return (await Category.findById(categoryId))?.remove();
     };

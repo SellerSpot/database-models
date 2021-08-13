@@ -5,12 +5,12 @@ import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { EPOSInfoType, IInfoDoc } from '../../../models/tenantDb/pointOfSaleModels/info';
 
-export class Info {
+export class InfoService {
     static getModel = (): Model<IInfoDoc> =>
         DbConnectionManager.getTenantModel<IInfoDoc>(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INFO);
 
     static getBillSettings = async (): Promise<IBillSettings> => {
-        const InfoModel = Info.getModel();
+        const InfoModel = InfoService.getModel();
         const info = await (
             await InfoModel.findOne({ infoType: EPOSInfoType.BILL_SETTINGS })
         )?.toJSON();
@@ -82,7 +82,7 @@ export class Info {
     };
 
     static updateBillSettings = async (billSettings: IBillSettings): Promise<IBillSettings> => {
-        const InfoModel = Info.getModel();
+        const InfoModel = InfoService.getModel();
         const info = await InfoModel.findOne({ infoType: EPOSInfoType.BILL_SETTINGS });
         const infoJson = info?.toJSON();
         const previousBillSettings = infoJson?.[EPOSInfoType.BILL_SETTINGS];

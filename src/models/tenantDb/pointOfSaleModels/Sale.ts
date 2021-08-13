@@ -1,10 +1,12 @@
-import { Document, Schema, Types } from 'mongoose';
+import { Document, Schema } from 'mongoose';
 import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { ICustomerDoc } from '../../coreDb';
-import { IOutletDoc, IProductDoc, IStockUnitDoc, ITaxSettingDoc } from '../catalogueModels';
-import { IUserDoc } from '../User';
+import {
+    EDiscountTypes,
+    EPaymentMethods,
+    ESaleStatus,
+    ISaleData,
+} from '@sellerspot/universal-types';
 import { SchemaService } from '../../SchemaService';
-import { EDiscountTypes, EPaymentMethods, ESaleStatus } from '@sellerspot/universal-types';
 
 export const CartSchema = new Schema(
     {
@@ -42,7 +44,7 @@ export const CartSchema = new Schema(
             ],
             reference: {
                 type: Schema.Types.ObjectId,
-                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXSETTING,
+                ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
             },
         },
     },
@@ -56,6 +58,9 @@ export const SaleSchema = new Schema(
             type: Schema.Types.String,
             enum: ESaleStatus,
         },
+        /**
+         * overall discount - special discount / different from individual product discount
+         */
         saleDiscount: {
             discount: Schema.Types.Number,
             discountType: {
@@ -110,74 +115,6 @@ export const SaleSchema = new Schema(
     },
 );
 
-export interface ICartDetails {
-    product: {
-        name: string;
-        reference: Schema.Types.ObjectId | IProductDoc;
-    };
-    stockUnit: {
-        name: string;
-        reference: Schema.Types.ObjectId | IStockUnitDoc;
-    };
-    quantity: number;
-    unitPrice: number; // should we need isModified flag?
-    productDiscount: {
-        discount: number;
-        discountType: EDiscountTypes;
-    };
-    taxBracket: {
-        name: string;
-        rate: number;
-        group?: [
-            {
-                name: string;
-                rate: number;
-                reference: Schema.Types.ObjectId | ITaxSettingDoc;
-            },
-        ];
-        reference: Schema.Types.ObjectId | ITaxSettingDoc;
-    };
-}
-
-export interface ISaleDoc extends Document {
-    cart: ICartDetails[];
-    status: ESaleStatus;
-    saleDiscount: {
-        discount: number;
-        discountType: EDiscountTypes;
-    };
-    payment: {
-        method: EPaymentMethods;
-        // all products discount and including total sale discount
-        totalDiscount: number;
-        // all products consolidated taxes
-        totalTax: number;
-        // total before applying tax and discount
-        subTotal: number;
-        // total after applying tax and discount
-        grandTotal: number;
-        // amount paid by the customer
-        amountPaid: number;
-        // balance given to the customer
-        balanceGiven: number;
-        // need to incorporate due schema here in next phase
-    };
-    // client / customer
-    customer: {
-        name: string;
-        reference: Schema.Types.ObjectId | ICustomerDoc;
-    };
-    // employee / owner
-    user: {
-        name: string;
-        reference: Schema.Types.ObjectId | IUserDoc;
-    };
-    outlet: {
-        name: string;
-        reference: Schema.Types.ObjectId | IOutletDoc;
-    };
-    createdAt?: string;
-    updatedAt?: string;
-}
+export type ISaleDoc = ISaleData & Document;
 
 SchemaService.set(MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.SALE, SaleSchema);
