@@ -34,7 +34,7 @@ export class InfoService {
                                 },
                                 footerMessage: {
                                     show: true,
-                                    data: 'This is a footer message',
+                                    data: 'This is a computer generated bill',
                                 },
                                 purchaseInvoiceSection: {
                                     show: true,
@@ -67,9 +67,9 @@ export class InfoService {
                                     name: 'Developer Store',
                                     address: 'No 69, Develper Store,\nChennai\n621211\n8489455901',
                                 },
-                                footerMessage: {
+                                remarkMessage: {
                                     show: true,
-                                    data: 'This is a footer message',
+                                    data: 'This is a remark message',
                                 },
                             },
                         },
