@@ -12,7 +12,7 @@ import { defaultStockUnits } from '../../../seeds/tenantDb/catalogue/StockUnit';
 import { isEmpty, pick } from 'lodash';
 import { Model } from 'mongoose';
 
-export class StockUnitDbService {
+export class StockUnitService {
     static getModal = (): Model<IStockUnitDoc> =>
         DbConnectionManager.getTenantModel<IStockUnitDoc>(
             MONGOOSE_MODELS.TENANT_DB.CATALOGUE.STOCKUNIT,
@@ -28,7 +28,7 @@ export class StockUnitDbService {
     };
 
     private static seedDefaultStockUnits = async (): Promise<IStockUnitDoc[]> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         const seedStockUnits = await StockUnit.insertMany(defaultStockUnits, { lean: true });
         return seedStockUnits;
     };
@@ -36,12 +36,12 @@ export class StockUnitDbService {
     // holds the fields to fetch when getting or populating the modal
     static fieldsToFetch: Array<keyof IStockUnitData> = ['id', 'name', 'unit'];
     // to use in mongoose select()
-    static fieldsToFetchString = StockUnitDbService.fieldsToFetch.join(' ');
+    static fieldsToFetchString = StockUnitService.fieldsToFetch.join(' ');
 
     static createStockUnit = async (
         newStockUnit: ICreateStockUnitRequest,
     ): Promise<IStockUnitData> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         const isStockUnitExist = await StockUnit.exists({ name: newStockUnit.name });
         if (isStockUnitExist) {
             throw new BadRequestError(
@@ -50,52 +50,52 @@ export class StockUnitDbService {
             );
         }
         const createdStockUnit = await StockUnit.create(newStockUnit);
-        return StockUnitDbService.convertToIStockUnitDataFormat(createdStockUnit);
+        return StockUnitService.convertToIStockUnitDataFormat(createdStockUnit);
     };
 
     static searchStockUnit = async (query: string): Promise<IStockUnitData[]> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         const matchingStockUnits = await StockUnit.find({
             $or: [{ name: new RegExp(`^${query}`, 'i') }, { unit: new RegExp(`^${query}`, 'i') }],
         });
         return matchingStockUnits.map((stockUnit) =>
-            StockUnitDbService.convertToIStockUnitDataFormat(stockUnit),
+            StockUnitService.convertToIStockUnitDataFormat(stockUnit),
         );
     };
 
     static getAllStockUnit = async (): Promise<IStockUnitData[]> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         const allStockUnit = await StockUnit.find({});
         if (isEmpty(allStockUnit)) {
-            const defaultStockUnits = await StockUnitDbService.seedDefaultStockUnits();
+            const defaultStockUnits = await StockUnitService.seedDefaultStockUnits();
             return defaultStockUnits.map((stockUnit) =>
-                StockUnitDbService.convertToIStockUnitDataFormat(stockUnit),
+                StockUnitService.convertToIStockUnitDataFormat(stockUnit),
             );
         }
         return allStockUnit.map((stockUnit) =>
-            StockUnitDbService.convertToIStockUnitDataFormat(stockUnit),
+            StockUnitService.convertToIStockUnitDataFormat(stockUnit),
         );
     };
 
     static getStockUnit = async (brandId: string): Promise<IStockUnitData> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         const stockUnit = await StockUnit.findById(brandId);
-        return StockUnitDbService.convertToIStockUnitDataFormat(stockUnit);
+        return StockUnitService.convertToIStockUnitDataFormat(stockUnit);
     };
 
     static editStockUnit = async (
         stockUnitId: string,
         stockUnitToUpdate: IEditStockUnitRequest,
     ): Promise<IStockUnitData> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         const updatedStockUnit = await StockUnit.findByIdAndUpdate(stockUnitId, stockUnitToUpdate, {
             new: true,
         });
-        return StockUnitDbService.convertToIStockUnitDataFormat(updatedStockUnit);
+        return StockUnitService.convertToIStockUnitDataFormat(updatedStockUnit);
     };
 
     static deleteStockUnit = async (stockUnit: string): Promise<void> => {
-        const StockUnit = StockUnitDbService.getModal();
+        const StockUnit = StockUnitService.getModal();
         await StockUnit.deleteOne({ _id: stockUnit });
     };
 }

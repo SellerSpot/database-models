@@ -5,7 +5,6 @@ import {
     ICategoryData,
     IEditProductInInventoryRequest,
     IInventoryData,
-    IInventoryDataDynamic,
     ISearchInventoryProductsResponse,
 } from '@sellerspot/universal-types';
 import { differenceWith, groupBy } from 'lodash';
@@ -17,52 +16,27 @@ import {
     IOutletDoc,
     IProductDoc,
     IStockUnitDoc,
-    ITaxSettingDoc,
+    ITaxBracketDoc,
 } from '../../../models/tenantDb/catalogueModels';
 import { IInventoryDoc } from '../../../models/tenantDb/pointOfSaleModels/Inventory';
-import {
-    BrandDbService,
-    ProductDbService,
-    StockUnitDbService,
-    TaxSettingDbService,
-} from '../catalogue';
-import { OutletDbService } from '../catalogue/outlet';
+import { BrandService, ProductService, StockUnitService, TaxBracketService } from '../catalogue';
+import { OutletService } from '../catalogue/Outlet';
 
-export class InventoryDbService {
+export class InventoryService {
     static getModal = (): Model<IInventoryDoc> =>
         DbConnectionManager.getTenantModel<IInventoryDoc>(
             MONGOOSE_MODELS.TENANT_DB.POINT_OF_SALE.INVENTORY,
         );
 
-    // // holds the fields to fetch when getting or populating the modal
-    // static fieldsToFetch: Array<keyof IInventoryData> &
-    //     Array<keyof IInventoryData['configurations']> = [
-    //     'id',
-    //     'isActive',
-    //     'isTrack',
-    //     'landingCost',
-    //     'markup',
-    //     'markup',
-    //     'mrp',
-    //     'outlet',
-    //     'product',
-    //     'sellingPrice',
-    //     'stock',
-    //     'tags',
-    //     'taxSetting',
-    // ];
-    // // to use in mongoose select()
-    // static fieldsToFetchString = InventoryDbService.fieldsToFetch.join(' ');
-
     static getInventoryDefaultPopulationList = (): PopulateOptions[] => {
         const populateArrOpts: PopulateOptions[] = [];
         populateArrOpts.push({
             path: 'product.reference',
-            populate: ProductDbService.getProductDefaultPopulationList(),
+            populate: ProductService.getProductDefaultPopulationList(),
         });
         populateArrOpts.push({
-            path: 'taxSetting',
-            populate: TaxSettingDbService.getDefaultPopulateOptions(),
+            path: 'taxBracket',
+            populate: TaxBracketService.getTaxGroupPopulateOptions(),
         });
         populateArrOpts.push({ path: 'outlet' });
         return populateArrOpts;
@@ -85,8 +59,8 @@ export class InventoryDbService {
                 // getting data of current outlet
                 const productOutletInformation = groupedBasedOnOutletId[outletId];
                 // compiling config data here for D.R.Y in the below statements
-                const configurationData: IInventoryDataDynamic = {
-                    outlet: OutletDbService.convertToIOutletDataFormat(
+                const configurationData: IInventoryData['outlets'][0] = {
+                    outlet: OutletService.convertToIOutletDataFormat(
                         productOutletInformation[0].outlet as IOutletDoc,
                     ),
                     isActive: productOutletInformation[0].isActive,
@@ -96,8 +70,8 @@ export class InventoryDbService {
                     mrp: productOutletInformation[0].mrp,
                     sellingPrice: productOutletInformation[0].sellingPrice,
                     stock: productOutletInformation[0].stock,
-                    taxSetting: TaxSettingDbService.convertToITaxSettingDataFormat(
-                        productOutletInformation[0].taxSetting as ITaxSettingDoc,
+                    taxBracket: TaxBracketService.convertToITaxGroupDataFormat(
+                        productOutletInformation[0].taxBracket as ITaxBracketDoc,
                     ),
                 };
                 // on first iteration, push the static values of the product
@@ -109,30 +83,23 @@ export class InventoryDbService {
                             .description,
                         barcode: (productOutletInformation[0].product.reference as IProductDoc)
                             .barcode,
-                        tags: productOutletInformation[0].tags,
-                        brand: BrandDbService.convertToIBrandDataFormat(
+                        brand: BrandService.convertToIBrandDataFormat(
                             (productOutletInformation[0].product.reference as IProductDoc)
                                 .brand as IBrandDoc,
                         ),
                         category: (productOutletInformation[0].product.reference as IProductDoc)
                             .category as ICategoryData,
-                        stockUnit: StockUnitDbService.convertToIStockUnitDataFormat(
+                        stockUnit: StockUnitService.convertToIStockUnitDataFormat(
                             (productOutletInformation[0].product.reference as IProductDoc)
                                 .stockUnit as IStockUnitDoc,
                         ),
-                        configurations: {},
+                        outlets: {},
                     };
                 }
                 // on subsequent iterations, only push config data
-                inventoryData.configurations[outletId] = configurationData;
-                // and create a unique set of combined tags
-                inventoryData.tags = [
-                    ...new Set([...productOutletInformation[0].tags, ...inventoryData.tags]),
-                ];
+                inventoryData.outlets[outletId] = configurationData;
             });
-            // if (productId === '611228dee6adc1394ca9e3af') {
-            //     logger.info(inventoryData);
-            // }
+
             // pushing current product inventory data to main array
             inventoryDataArr.push(inventoryData);
         });
@@ -146,7 +113,7 @@ export class InventoryDbService {
     }): Promise<IInventoryData[]> => {
         // props
         const { outletId, productId } = props;
-        const Inventory = InventoryDbService.getModal();
+        const Inventory = InventoryService.getModal();
         const filterQuery = <{ [key: string]: string | RegExp }>{};
         if (outletId) {
             filterQuery['outlet'] = outletId;
@@ -154,9 +121,9 @@ export class InventoryDbService {
             filterQuery['product.reference'] = productId;
         }
         const allInventoryDocs = await Inventory.find(filterQuery).populate(
-            InventoryDbService.getInventoryDefaultPopulationList(),
+            InventoryService.getInventoryDefaultPopulationList(),
         );
-        return InventoryDbService.convertToIInventoryDataFormat(allInventoryDocs);
+        return InventoryService.convertToIInventoryDataFormat(allInventoryDocs);
     };
 
     // search for products in inventory
@@ -164,12 +131,12 @@ export class InventoryDbService {
         query: string,
         outletId: string,
     ): Promise<ISearchInventoryProductsResponse['data']> => {
-        const Inventory = InventoryDbService.getModal();
-        const CatalogueProduct = ProductDbService.getModal();
+        const Inventory = InventoryService.getModal();
+        const CatalogueProduct = ProductService.getModal();
         // if product does not exists in catalogue, no use searching in inventory
         const matchingCatalogueProducts = await CatalogueProduct.find({
             name: new RegExp(`^${query}`, 'i'),
-        }).populate(ProductDbService.getProductDefaultPopulationList());
+        }).populate(ProductService.getProductDefaultPopulationList());
         if (matchingCatalogueProducts.length) {
             const inventoryFilterQuery = <{ [key: string]: string | RegExp }>{
                 'product.name': new RegExp(`^${query}`, 'i'),
@@ -178,14 +145,14 @@ export class InventoryDbService {
                 inventoryFilterQuery['outlet'] = outletId;
             }
             const matchingInventoryProducts = await Inventory.find(inventoryFilterQuery).populate(
-                InventoryDbService.getInventoryDefaultPopulationList(),
+                InventoryService.getInventoryDefaultPopulationList(),
             );
             // returning error if the product does not exist in inventory
             if (!matchingInventoryProducts.length) {
                 return {
                     products: {
                         catalogueProducts: matchingCatalogueProducts.map((catalogueProduct) =>
-                            ProductDbService.convertToIProductDataFormat(catalogueProduct),
+                            ProductService.convertToIProductDataFormat(catalogueProduct),
                         ),
                     },
                     searchStatus: false,
@@ -194,7 +161,7 @@ export class InventoryDbService {
             }
             return {
                 products: {
-                    inventoryProducts: InventoryDbService.convertToIInventoryDataFormat(
+                    inventoryProducts: InventoryService.convertToIInventoryDataFormat(
                         matchingInventoryProducts,
                     ),
                     catalogueProducts: differenceWith(
@@ -204,7 +171,7 @@ export class InventoryDbService {
                             return catalogueProduct.name === inventoryProduct.product.name;
                         },
                     ).map((catalogueProduct) => {
-                        return ProductDbService.convertToIProductDataFormat(catalogueProduct);
+                        return ProductService.convertToIProductDataFormat(catalogueProduct);
                     }),
                 },
                 searchStatus: true,
@@ -224,9 +191,9 @@ export class InventoryDbService {
     ): Promise<IInventoryData> => {
         const updatedCollectionOfProducts: IInventoryDoc[] = [];
         // performing checks on passed values
-        const Outlet = OutletDbService.getModal();
-        const TaxSetting = TaxSettingDbService.getModal();
-        const Inventory = InventoryDbService.getModal();
+        const Outlet = OutletService.getModal();
+        const TaxSetting = TaxBracketService.getModal();
+        const Inventory = InventoryService.getModal();
         // checking product data
         const productData = await Inventory.exists({
             'product.reference': inventoryProps.productId,
@@ -236,9 +203,9 @@ export class InventoryDbService {
         }
         // currOutletIndex because it returns 0, 1, 2 ... due to general type definition
         await Promise.all(
-            Object.keys(inventoryProps.configurations).map(async (currOutletIndex) => {
-                const outletConfiguration = inventoryProps.configurations[currOutletIndex];
-                const { outlet, taxSetting } = outletConfiguration;
+            Object.keys(inventoryProps.outlets).map(async (currOutletIndex) => {
+                const outletConfiguration = inventoryProps.outlets[currOutletIndex];
+                const { outlet, taxBracket } = outletConfiguration;
                 // checking outlet data
                 const isOutletExist = await Outlet.exists({ _id: outlet });
                 if (!isOutletExist) {
@@ -249,9 +216,9 @@ export class InventoryDbService {
                 }
 
                 // checking tax settings data
-                if (taxSetting) {
+                if (taxBracket) {
                     const isTaxSettingExist = await TaxSetting.exists({
-                        _id: taxSetting,
+                        _id: taxBracket,
                     });
                     if (!isTaxSettingExist) {
                         throw new BadRequestError(
@@ -265,8 +232,8 @@ export class InventoryDbService {
 
         // checks completed - now updating all required instances
         await Promise.all(
-            Object.keys(inventoryProps.configurations).map(async (currOutletIndex) => {
-                const outletConfiguration = inventoryProps.configurations[currOutletIndex];
+            Object.keys(inventoryProps.outlets).map(async (currOutletIndex) => {
+                const outletConfiguration = inventoryProps.outlets[currOutletIndex];
                 const {
                     outlet,
                     isActive,
@@ -276,7 +243,7 @@ export class InventoryDbService {
                     mrp,
                     sellingPrice,
                     stock,
-                    taxSetting,
+                    taxBracket,
                 } = outletConfiguration;
 
                 const updatedDoc = await Inventory.findOneAndUpdate(
@@ -289,16 +256,16 @@ export class InventoryDbService {
                         mrp,
                         sellingPrice,
                         stock,
-                        taxSetting: taxSetting as string,
+                        taxBracket: taxBracket as string,
                     },
                     {
                         new: true,
                     },
-                ).populate(InventoryDbService.getInventoryDefaultPopulationList());
+                ).populate(InventoryService.getInventoryDefaultPopulationList());
                 updatedCollectionOfProducts.push(updatedDoc);
             }),
         );
-        return InventoryDbService.convertToIInventoryDataFormat(updatedCollectionOfProducts)[0];
+        return InventoryService.convertToIInventoryDataFormat(updatedCollectionOfProducts)[0];
     };
 
     // add a new product to inventory
@@ -306,10 +273,10 @@ export class InventoryDbService {
         inventoryProps: IAddProductToInventoryRequest,
     ): Promise<IInventoryData[]> => {
         // getting modals
-        const Product = ProductDbService.getModal();
-        const Outlet = OutletDbService.getModal();
-        const TaxSetting = TaxSettingDbService.getModal();
-        const Inventory = InventoryDbService.getModal();
+        const Product = ProductService.getModal();
+        const Outlet = OutletService.getModal();
+        const TaxSetting = TaxBracketService.getModal();
+        const Inventory = InventoryService.getModal();
 
         // checking product data
         const productData = await Product.findById(inventoryProps.productId);
@@ -323,8 +290,8 @@ export class InventoryDbService {
         // iterating throught each outlet configuration
         await Promise.all(
             // currOutletIndex because it returns 0, 1, 2 ... due to general type definition
-            Object.keys(inventoryProps.configurations).map(async (currOutletIndex) => {
-                const outletConfiguration = inventoryProps.configurations[currOutletIndex];
+            Object.keys(inventoryProps.outlets).map(async (currOutletIndex) => {
+                const outletConfiguration = inventoryProps.outlets[currOutletIndex];
                 const {
                     mrp,
                     sellingPrice,
@@ -334,7 +301,7 @@ export class InventoryDbService {
                     stock,
                     outlet,
                     isActive = true,
-                    taxSetting,
+                    taxBracket,
                 } = outletConfiguration;
 
                 // checking outlet data
@@ -347,9 +314,9 @@ export class InventoryDbService {
                 }
 
                 // checking tax settings data
-                if (taxSetting) {
+                if (taxBracket) {
                     const isTaxSettingExist = await TaxSetting.exists({
-                        _id: taxSetting,
+                        _id: taxBracket,
                     });
                     if (!isTaxSettingExist) {
                         throw new BadRequestError(
@@ -365,7 +332,6 @@ export class InventoryDbService {
                         name: productName,
                         reference: Types.ObjectId(inventoryProps.productId),
                     },
-                    tags: inventoryProps.tags,
                     stock,
                     isTrack,
                     markup,
@@ -373,19 +339,19 @@ export class InventoryDbService {
                     mrp,
                     landingCost,
                     sellingPrice,
-                    taxSetting: Types.ObjectId(taxSetting as string),
+                    taxBracket: Types.ObjectId(taxBracket as string),
                     outlet: Types.ObjectId(outlet as string),
                 });
 
                 const newInventoryProduct = await newInventoryProductDoc
-                    .populate(InventoryDbService.getInventoryDefaultPopulationList())
+                    .populate(InventoryService.getInventoryDefaultPopulationList())
                     .execPopulate();
 
                 // pushing into array to send back to client
                 createdCollectionOfProducts.push(newInventoryProduct);
             }),
         );
-        return InventoryDbService.convertToIInventoryDataFormat(createdCollectionOfProducts);
+        return InventoryService.convertToIInventoryDataFormat(createdCollectionOfProducts);
     };
 
     // delete product data from inventory
@@ -393,7 +359,7 @@ export class InventoryDbService {
         productId: string,
         outletId: string,
     ): Promise<void> => {
-        const Inventory = InventoryDbService.getModal();
+        const Inventory = InventoryService.getModal();
         const filterQuery = <{ [key: string]: string }>{
             'product.reference': productId,
         };

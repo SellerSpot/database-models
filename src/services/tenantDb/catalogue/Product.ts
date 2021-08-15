@@ -2,7 +2,6 @@ import { BadRequestError } from '@sellerspot/universal-functions';
 import {
     DeepPartial,
     ERROR_CODE,
-    ICategoryData,
     ICreateProductRequest,
     IEditProductRequest,
     IProductData,
@@ -13,12 +12,12 @@ import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IBrandDoc, IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
 import { IInventoryDoc } from '../../../models/tenantDb/pointOfSaleModels';
-import { InventoryDbService } from '../pos';
-import { BrandDbService } from './brand';
-import { CategoryDbService } from './category';
-import { StockUnitDbService } from './stockUnit';
+import { InventoryService } from '../pos';
+import { BrandService } from './Brand';
+import { CategoryService } from './Category';
+import { StockUnitService } from './StockUnit';
 
-export class ProductDbService {
+export class ProductService {
     static getModal = (): Model<IProductDoc> =>
         DbConnectionManager.getTenantModel<IProductDoc>(
             MONGOOSE_MODELS.TENANT_DB.CATALOGUE.PRODUCT,
@@ -43,7 +42,7 @@ export class ProductDbService {
         'category',
     ];
     // to use in mongoose select()
-    static fieldsToFetchString = ProductDbService.fieldsToFetch.join(' ');
+    static fieldsToFetchString = ProductService.fieldsToFetch.join(' ');
 
     // to convert to IProductData
     static convertToIProductDataFormat = (productDoc: IProductDoc): IProductData => {
@@ -52,27 +51,27 @@ export class ProductDbService {
             id: _id,
             name,
             barcode,
-            brand: BrandDbService.convertToIBrandDataFormat(brand as IBrandDoc),
+            brand: BrandService.convertToIBrandDataFormat(brand as IBrandDoc),
             description,
-            category: category as ICategoryData,
-            stockUnit: StockUnitDbService.convertToIStockUnitDataFormat(stockUnit as IStockUnitDoc),
+            category: null,
+            stockUnit: StockUnitService.convertToIStockUnitDataFormat(stockUnit as IStockUnitDoc),
         };
     };
 
     // create a new product
     static createProduct = async (productsProps: ICreateProductRequest): Promise<IProductData> => {
         const { brand, category, stockUnit, name, barcode, description } = productsProps;
-        const Product = ProductDbService.getModal();
+        const Product = ProductService.getModal();
 
         if (brand) {
-            const Brand = BrandDbService.getModal();
+            const Brand = BrandService.getModal();
 
             const isBrand = await Brand.exists({ _id: brand });
             if (!isBrand)
                 throw new BadRequestError(ERROR_CODE.BRAND_NOT_FOUND, 'Invalid Brand is assigned');
         }
         if (category) {
-            const Category = CategoryDbService.getModal();
+            const Category = CategoryService.getModal();
 
             const isCategory = await Category.exists({ _id: category });
             if (!isCategory)
@@ -82,7 +81,7 @@ export class ProductDbService {
                 );
         }
         if (stockUnit) {
-            const StockUnit = StockUnitDbService.getModal();
+            const StockUnit = StockUnitService.getModal();
 
             const isStockUnit = await StockUnit.exists({ _id: stockUnit });
             if (!isStockUnit)
@@ -100,9 +99,9 @@ export class ProductDbService {
             description,
         });
         const createdProduct = await createdProductDoc
-            .populate(ProductDbService.getProductDefaultPopulationList())
+            .populate(ProductService.getProductDefaultPopulationList())
             .execPopulate();
-        return ProductDbService.convertToIProductDataFormat(createdProduct);
+        return ProductService.convertToIProductDataFormat(createdProduct);
     };
 
     // edit specific product
@@ -110,7 +109,7 @@ export class ProductDbService {
         productId: string,
         productProps: IEditProductRequest,
     ): Promise<IProductData> => {
-        const Product = ProductDbService.getModal();
+        const Product = ProductService.getModal();
 
         // checking if product exists
         const doesProductExists = await Product.exists({ _id: productId });
@@ -128,11 +127,11 @@ export class ProductDbService {
         };
         const updatedDocument = await Product.findByIdAndUpdate(productId, document, {
             new: true,
-        }).populate(ProductDbService.getProductDefaultPopulationList());
+        }).populate(ProductService.getProductDefaultPopulationList());
 
         // queuing functions
         // updating product name stored in pos inventory
-        const Inventory = InventoryDbService.getModal();
+        const Inventory = InventoryService.getModal();
         // getting flat version of collection path for nested mongoose search
         const pathToSearch = flat({
             product: {
@@ -150,41 +149,41 @@ export class ProductDbService {
             $set: pathToUpdate,
         });
 
-        return ProductDbService.convertToIProductDataFormat(updatedDocument);
+        return ProductService.convertToIProductDataFormat(updatedDocument);
     };
 
     // get specific product
     static getProduct = async (productId: string): Promise<IProductData> => {
-        const Product = ProductDbService.getModal();
+        const Product = ProductService.getModal();
         const product = await Product.findById(productId).populate(
-            ProductDbService.getProductDefaultPopulationList(),
+            ProductService.getProductDefaultPopulationList(),
         );
-        return ProductDbService.convertToIProductDataFormat(product);
+        return ProductService.convertToIProductDataFormat(product);
     };
 
     // get all products
     static getAllProduct = async (): Promise<IProductData[]> => {
-        const Product = ProductDbService.getModal();
+        const Product = ProductService.getModal();
         const allProducts = await Product.find({}).populate(
-            ProductDbService.getProductDefaultPopulationList(),
+            ProductService.getProductDefaultPopulationList(),
         );
-        return allProducts.map((product) => ProductDbService.convertToIProductDataFormat(product));
+        return allProducts.map((product) => ProductService.convertToIProductDataFormat(product));
     };
 
     // search for product based on query
     static searchProduct = async (query: string): Promise<IProductData[]> => {
-        const Product = ProductDbService.getModal();
+        const Product = ProductService.getModal();
         const matchedProducts = await Product.find({ name: new RegExp(`^${query}`, 'i') }).populate(
-            ProductDbService.getProductDefaultPopulationList(),
+            ProductService.getProductDefaultPopulationList(),
         );
         return matchedProducts.map((product) =>
-            ProductDbService.convertToIProductDataFormat(product),
+            ProductService.convertToIProductDataFormat(product),
         );
     };
 
     // delete specific product
     static deleteProduct = async (productId: string): Promise<void> => {
-        const Product = ProductDbService.getModal();
+        const Product = ProductService.getModal();
         await Product.deleteOne({ _id: productId });
     };
 }

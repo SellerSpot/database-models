@@ -58,7 +58,7 @@ export const BillSettingsSchema = new Schema(
                     name: Schema.Types.String,
                     address: Schema.Types.String,
                 },
-                footerMessage: {
+                remarkMessage: {
                     show: Schema.Types.Boolean,
                     data: Schema.Types.String,
                 },
