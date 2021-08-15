@@ -1,9 +1,9 @@
-import { BadRequestError } from '@sellerspot/universal-functions';
-import { ERROR_CODE, IOutletData } from '@sellerspot/universal-types';
 import { Model } from 'mongoose';
-import { DbConnectionManager, MONGOOSE_MODELS } from '../../..';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import { ERROR_CODE, IOutletData } from '@sellerspot/universal-types';
 import { IOutletDoc } from '../../../models/tenantDb/catalogueModels';
 import { defaultOutlet } from '../../../seeds';
+import { DbConnectionManager, MONGOOSE_MODELS } from '../../..';
 
 export class OutletService {
     static getModal = (): Model<IOutletDoc> =>
@@ -26,6 +26,7 @@ export class OutletService {
     static seedMainOutlet = async (): Promise<IOutletDoc> => {
         const Outlet = OutletService.getModal();
         const mainOutlet = await Outlet.create(defaultOutlet);
+        logger.info('Outlets seeded successfully');
         return mainOutlet;
     };
 

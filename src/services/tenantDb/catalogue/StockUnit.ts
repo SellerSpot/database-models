@@ -1,16 +1,16 @@
-import { DbConnectionManager } from '../../../configs/DbConnectionManager';
-import { MONGOOSE_MODELS } from '../../../models';
-import { IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
+import { isEmpty, pick } from 'lodash';
+import { Model } from 'mongoose';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import {
     ERROR_CODE,
     ICreateStockUnitRequest,
     IEditStockUnitRequest,
     IStockUnitData,
 } from '@sellerspot/universal-types';
-import { BadRequestError } from '@sellerspot/universal-functions';
+import { DbConnectionManager } from '../../../configs/DbConnectionManager';
+import { MONGOOSE_MODELS } from '../../../models';
+import { IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
 import { defaultStockUnits } from '../../../seeds/tenantDb/catalogue/StockUnit';
-import { isEmpty, pick } from 'lodash';
-import { Model } from 'mongoose';
 
 export class StockUnitService {
     static getModal = (): Model<IStockUnitDoc> =>
@@ -27,9 +27,10 @@ export class StockUnitService {
         };
     };
 
-    private static seedDefaultStockUnits = async (): Promise<IStockUnitDoc[]> => {
+    static seedDefaultStockUnits = async (): Promise<IStockUnitDoc[]> => {
         const StockUnit = StockUnitService.getModal();
         const seedStockUnits = await StockUnit.insertMany(defaultStockUnits, { lean: true });
+        logger.info('Stock Units seeded successfully');
         return seedStockUnits;
     };
 
