@@ -1,10 +1,8 @@
-import { Document, Schema, Types } from 'mongoose';
-import { isEmpty } from 'lodash';
-import { MONGOOSE_MODELS } from '../../mongooseModels';
-import { SchemaService } from '../../SchemaService';
-import { CONFIG } from '../../../configs/config';
-import { logger } from '../../../../.yalc/@sellerspot/universal-functions/dist';
+import { Document, Schema } from 'mongoose';
 import { ITaxBracketData } from '../../../../.yalc/@sellerspot/universal-types/dist';
+import { CONFIG } from '../../../configs/config';
+import { SchemaService } from '../../SchemaService';
+import { MONGOOSE_MODELS } from '../../mongooseModels';
 
 /**
  * TaxBracket -> entity with single tax info ie name & rate
@@ -27,6 +25,7 @@ export const TaxBracketchema = new Schema(
         group: {
             type: [Schema.Types.ObjectId],
             ref: MONGOOSE_MODELS.TENANT_DB.CATALOGUE.TAXBRACKET,
+            default: undefined,
         },
     },
     {

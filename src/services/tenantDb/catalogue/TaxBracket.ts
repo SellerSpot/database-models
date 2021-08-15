@@ -1,4 +1,4 @@
-import { BadRequestError } from '@sellerspot/universal-functions';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE, ITaxBracketData } from '@sellerspot/universal-types';
 import { Model, PopulateOptions, _FilterQuery } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
@@ -65,6 +65,7 @@ export class TaxBracketService {
     static getOnlyTaxBrackets = async (): Promise<ITaxBracketData[]> => {
         const TaxBracket = TaxBracketService.getModal();
         const allTaxBracket = await TaxBracket.find({ group: { $exists: false } });
+        logger.info(allTaxBracket);
         return allTaxBracket.map((taxBracket) =>
             TaxBracketService.convertToITaxBracketDataFormat(taxBracket),
         );

@@ -1,6 +1,6 @@
+import { Model } from 'mongoose';
 import { BadRequestError } from '@sellerspot/universal-functions';
 import { ERROR_CODE, IBrandData, ICreateBrandRequest } from '@sellerspot/universal-types';
-import { Model } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IBrandDoc } from '../../../models/tenantDb/catalogueModels';
@@ -58,7 +58,7 @@ export class BrandService {
     // edit specific brand
     static editBrand = async (
         brandId: string,
-        brandDataToUpdate: IBrandData,
+        brandDataToUpdate: Omit<IBrandData, 'id'>,
     ): Promise<IBrandData> => {
         const Brand = BrandService.getModal();
         const updatedBrand = await Brand.findByIdAndUpdate(brandId, brandDataToUpdate, {

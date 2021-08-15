@@ -1,13 +1,14 @@
+import flat from 'flat';
+import { Model, PopulateOptions, UpdateQuery } from 'mongoose';
 import { BadRequestError } from '@sellerspot/universal-functions';
 import {
     DeepPartial,
     ERROR_CODE,
+    ICategoryData,
     ICreateProductRequest,
     IEditProductRequest,
     IProductData,
 } from '@sellerspot/universal-types';
-import flat from 'flat';
-import { Model, PopulateOptions, UpdateQuery } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { IBrandDoc, IProductDoc, IStockUnitDoc } from '../../../models/tenantDb/catalogueModels';
@@ -53,7 +54,7 @@ export class ProductService {
             barcode,
             brand: BrandService.convertToIBrandDataFormat(brand as IBrandDoc),
             description,
-            category: null,
+            category: category as ICategoryData,
             stockUnit: StockUnitService.convertToIStockUnitDataFormat(stockUnit as IStockUnitDoc),
         };
     };
