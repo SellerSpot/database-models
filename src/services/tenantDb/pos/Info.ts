@@ -36,6 +36,12 @@ export class InfoService {
                                     show: true,
                                     data: 'This is a computer generated bill',
                                 },
+                                taxInvoiceSection: {
+                                    show: true,
+                                    GSTNumber: true,
+                                    billingAddress: true,
+                                    shippingAddress: true,
+                                },
                                 purchaseInvoiceSection: {
                                     show: true,
                                     MRPColumn: true,

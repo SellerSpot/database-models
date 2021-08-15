@@ -23,6 +23,12 @@ export const BillSettingsSchema = new Schema(
                     show: Schema.Types.Boolean,
                     data: Schema.Types.String,
                 },
+                taxInvoiceSection: {
+                    show: Schema.Types.Boolean,
+                    GSTNumber: Schema.Types.Boolean,
+                    shippingAddress: Schema.Types.Boolean,
+                    billingAddress: Schema.Types.Boolean,
+                },
                 purchaseInvoiceSection: {
                     show: Schema.Types.Boolean,
                     discountColumn: Schema.Types.Boolean,

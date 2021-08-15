@@ -10,6 +10,7 @@ export const MONGOOSE_MODELS = {
     TENANT_DB: {
         // billing model needs to added once confirmed
         USER: 'USER',
+        CUSTOMER: 'CUSTOMER',
         // point of sale models
         POINT_OF_SALE: {
             // point of sale collections goes here
