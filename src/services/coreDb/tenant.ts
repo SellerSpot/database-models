@@ -1,12 +1,14 @@
 import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
-import { ERROR_CODE } from '@sellerspot/universal-types';
+import { ERROR_CODE, getPluginByName } from '@sellerspot/universal-types';
 import { Model } from 'mongoose';
+import { OutletService, StockUnitService } from '../../services/tenantDb/catalogue';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { coreDbModels, MONGOOSE_MODELS } from '../../models';
-import { IStoreCurrency } from '../../models/coreDb';
+import { IPluginDoc, IStoreCurrency } from '../../models/coreDb';
 import { ITenant, IInstalledPlugin } from '../../models/coreDb/Tenant';
 import { getDefaultStoreCurrencyId } from '../../seeds';
 import { getPluginById } from './plugin';
+import { getObjectIdAsString } from '../../utilities';
 
 type TTenantAttrs = Pick<ITenant, 'storeName' | 'primaryEmail'>;
 
@@ -71,6 +73,20 @@ export const deleteTenant = async (): Promise<ITenant> => {
 };
 
 /**
+ * Extra tasks to be performed when plugins are installed
+ */
+const pluginInstallationAddonTasks = (newPluginId: string) => {
+    // for catalogue plugin
+    const cataloguePluginId = getObjectIdAsString(getPluginByName('CATALOGUE'));
+    if (newPluginId == cataloguePluginId) {
+        // seeding main outlet
+        OutletService.seedMainOutlet();
+        // seeding default stock units
+        StockUnitService.seedDefaultStockUnits();
+    }
+};
+
+/**
  * add plugin
  * install plugin for the user
  */
@@ -90,16 +106,25 @@ export const addPlugin = async (
     // tenant validation
     const pluginsToInstall = [pluginId];
 
+    // running any addon tasks for current plugin
+    pluginInstallationAddonTasks(pluginId);
+
     // push any dependant plugins for the current plugin
-    pluginsToInstall.push(...(((plugin.dependantPlugins ?? []) as unknown) as string[]));
+    (plugin.dependantPlugins as IPluginDoc[]).map((dependantPlugin: IPluginDoc) => {
+        // running any addon tasks for dependant plugins
+        pluginInstallationAddonTasks(dependantPlugin._id);
+        pluginsToInstall.push(dependantPlugin._id);
+    });
 
     const Tenant = getTenantModel();
 
     // structing the array of plugin object to push all at one shot
     const structuredPluginsToInstall: { plugin: string }[] = pluginsToInstall.map(
-        (pluginToInstall) => ({
-            plugin: pluginToInstall,
-        }),
+        (pluginToInstall) => {
+            return {
+                plugin: pluginToInstall,
+            };
+        },
     );
     const tenant = await Tenant.findByIdAndUpdate(
         tenantId,
