@@ -28,6 +28,7 @@ export const MONGOOSE_MODELS = {
             OUTLET: 'CATALOGUE_OUTLET',
             BRAND: 'CATALOGUE_BRAND',
             TAXBRACKET: 'CATALOGUE_TAXBRACKET',
+            INFO: 'CATALOGUE_INFO',
         },
     },
 };

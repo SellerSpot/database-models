@@ -1,7 +1,7 @@
 import { AuthUtil, BadRequestError, logger } from '@sellerspot/universal-functions';
 import { ERROR_CODE, getPluginByName } from '@sellerspot/universal-types';
 import { Model } from 'mongoose';
-import { OutletService, StockUnitService } from '../../services/tenantDb/catalogue';
+import { InfoService, OutletService, StockUnitService } from '../../services/tenantDb/catalogue';
 import { DbConnectionManager } from '../../configs/DbConnectionManager';
 import { coreDbModels, MONGOOSE_MODELS } from '../../models';
 import { IPluginDoc, IStoreCurrency } from '../../models/coreDb';
@@ -75,14 +75,18 @@ export const deleteTenant = async (): Promise<ITenant> => {
 /**
  * Extra tasks to be performed when plugins are installed
  */
-const pluginInstallationAddonTasks = (newPluginId: string) => {
+const pluginInstallationAddonTasks = async (newPluginId: string) => {
     // for catalogue plugin
     const cataloguePluginId = getObjectIdAsString(getPluginByName('CATALOGUE'));
     if (newPluginId == cataloguePluginId) {
         // seeding main outlet
-        OutletService.seedMainOutlet();
+        const mainOutletDoc = await OutletService.seedMainOutlet();
         // seeding default stock units
         StockUnitService.seedDefaultStockUnits();
+        // setting main outlet as default outlet
+        InfoService.updateOutletSettings({
+            defaultOutlet: mainOutletDoc._id,
+        });
     }
 };
 
