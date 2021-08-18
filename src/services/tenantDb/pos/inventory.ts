@@ -194,8 +194,8 @@ export class InventoryService {
 
         // returns the result
         return {
-            inventory: [],
-            catalogue: [],
+            inventory,
+            catalogue,
         };
     };
 
