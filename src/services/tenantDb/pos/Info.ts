@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { merge } from 'lodash';
-import { IBillSettings } from '@sellerspot/universal-types';
+import { IBillA4Settings, IBillSettings } from '@sellerspot/universal-types';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
 import { EPOSInfoType, IInfoDoc } from '../../../models/tenantDb/pointOfSaleModels/info';
@@ -16,6 +16,20 @@ export class InfoService {
         )?.toJSON();
         let billSettings = info?.[EPOSInfoType.BILL_SETTINGS];
         if (!billSettings) {
+            const storeDetails = {
+                // fetch from tenant details
+                name: 'Developer Store',
+                address: 'No 69, Develper Store,\nChennai\n621211\n8489455901',
+            };
+            const remarkMessage: IBillA4Settings['remarkMessage'] = {
+                show: true,
+                data: 'Thanks for shopping with us!',
+            };
+            const termsAndConditions: IBillA4Settings['termsAndConditions'] = {
+                show: true,
+                data:
+                    '1. We declare that this invoice shows the actual price of the goods describe and that all particulars are true and correct\n',
+            };
             // seed billSettings for first time
             const info = (
                 await InfoModel.create({
@@ -24,10 +38,7 @@ export class InfoService {
                         defaultBill: 'BILL_A4',
                         bills: {
                             BILL_A4: {
-                                storeDetails: {
-                                    name: 'Developer Store',
-                                    address: 'No 69, Develper Store,\nChennai\n621211\n8489455901',
-                                },
+                                storeDetails,
                                 GSTNumber: {
                                     show: true,
                                     data: '1234235234234',
@@ -55,10 +66,7 @@ export class InfoService {
                                 taxSplitUpSection: {
                                     show: true,
                                 },
-                                remarkMessage: {
-                                    show: true,
-                                    data: 'This is a remark message',
-                                },
+                                remarkMessage,
                                 termsAndConditions: {
                                     show: true,
                                     data: '1. This is a terms and conditions\n2. It can be a list',
@@ -69,14 +77,8 @@ export class InfoService {
                                 },
                             },
                             BILL_90MM: {
-                                storeDetails: {
-                                    name: 'Developer Store',
-                                    address: 'No 69, Develper Store,\nChennai\n621211\n8489455901',
-                                },
-                                remarkMessage: {
-                                    show: true,
-                                    data: 'This is a remark message',
-                                },
+                                storeDetails,
+                                remarkMessage,
                             },
                         },
                     },

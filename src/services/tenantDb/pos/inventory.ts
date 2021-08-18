@@ -5,7 +5,9 @@ import {
     ICategoryData,
     IEditProductInInventoryRequest,
     IInventoryData,
+    IProductData,
     ISearchInventoryProductsResponse,
+    ISearchInventoryQueryParam,
 } from '@sellerspot/universal-types';
 import { differenceWith, groupBy, isUndefined } from 'lodash';
 import { Model, PopulateOptions, Types } from 'mongoose';
@@ -136,59 +138,65 @@ export class InventoryService {
     static searchInventoryProducts = async (
         query: string,
         outletId: string,
-    ): Promise<ISearchInventoryProductsResponse['data']> => {
+        lookup: ISearchInventoryQueryParam['lookup'] = 'all',
+    ): Promise<{
+        inventory?: IInventoryData[];
+        catalogue?: IProductData[];
+    }> => {
         const Inventory = InventoryService.getModal();
         const CatalogueProduct = ProductService.getModal();
+
+        let matchingCatalogueProducts: IProductDoc[] = [];
+        let matchingInventoryProducts: IInventoryDoc[] = [];
+
+        let [inventory, catalogue]: [IInventoryData[], IProductData[]] = [[], []];
+
+        const searchQueryRegExp = new RegExp(`^${query}`, 'i');
+
         // if product does not exists in catalogue, no use searching in inventory
-        const matchingCatalogueProducts = await CatalogueProduct.find({
-            name: new RegExp(`^${query}`, 'i'),
-        }).populate(ProductService.getProductDefaultPopulationList());
-        if (matchingCatalogueProducts.length) {
+        if ((<typeof lookup[]>['all', 'catalogue']).includes(lookup)) {
+            matchingCatalogueProducts = await CatalogueProduct.find({
+                name: searchQueryRegExp,
+            }).populate(ProductService.getProductDefaultPopulationList());
+        }
+
+        if ((<typeof lookup[]>['all', 'inventory']).includes(lookup)) {
             const inventoryFilterQuery = <{ [key: string]: string | RegExp }>{
-                'product.name': new RegExp(`^${query}`, 'i'),
+                'product.name': searchQueryRegExp,
             };
             if (outletId) {
                 inventoryFilterQuery['outlet'] = outletId;
             }
-            const matchingInventoryProducts = await Inventory.find(inventoryFilterQuery).populate(
+            matchingInventoryProducts = await Inventory.find(inventoryFilterQuery).populate(
                 InventoryService.getInventoryDefaultPopulationList(),
             );
-            // returning error if the product does not exist in inventory
-            if (!matchingInventoryProducts.length) {
-                return {
-                    products: {
-                        catalogueProducts: matchingCatalogueProducts.map((catalogueProduct) =>
-                            ProductService.convertToIProductDataFormat(catalogueProduct),
-                        ),
-                    },
-                    searchStatus: false,
-                    error: 'nonExistingInventory',
-                };
-            }
-            return {
-                products: {
-                    inventoryProducts: InventoryService.convertToIInventoryDataFormat(
-                        matchingInventoryProducts,
-                    ),
-                    catalogueProducts: differenceWith(
-                        matchingCatalogueProducts,
-                        matchingInventoryProducts,
-                        (catalogueProduct, inventoryProduct) => {
-                            return catalogueProduct.name === inventoryProduct.product.name;
-                        },
-                    ).map((catalogueProduct) => {
-                        return ProductService.convertToIProductDataFormat(catalogueProduct);
-                    }),
-                },
-                searchStatus: true,
-            };
-        } else {
-            return {
-                products: {},
-                searchStatus: false,
-                error: 'nonExistingProduct',
-            };
         }
+
+        // returning error if the product does not exist in inventory
+        if (lookup === 'inventory') {
+            inventory = InventoryService.convertToIInventoryDataFormat(matchingInventoryProducts);
+        } else if (lookup === 'catalogue') {
+            catalogue = matchingCatalogueProducts.map((catalogueProduct) =>
+                ProductService.convertToIProductDataFormat(catalogueProduct),
+            );
+        } else {
+            inventory = InventoryService.convertToIInventoryDataFormat(matchingInventoryProducts);
+            catalogue = differenceWith(
+                matchingCatalogueProducts,
+                matchingInventoryProducts,
+                (catalogueProduct, inventoryProduct) => {
+                    return catalogueProduct.name === inventoryProduct.product.name;
+                },
+            ).map((catalogueProduct) => {
+                return ProductService.convertToIProductDataFormat(catalogueProduct);
+            });
+        }
+
+        // returns the result
+        return {
+            inventory: [],
+            catalogue: [],
+        };
     };
 
     // to edit an already present product in inventory

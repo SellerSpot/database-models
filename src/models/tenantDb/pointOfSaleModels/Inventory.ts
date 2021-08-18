@@ -46,9 +46,6 @@ export const InventorySchema = new Schema(
 // unique composite index with outlet and product id
 InventorySchema.index({ outlet: 1, product: 1 }, { unique: true });
 
-// text index with tag (full text search)
-InventorySchema.index({ tags: 'text' });
-
 export interface IInventoryDoc extends Document {
     id: string;
     product: {
