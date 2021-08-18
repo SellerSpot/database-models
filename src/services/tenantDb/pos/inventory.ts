@@ -7,7 +7,7 @@ import {
     IInventoryData,
     ISearchInventoryProductsResponse,
 } from '@sellerspot/universal-types';
-import { differenceWith, groupBy } from 'lodash';
+import { differenceWith, groupBy, isUndefined } from 'lodash';
 import { Model, PopulateOptions, Types } from 'mongoose';
 import { DbConnectionManager } from '../../../configs/DbConnectionManager';
 import { MONGOOSE_MODELS } from '../../../models';
@@ -70,9 +70,15 @@ export class InventoryService {
                     mrp: productOutletInformation[0].mrp,
                     sellingPrice: productOutletInformation[0].sellingPrice,
                     stock: productOutletInformation[0].stock,
-                    taxBracket: TaxBracketService.convertToITaxGroupDataFormat(
-                        productOutletInformation[0].taxBracket as ITaxBracketDoc,
-                    ),
+                    taxBracket: !isUndefined(
+                        (productOutletInformation[0].taxBracket as ITaxBracketDoc).group,
+                    )
+                        ? TaxBracketService.convertToITaxGroupDataFormat(
+                              productOutletInformation[0].taxBracket as ITaxBracketDoc,
+                          )
+                        : TaxBracketService.convertToITaxBracketDataFormat(
+                              productOutletInformation[0].taxBracket as ITaxBracketDoc,
+                          ),
                 };
                 // on first iteration, push the static values of the product
                 if (index === 0) {
@@ -201,10 +207,9 @@ export class InventoryService {
         if (!productData) {
             throw new BadRequestError(ERROR_CODE.PRODUCT_NOT_FOUND, 'Product not found');
         }
-        // currOutletIndex because it returns 0, 1, 2 ... due to general type definition
         await Promise.all(
-            Object.keys(inventoryProps.outlets).map(async (currOutletIndex) => {
-                const outletConfiguration = inventoryProps.outlets[currOutletIndex];
+            inventoryProps.outlets.map(async (currOutlet) => {
+                const outletConfiguration = currOutlet;
                 const { outlet, taxBracket } = outletConfiguration;
                 // checking outlet data
                 const isOutletExist = await Outlet.exists({ _id: outlet });
@@ -232,8 +237,8 @@ export class InventoryService {
 
         // checks completed - now updating all required instances
         await Promise.all(
-            Object.keys(inventoryProps.outlets).map(async (currOutletIndex) => {
-                const outletConfiguration = inventoryProps.outlets[currOutletIndex];
+            inventoryProps.outlets.map(async (currOutlet) => {
+                const outletConfiguration = currOutlet;
                 const {
                     outlet,
                     isActive,
@@ -290,8 +295,8 @@ export class InventoryService {
         // iterating throught each outlet configuration
         await Promise.all(
             // currOutletIndex because it returns 0, 1, 2 ... due to general type definition
-            Object.keys(inventoryProps.outlets).map(async (currOutletIndex) => {
-                const outletConfiguration = inventoryProps.outlets[currOutletIndex];
+            inventoryProps.outlets.map(async (currOutlet) => {
+                const outletConfiguration = currOutlet;
                 const {
                     mrp,
                     sellingPrice,

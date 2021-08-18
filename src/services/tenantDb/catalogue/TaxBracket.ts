@@ -33,7 +33,7 @@ export class TaxBracketService {
 
     // to convert to ITaxBracketData without group populated
     static convertToITaxGroupDataFormat = (taxBracketDoc: ITaxBracketDoc): ITaxBracketData => {
-        const totalGroupRate = (<ITaxBracketData[]>taxBracketDoc.group).reduce(
+        const totalGroupRate = (<ITaxBracketData[]>taxBracketDoc?.group)?.reduce(
             (acc, curr) => acc + curr.rate,
             0,
         );
